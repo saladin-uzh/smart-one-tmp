@@ -1,0 +1,122 @@
+--- !com.amazonaws.mobilehub.v0.Project 
+features:
+  cloudlogic: !com.amazonaws.mobilehub.v0.CloudLogic 
+    components:
+      notificationsCRUD: !com.amazonaws.mobilehub.v0.API 
+        attributes:
+          name: notificationsCRUD
+          requires-signin: false
+          sdk-generation-stage-name: Development
+        paths:
+          /notifications: !com.amazonaws.mobilehub.v0.Function 
+            codeFilename: uploads/notifications-20171206213441.zip
+            description: 'Handler for calls to resource path : /notifications/{proxy+}'
+            enableCORS: true
+            environment: {}
+            handler: lambda.handler
+            hashcode: 5WViZl4DFsM+hzvTGbgCJFVuVkJKDZ0Z3WKSNo0fdZM=
+            memorySize: '128'
+            modified: '2017-12-07T05:35:47.541+0000'
+            name: notifications
+            runtime: nodejs6.10
+            timeout: '3'
+            version: poMA3YutE2o_hP6gl2GGME40bVQFR6Jz
+          '/notifications/{proxy+}': !com.amazonaws.mobilehub.v0.Function 
+            codeFilename: uploads/notifications-20171206213441.zip
+            description: 'Handler for calls to resource path : /notifications/{proxy+}'
+            enableCORS: true
+            environment: {}
+            handler: lambda.handler
+            hashcode: 5WViZl4DFsM+hzvTGbgCJFVuVkJKDZ0Z3WKSNo0fdZM=
+            memorySize: '128'
+            modified: '2017-12-07T05:35:47.541+0000'
+            name: notifications
+            runtime: nodejs6.10
+            timeout: '3'
+            version: LOWc6Y7jDkz1aBbI9fQ8g8Kdm03dsEHj
+      sampleCloudApi: !com.amazonaws.mobilehub.v0.API 
+        attributes:
+          name: sampleCloudApi
+          requires-signin: false
+          sdk-generation-stage-name: Development
+        paths:
+          /items: !com.amazonaws.mobilehub.v0.Function 
+            codeFilename: uploads/sampleLambda-20171206213441.zip
+            description: 'Handler for calls to resource path : /items/{proxy+}'
+            enableCORS: true
+            environment: {}
+            handler: lambda.handler
+            hashcode: p4GkwQeivjmbQ1dmLZMz+eTOXmR2XahMymenSCO/xxE=
+            memorySize: '128'
+            modified: '2017-12-07T05:35:46.822+0000'
+            name: sampleLambda
+            runtime: nodejs6.10
+            timeout: '3'
+            version: tQmGECAYxlLUFd_OZsTxWB56.Y5ifNIL
+          '/items/{proxy+}': !com.amazonaws.mobilehub.v0.Function 
+            codeFilename: uploads/sampleLambda-20171206213441.zip
+            description: 'Handler for calls to resource path : /items/{proxy+}'
+            enableCORS: true
+            environment: {}
+            handler: lambda.handler
+            hashcode: p4GkwQeivjmbQ1dmLZMz+eTOXmR2XahMymenSCO/xxE=
+            memorySize: '128'
+            modified: '2017-12-07T05:35:46.822+0000'
+            name: sampleLambda
+            runtime: nodejs6.10
+            timeout: '3'
+            version: rXuAt3iVy9UZ.hZ7xXfxNhA2S4ro2hXP
+  content-delivery: !com.amazonaws.mobilehub.v0.ContentDelivery 
+    attributes:
+      enabled: true
+      visibility: public-global
+    components:
+      release: !com.amazonaws.mobilehub.v0.Bucket {}
+  database: !com.amazonaws.mobilehub.v0.Database 
+    components:
+      database-nosql: !com.amazonaws.mobilehub.v0.NoSQLDatabase 
+        tables:
+          - !com.amazonaws.mobilehub.v0.NoSQLTable 
+            attributes:
+              buildings: M
+              community_id: S
+              created: 'N'
+              effective: 'N'
+              expires: 'N'
+              external_id: S
+              from: S
+              message: S
+              message_id: S
+              status: S
+              subject: S
+              type: S
+              units: M
+            hashKeyName: community_id
+            hashKeyType: S
+            rangeKeyName: from
+            rangeKeyType: S
+            tableName: ___DYNAMIC_PREFIX___-notifications
+            tablePrivacy: public
+  mobile-analytics: !com.amazonaws.mobilehub.v0.Pinpoint 
+    components:
+      analytics: !com.amazonaws.mobilehub.v0.PinpointAnalytics {}
+  sign-in: !com.amazonaws.mobilehub.v0.SignIn 
+    attributes:
+      enabled: true
+      optional-sign-in: true
+    components:
+      sign-in-user-pools: !com.amazonaws.mobilehub.v0.UserPoolsIdentityProvider 
+        attributes:
+          alias-attributes:
+            - email
+            - phone_number
+          mfa-configuration: 'ON'
+          name: userpool
+          password-policy: !com.amazonaws.mobilehub.ConvertibleMap 
+            min-length: '8'
+            require-lower-case: true
+            require-numbers: true
+            require-symbols: true
+            require-upper-case: true
+name: smartone-pm-app
+region: us-east-1

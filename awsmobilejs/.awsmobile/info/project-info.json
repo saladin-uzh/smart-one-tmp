@@ -1,0 +1,22 @@
+{
+	"ProjectName": "app",
+	"ProjectPath": "/Users/bryan/projects/cephalopod/app",
+	"SourceDir": "src",
+	"DistributionDir": "build",
+	"BuildCommand": "yarn build",
+	"StartCommand": "yarn run",
+	"InitializationTime": "2017-12-06-21-27-54",
+	"LastConfigurationTime": "2017-12-06-21-28-26",
+	"LastNPMInstallTime": "2018-02-25-15-26-29",
+	"FrontendLastBuildTime": "",
+	"LastPublishTime": "",
+	"BackendFormat": "yml",
+	"BackendLastBuildTime": "2018-02-25-15-24-03",
+	"BackendLastUpdateTime": "2018-02-25-15-20-39",
+	"BackendLastUpdateSuccessful": true,
+	"BackendProjectID": "2aaeb26e-9191-48e2-a046-a3c8c1e6f2c9",
+	"BackendProjectName": "smartone-pm-app",
+	"BackendProjectConsoleUrl": "https://console.aws.amazon.com/mobilehub/home#/2aaeb26e-9191-48e2-a046-a3c8c1e6f2c9/build",
+	"BackendProjectCreationTime": "2017-12-07T05:28:48.097Z",
+	"BackendProjectLastUpdatedTime": "2018-02-25T23:20:28.094Z"
+}

@@ -1,65 +1,65 @@
-import _ from 'lodash';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import _ from 'lodash'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {
   Card,
   CardActions,
   CardHeader,
-  CardMedia,
+  // CardMedia,
   CardTitle,
   CardText,
-} from 'material-ui/Card';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import AutoComplete from 'material-ui/AutoComplete';
-import TextField from 'material-ui/TextField';
-import Grid from 'material-ui-next/Grid';
-import Tooltip from 'material-ui-next/Tooltip';
-import Divider from 'material-ui/Divider';
-import Paper from 'material-ui/Paper';
-import DatePicker from 'material-ui/DatePicker';
-import Chip from 'material-ui/Chip';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import Dialog from 'material-ui/Dialog';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
-import IconButton from 'material-ui/IconButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import moment from 'moment';
+} from 'material-ui/Card'
+import RaisedButton from 'material-ui/RaisedButton'
+import FlatButton from 'material-ui/FlatButton'
+import AutoComplete from 'material-ui/AutoComplete'
+import TextField from 'material-ui/TextField'
+import Grid from 'material-ui-next/Grid'
+import Tooltip from 'material-ui-next/Tooltip'
+// import Divider from 'material-ui/Divider'
+// import Paper from 'material-ui/Paper'
+import DatePicker from 'material-ui/DatePicker'
+import Chip from 'material-ui/Chip'
+// import SelectField from 'material-ui/SelectField'
+// import MenuItem from 'material-ui/MenuItem'
+import Dialog from 'material-ui/Dialog'
+// import {
+//   Table,
+//   TableBody,
+//   TableHeader,
+//   TableHeaderColumn,
+//   TableRow,
+//   TableRowColumn,
+// } from 'material-ui/Table'
+import IconButton from 'material-ui/IconButton'
+import ContentAdd from 'material-ui/svg-icons/content/add'
+import moment from 'moment'
 import {
   CognitoState,
   Logout,
   Login,
   NewPasswordRequired,
   PasswordReset,
-  EmailVerification,
-  Confirm,
+  // EmailVerification,
+  // Confirm,
   changePassword,
-} from 'react-cognito';
+} from 'react-cognito'
 
-import logo from './logo.svg';
-import headerImage from './1920-header.png';
-import smart1 from './ONElogo_ns.png';
-import './App.css';
+// import logo from './logo.svg'
+import headerImage from './assets/1920-header.png'
+import smart1 from './assets/ONElogo_ns.png'
+import './styles/App.css'
 import {
   AutoCompleteSearch,
   MessageList,
-  SearchAutoSuggest,
+  // SearchAutoSuggest,
   ComposeMessageDialog,
   EntityCrudSummaryCard,
   EntityCrudSelectField,
-} from './foundation.js';
-import { rememberMeAction } from './login';
-import { Checkbox } from 'material-ui';
+} from './utils/foundation'
+import { rememberMeAction } from './store/login'
+// import { Checkbox } from 'material-ui'
 
 //const App = ({state, user, attrs}) => {
 //  switch (state)
@@ -84,9 +84,9 @@ import { Checkbox } from 'material-ui';
 // }
 
 class AppBase extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+  // constructor(props) {
+  //   super(props)
+  // }
 
   render() {
     switch (this.props.state) {
@@ -94,15 +94,15 @@ class AppBase extends React.Component {
       case CognitoState.LOGGING_IN:
       case CognitoState.LOGGED_IN:
         if (this.props.userLogin || this.props.rememberMe) {
-          if (this.props.changePass) return ChangePassword(this.props);
-          else return mainPage(this.props);
+          if (this.props.changePass) return ChangePassword(this.props)
+          else return mainPage(this.props)
         } else {
-          return loginPage(this.props);
+          return loginPage(this.props)
         }
       case CognitoState.NEW_PASSWORD_REQUIRED:
-        return newPasswordPage();
+        return newPasswordPage()
       default:
-        return loginPage(this.props);
+        return loginPage(this.props)
     }
   }
 }
@@ -114,24 +114,24 @@ const mapStateToProps = (state) => ({
   rememberMe: state.login.rememberMe,
   userLogin: state.login.userLogin,
   changePass: state.login.changePass,
-});
+})
 
-const App = connect(mapStateToProps, null)(AppBase);
+const App = connect(mapStateToProps, null)(AppBase)
 
 class LoginAndReset extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       showReset: false,
-    };
+    }
   }
 
   onShowReset = () => {
-    this.setState({ showReset: !this.state.showReset });
-  };
+    this.setState({ showReset: !this.state.showReset })
+  }
 
   render() {
-    const component = this;
+    const component = this
     const showComponent = component.state.showReset ? (
       <PasswordReset>
         <PasswordResetForm />
@@ -144,66 +144,66 @@ class LoginAndReset extends React.Component {
           dispatch={this.props.dispatch}
         />
       </Login>
-    );
-    return <div>{showComponent}</div>;
+    )
+    return <div>{showComponent}</div>
   }
 }
 
 const loginPage = (props) => {
-  if (props.userLogin) props.dispatch(rememberMeAction.setlogin);
+  if (props.userLogin) props.dispatch(rememberMeAction.setlogin)
   return (
     <LoginAndReset
       rememberMe={props.rememberMe}
       dispatch={props.dispatch}
     ></LoginAndReset>
-  );
-};
+  )
+}
 
 const newPasswordPage = () => {
   return (
     <NewPasswordRequired>
       <NewPasswordForm />
     </NewPasswordRequired>
-  );
-};
+  )
+}
 
 class LoginForm extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       email: props.email,
       username: props.username,
       password: '',
       rememberMe: props.rememberMe,
-    };
+    }
   }
 
   onSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    this.props.dispatch(rememberMeAction.set(this.state.rememberMe, true));
+    this.props.dispatch(rememberMeAction.set(this.state.rememberMe, true))
 
-    this.props.onSubmit(this.state.username, this.state.password);
-  };
+    this.props.onSubmit(this.state.username, this.state.password)
+  }
 
   changeUsername = (event) => {
-    this.setState({ username: event.target.value });
-  };
+    this.setState({ username: event.target.value })
+  }
 
   changePassword = (event) => {
-    this.setState({ password: event.target.value });
-  };
+    this.setState({ password: event.target.value })
+  }
 
   changeRememberMe = (event, checked) => {
-    this.setState({ rememberMe: checked });
-  };
+    this.setState({ rememberMe: checked })
+  }
 
   componentWillUnmount = () => {
-    this.props.clearCache();
-  };
+    this.props.clearCache()
+  }
 
   render = () => {
-    const msg = typeof this.props.error == 'string' ? this.props.error : '';
+    const msg = typeof this.props.error === 'string' ? this.props.error : ''
     return (
       <MuiThemeProvider>
         <form onSubmit={this.onSubmit}>
@@ -212,21 +212,21 @@ class LoginForm extends React.Component {
             <Grid item xs={8}>
               <h1>SmartONE Grandview</h1>
               <h2>Please log in</h2>
-              <TextField onChange={this.changeUsername} hintText='Username' />
+              <TextField onChange={this.changeUsername} hintText="Username" />
               <TextField
                 onChange={this.changePassword}
-                hintText='Password'
-                type='password'
+                hintText="Password"
+                type="password"
                 errorText={msg}
-                autoComplete='new-password'
+                autoComplete="new-password"
               />
               <div style={{ marginTop: '30px' }}>
-                <RaisedButton primary type='submit'>
+                <RaisedButton primary type="submit">
                   Log in
                 </RaisedButton>
               </div>
               <div style={{ marginTop: '30px' }}>
-                <a href='#' onClick={this.props.onShowReset}>
+                <a href="!#" onClick={this.props.onShowReset}>
                   Forgot your password?
                 </a>
               </div>
@@ -234,30 +234,30 @@ class LoginForm extends React.Component {
           </Grid>
         </form>
       </MuiThemeProvider>
-    );
-  };
+    )
+  }
 }
 
 class NewPasswordForm extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       error: props.error,
       password: '',
-    };
+    }
   }
 
   onSubmit = (event) => {
-    event.preventDefault();
-    this.props.onSubmit(this.state.password);
-  };
+    event.preventDefault()
+    this.props.onSubmit(this.state.password)
+  }
 
   changePassword = (event) => {
-    this.setState({ password: event.target.value });
-  };
+    this.setState({ password: event.target.value })
+  }
 
   render = () => {
-    const msg = typeof this.props.error == 'string' ? this.props.error : '';
+    const msg = typeof this.props.error === 'string' ? this.props.error : ''
     return (
       <MuiThemeProvider>
         <form onSubmit={this.onSubmit}>
@@ -268,13 +268,13 @@ class NewPasswordForm extends React.Component {
               <h2>Please select a new password for your account:</h2>
               <TextField
                 onChange={this.changePassword}
-                hintText='Password'
+                hintText="Password"
                 required
-                type='password'
+                type="password"
                 errorText={msg}
               />
               <div style={{ marginTop: '30px' }}>
-                <RaisedButton primary type='submit'>
+                <RaisedButton primary type="submit">
                   Submit
                 </RaisedButton>
               </div>
@@ -282,13 +282,13 @@ class NewPasswordForm extends React.Component {
           </Grid>
         </form>
       </MuiThemeProvider>
-    );
-  };
+    )
+  }
 }
 
 class PasswordResetForm extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       username: props.username,
       code: '',
@@ -297,11 +297,11 @@ class PasswordResetForm extends React.Component {
       error: '',
       codeSent: false,
       pwdReset: false,
-    };
+    }
   }
 
   onSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     this.props
       .setPassword(this.state.username, this.state.code, this.state.password)
       .then(() =>
@@ -316,11 +316,11 @@ class PasswordResetForm extends React.Component {
           message: '',
           error: err.message,
         })
-      );
-  };
+      )
+  }
 
   sendVerificationCode = (event) => {
-    event.preventDefault();
+    event.preventDefault()
     this.props
       .sendVerificationCode(this.state.username)
       .then(() =>
@@ -332,28 +332,28 @@ class PasswordResetForm extends React.Component {
       )
       .catch((err) => {
         if (err.code === 'UserNotFoundException') {
-          this.setState({ error: 'User not found' });
+          this.setState({ error: 'User not found' })
         } else {
-          this.setState({ error: err.message });
+          this.setState({ error: err.message })
         }
-      });
-  };
+      })
+  }
 
   changePassword = (event) => {
-    this.setState({ password: event.target.value });
-  };
+    this.setState({ password: event.target.value })
+  }
 
   changeCode = (event) => {
-    this.setState({ code: event.target.value });
-  };
+    this.setState({ code: event.target.value })
+  }
 
   changeUsername = (event) => {
-    this.setState({ username: event.target.value });
-  };
+    this.setState({ username: event.target.value })
+  }
 
   render = () => {
-    const msg = typeof this.props.error == 'string' ? this.props.error : '';
-    let verify = null;
+    const msg = typeof this.props.error === 'string' ? this.props.error : ''
+    let verify = null
     if (this.state.codeSent && !this.state.pwdReset) {
       verify = (
         <div>
@@ -364,32 +364,32 @@ class PasswordResetForm extends React.Component {
           </h4>
           <TextField
             onChange={this.changeCode}
-            hintText='Verification Code'
+            hintText="Verification Code"
             required
           />
           <TextField
             onChange={this.changePassword}
-            hintText='New Password'
+            hintText="New Password"
             required
-            type='password'
+            type="password"
             errorText={msg}
           />
           <div style={{ marginTop: '30px' }}>
-            <RaisedButton primary type='submit'>
+            <RaisedButton primary type="submit">
               Submit
             </RaisedButton>
           </div>
         </div>
-      );
+      )
     }
 
     if (this.state.codeSent && this.state.pwdReset) {
       verify = (
         <div>
           <h4>Your password has been reset.</h4>
-          <a href='/'>Login</a>
+          <a href="/">Login</a>
         </div>
-      );
+      )
     }
 
     if (!this.state.codeSent) {
@@ -401,7 +401,7 @@ class PasswordResetForm extends React.Component {
           </h4>
           <TextField
             onChange={this.changeUsername}
-            hintText='Username'
+            hintText="Username"
             required
             errorText={msg}
           />
@@ -411,7 +411,7 @@ class PasswordResetForm extends React.Component {
             </RaisedButton>
           </div>
         </div>
-      );
+      )
     }
     return (
       <MuiThemeProvider>
@@ -424,8 +424,8 @@ class PasswordResetForm extends React.Component {
           </Grid>
         </form>
       </MuiThemeProvider>
-    );
-  };
+    )
+  }
 }
 
 const ChangePassword = (props) => {
@@ -435,12 +435,12 @@ const ChangePassword = (props) => {
       dispatch={props.dispatch}
       rememberMe={props.rememberMe}
     ></ChangePasswordForm>
-  );
-};
+  )
+}
 
 class ChangePasswordForm extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       error: '',
       oldPassword: '',
@@ -448,41 +448,41 @@ class ChangePasswordForm extends React.Component {
       confirmPassword: '',
       loginDisplay: 'none',
       formDisplay: 'block',
-    };
+    }
   }
 
   onSubmit = (event) => {
     if (this.state.newPassword !== this.state.confirmPassword)
       this.setState({
         error: 'Your new password and confirmation password do not match.',
-      });
+      })
     else {
-      const user = this.props.user.user;
-      event.preventDefault();
+      const user = this.props.user.user
+      event.preventDefault()
       changePassword(user, this.state.oldPassword, this.state.newPassword).then(
         () => {
-          this.setState({ loginDisplay: 'block', formDisplay: 'none' });
+          this.setState({ loginDisplay: 'block', formDisplay: 'none' })
         },
         (error) => this.setState({ error })
-      );
+      )
     }
-  };
+  }
 
   onShowLogin = () => {
-    this.props.dispatch(rememberMeAction.set(this.props.rememberMe));
-  };
+    this.props.dispatch(rememberMeAction.set(this.props.rememberMe))
+  }
 
   changeOldPassword = (event) => {
-    this.setState({ oldPassword: event.target.value });
-  };
+    this.setState({ oldPassword: event.target.value })
+  }
 
   changeNewPassword = (event) => {
-    this.setState({ newPassword: event.target.value });
-  };
+    this.setState({ newPassword: event.target.value })
+  }
 
   changeConfirmPassword = (event) => {
-    this.setState({ confirmPassword: event.target.value });
-  };
+    this.setState({ confirmPassword: event.target.value })
+  }
 
   render = () => {
     return (
@@ -496,23 +496,23 @@ class ChangePasswordForm extends React.Component {
                 <h2>Change Password</h2>
                 <TextField
                   onChange={this.changeOldPassword}
-                  hintText='Old Password'
-                  type='password'
+                  hintText="Old Password"
+                  type="password"
                 />
                 <br />
                 <TextField
                   onChange={this.changeNewPassword}
-                  hintText='New Password'
-                  type='password'
+                  hintText="New Password"
+                  type="password"
                 />
                 <TextField
                   onChange={this.changeConfirmPassword}
-                  hintText='Confirmation Password'
-                  type='password'
+                  hintText="Confirmation Password"
+                  type="password"
                   errorText={this.state.error}
                 />
                 <div style={{ marginTop: '30px' }}>
-                  <RaisedButton primary type='submit'>
+                  <RaisedButton primary type="submit">
                     Change password
                   </RaisedButton>
                 </div>
@@ -522,28 +522,28 @@ class ChangePasswordForm extends React.Component {
         </div>
         <div style={{ marginTop: '30px', display: this.state.loginDisplay }}>
           Password changed successfully.{' '}
-          <a href='#' onClick={this.onShowLogin}>
+          <a href="!#" onClick={this.onShowLogin}>
             Login
           </a>{' '}
           with new password.
         </div>
       </MuiThemeProvider>
-    );
-  };
+    )
+  }
 }
 
 const mainPage = (props) => {
   return (
     <Router>
       <MuiThemeProvider>
-        <div className='App' style={{ width: '1900px' }}>
+        <div className="App" style={{ width: '1900px' }}>
           <SidebarNav dispatch={props.dispatch}></SidebarNav>
           <div>
-            <header className='App-header'>
+            <header className="App-header">
               <div
                 style={{ width: '1900px', height: '120px', overflow: 'hidden' }}
               >
-                <img src={headerImage} alt='logo' style={{ opacity: '0.33' }} />
+                <img src={headerImage} alt="logo" style={{ opacity: '0.33' }} />
               </div>
 
               <div
@@ -628,92 +628,92 @@ const mainPage = (props) => {
         </div>
       </MuiThemeProvider>
     </Router>
-  );
-};
+  )
+}
 
 const LogoutButton = ({ onClick }) => {
   return (
-    <i onClick={onClick} className='menu-item__icon material-icons'>
+    <i onClick={onClick} className="menu-item__icon material-icons">
       exit_to_app
     </i>
-  );
-};
+  )
+}
 
 class SidebarNav extends Component {
-  constructor(props) {
-    super(props);
-  }
+  // constructor(props) {
+  //   super(props)
+  // }
 
   onChangePass = () => {
-    this.props.dispatch(rememberMeAction.setChangePass(true));
-  };
+    this.props.dispatch(rememberMeAction.setChangePass(true))
+  }
   render() {
     return (
-      <div className='sidebar'>
-        <div className='menu-item menu-item--top menu-item--home'>
-          <Link className='menu-item__logo active' to='/'>
+      <div className="sidebar">
+        <div className="menu-item menu-item--top menu-item--home">
+          <Link className="menu-item__logo active" to="/">
             <img
               src={smart1}
               style={{ width: '40px', marginTop: '4px' }}
-              alt=''
+              alt=""
             />
           </Link>
         </div>
-        <div className='menu-item menu-item--top'>
-          <Tooltip id='directory-tooltip' title='Suite' placement='right'>
-            <Link className='menu-item__link' to='/directory'>
-              <i className='menu-item__icon material-icons'>home</i>
+        <div className="menu-item menu-item--top">
+          <Tooltip id="directory-tooltip" title="Suite" placement="right">
+            <Link className="menu-item__link" to="/directory">
+              <i className="menu-item__icon material-icons">home</i>
             </Link>
           </Tooltip>
         </div>
-        <div className='menu-item menu-item--top'>
+        <div className="menu-item menu-item--top">
           <Tooltip
-            id='notification-tooltip'
-            title='Notifications'
-            placement='right'
+            id="notification-tooltip"
+            title="Notifications"
+            placement="right"
           >
-            <Link to='/notifications' className='menu-item__link'>
-              <i className='menu-item__icon material-icons'>mail_outline</i>
+            <Link to="/notifications" className="menu-item__link">
+              <i className="menu-item__icon material-icons">mail_outline</i>
             </Link>
           </Tooltip>
         </div>
-        <div className='menu-item menu-item--top'>
-          <Tooltip id='ownership-tooltip' title='Ownership' placement='right'>
-            <Link to='/ownership' className='menu-item__link'>
-              <i className='menu-item__icon material-icons'>contacts</i>
+        <div className="menu-item menu-item--top">
+          <Tooltip id="ownership-tooltip" title="Ownership" placement="right">
+            <Link to="/ownership" className="menu-item__link">
+              <i className="menu-item__icon material-icons">contacts</i>
             </Link>
           </Tooltip>
         </div>
-        <div className='menu-item menu-item--bottom-3'>
+        <div className="menu-item menu-item--bottom-3">
           <Tooltip
-            id='community-tooltip'
-            title='Building Configuration'
-            placement='right'
+            id="community-tooltip"
+            title="Building Configuration"
+            placement="right"
           >
-            <Link className='menu-item__link' to='/community'>
-              <i className='menu-item__icon material-icons'>business</i>
+            <Link className="menu-item__link" to="/community">
+              <i className="menu-item__icon material-icons">business</i>
             </Link>
           </Tooltip>
         </div>
-        <div className='menu-item menu-item--bottom-2'>
+        <div className="menu-item menu-item--bottom-2">
           <Tooltip
-            id='changepassword-tooltip'
-            title='Change Password'
-            placement='right'
+            id="changepassword-tooltip"
+            title="Change Password"
+            placement="right"
           >
-            <Link className='menu-item__link' to='/'>
+            <Link className="menu-item__link" to="/">
               <i
                 onClick={this.onChangePass}
-                className='menu-item__icon material-icons'
+                className="menu-item__icon material-icons"
               >
                 vpn_key
               </i>
             </Link>
           </Tooltip>
         </div>
-        <div className='menu-item menu-item--bottom-1'>
-          <Tooltip id='logout-tooltip' title='Log out' placement='right'>
-            <Link className='menu-item__link' to='/'>
+        <div className="menu-item menu-item--bottom-1">
+          <Tooltip id="logout-tooltip" title="Log out" placement="right">
+            <Link className="menu-item__link" to="/">
               <Logout>
                 <LogoutButton />
               </Logout>
@@ -721,56 +721,57 @@ class SidebarNav extends Component {
           </Tooltip>
         </div>
       </div>
-    );
+    )
   }
 }
 
 class Notifications extends Component {
   constructor(props) {
-    super(props);
-    this.getNotifications = this.getNotifications.bind(this);
-    this.handleMessageSend = this.handleMessageSend.bind(this);
-    this.handleMessageDelete = this.handleMessageDelete.bind(this);
-    this.getUnits = this.getUnits.bind(this);
+    super(props)
+    this.getNotifications = this.getNotifications.bind(this)
+    this.handleMessageSend = this.handleMessageSend.bind(this)
+    this.handleMessageDelete = this.handleMessageDelete.bind(this)
+    this.getUnits = this.getUnits.bind(this)
     this.state = {
       messages: [],
-    };
-    this.getNotifications();
-    this.getUnits();
+    }
+    this.getNotifications()
+    this.getUnits()
   }
 
   getUnits() {
-    const component = this;
+    const component = this
     global.internalApi
       .getBuildingUnits(global.buildingId)
       .then(function (data) {
-        const units = data;
-        let options = { 'All suites': _.map(units, 'suite') };
+        const units = data
+        let options = { 'All suites': _.map(units, 'suite') }
         const suiteOptions = _.fromPairs(
           _.map(_.sortBy(units, ['suite']), (unit) => {
-            return [`Suite ${unit.suite}`, [unit.suite]];
+            return [`Suite ${unit.suite}`, [unit.suite]]
           })
-        );
+        )
         const tags = _.reduce(
           _.flatMap(units, (unit) => {
             return _.map(unit.tags, (tag) => {
-              return { tag: tag.tag, unit: unit.suite };
-            });
+              return { tag: tag.tag, unit: unit.suite }
+            })
           }),
           (result, tag) => {
-            (result[tag.tag] || (result[tag.tag] = [])).push(tag.unit);
-            return result;
+            if (result[tag.tag] || (result[tag.tag] = []))
+              result[tag.tag].push(tag.unit)
+            return result
           },
           {}
-        );
-        _.merge(options, suiteOptions, tags);
-        console.log('options', options);
-        component.setState({ addressOptions: options });
-      });
+        )
+        _.merge(options, suiteOptions, tags)
+        console.log('options', options)
+        component.setState({ addressOptions: options })
+      })
   }
 
   getNotifications() {
-    const component = this;
+    const component = this
     global.externalApi
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
@@ -778,9 +779,9 @@ class Notifications extends Component {
           //console.log('message', msg)
           const allAddressees = _.uniq(
             _.map(msg.m_house, (addr) => {
-              return addr.House.split('-')[1];
+              return addr.House.split('-')[1]
             })
-          );
+          )
           const displayAddressees =
             msg.m_house.length > 4
               ? `${allAddressees[0]}, ${allAddressees[1]}, ${
@@ -788,10 +789,10 @@ class Notifications extends Component {
                 } and ${allAddressees.length - 3} others`
               : _.sum(
                   _.map(allAddressees, (a) => {
-                    return a + ' ';
+                    return a + ' '
                   })
-                );
-          var parser = new DOMParser();
+                )
+          var parser = new DOMParser()
           return {
             id: msg.m_no,
             subject: parser.parseFromString(
@@ -807,29 +808,29 @@ class Notifications extends Component {
             sentTo: displayAddressees,
             sendDate: moment(msg.m_wdate, 'YYYYMMDDHHmm').unix(),
             expires: moment(msg.m_edate, 'YYYYMMDDHHmm').unix(),
-          };
-        });
-        component.setState({ messages: notifications });
-      });
+          }
+        })
+        component.setState({ messages: notifications })
+      })
   }
 
   handleMessageSend(buildingId, toAddr, msgSubject, msgMessage) {
-    console.log('sending message to ', toAddr);
+    console.log('sending message to ', toAddr)
     global.externalApi
       .sendNotification(buildingId, toAddr, msgSubject, msgMessage)
       .then(() => {
-        this.getNotifications();
-      });
+        this.getNotifications()
+      })
   }
 
   handleMessageDelete(message) {
     global.externalApi.deleteNotification(message.id).then(() => {
-      this.getNotifications();
-    });
+      this.getNotifications()
+    })
   }
 
   showComposeDialog() {
-    this.setState({ showCompose: true });
+    this.setState({ showCompose: true })
   }
 
   //componentDidMount() {
@@ -858,36 +859,36 @@ class Notifications extends Component {
           addressOptions={this.state.addressOptions}
         />
       </div>
-    );
+    )
   }
 }
 
 class Directory extends Component {
   constructor(props) {
-    super(props);
-    this.getUnitByNumber = this.getUnitByNumber.bind(this);
-    this.getunitId = this.getunitId.bind(this);
-    this.handleOccupantSave = this.handleOccupantSave.bind(this);
-    this.handleOccupantDelete = this.handleOccupantDelete.bind(this);
-    this.handleDirectorySave = this.handleDirectorySave.bind(this);
-    this.handleDirectoryAdd = this.handleDirectoryAdd.bind(this);
-    this.handleDirectoryDelete = this.handleDirectoryDelete.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.getUnits = this.getUnits.bind(this);
-    this.getunitId = this.getunitId.bind(this);
-    this.getNotifications = this.getNotifications.bind(this);
-    this.getDirectoryEntity = this.getDirectoryEntity.bind(this);
+    super(props)
+    this.getUnitByNumber = this.getUnitByNumber.bind(this)
+    this.getunitId = this.getunitId.bind(this)
+    this.handleOccupantSave = this.handleOccupantSave.bind(this)
+    this.handleOccupantDelete = this.handleOccupantDelete.bind(this)
+    this.handleDirectorySave = this.handleDirectorySave.bind(this)
+    this.handleDirectoryAdd = this.handleDirectoryAdd.bind(this)
+    this.handleDirectoryDelete = this.handleDirectoryDelete.bind(this)
+    this.handleSearchChange = this.handleSearchChange.bind(this)
+    this.getUnits = this.getUnits.bind(this)
+    this.getunitId = this.getunitId.bind(this)
+    this.getNotifications = this.getNotifications.bind(this)
+    this.getDirectoryEntity = this.getDirectoryEntity.bind(this)
     //this.getTagList = this.getTagList.bind(this);
-    this.handleAddTag = this.handleAddTag.bind(this);
-    this.handleNewTagValueChange = this.handleNewTagValueChange.bind(this);
-    this.handleTagSave = this.handleTagSave.bind(this);
-    this.handleRemoveTag = this.handleRemoveTag.bind(this);
-    this.handleFilterTag = this.handleFilterTag.bind(this);
-    this.handleMessageDelete = this.handleMessageDelete.bind(this);
-    this.handleOpenAlert = this.handleOpenAlert.bind(this);
-    this.handleCloseAlert = this.handleCloseAlert.bind(this);
-    this.isValueName = this.isValueName.bind(this);
-    this.formateName = this.formateName.bind(this);
+    this.handleAddTag = this.handleAddTag.bind(this)
+    this.handleNewTagValueChange = this.handleNewTagValueChange.bind(this)
+    this.handleTagSave = this.handleTagSave.bind(this)
+    this.handleRemoveTag = this.handleRemoveTag.bind(this)
+    this.handleFilterTag = this.handleFilterTag.bind(this)
+    this.handleMessageDelete = this.handleMessageDelete.bind(this)
+    this.handleOpenAlert = this.handleOpenAlert.bind(this)
+    this.handleCloseAlert = this.handleCloseAlert.bind(this)
+    this.isValueName = this.isValueName.bind(this)
+    this.formateName = this.formateName.bind(this)
     this.state = {
       unit: {
         id: 1,
@@ -906,16 +907,16 @@ class Directory extends Component {
       tagList: [],
       openAlert: false,
       AlertMessage: '',
-    };
-    this.getUnits(global.buildingId);
+    }
+    this.getUnits(global.buildingId)
   }
 
   handleOpenAlert(alertMessage) {
-    this.setState({ openAlert: true, AlertMessage: alertMessage });
+    this.setState({ openAlert: true, AlertMessage: alertMessage })
   }
 
   handleCloseAlert() {
-    this.setState({ openAlert: false });
+    this.setState({ openAlert: false })
   }
 
   componentWillReceiveProps() {
@@ -923,31 +924,31 @@ class Directory extends Component {
   }
 
   getTagList(buildingId) {
-    const component = this;
+    const component = this
     global.internalApi
       .getExistBuildingTags(buildingId)
       .then(function (data) {
-        const tags = data;
-        component.setState({ buildingTagList: tags });
+        const tags = data
+        component.setState({ buildingTagList: tags })
       })
       .then(function () {
-        let list = component.state.buildingTagList;
+        let list = component.state.buildingTagList
         if (component.state.unit) {
           list = component.state.buildingTagList.filter(
             (tag) =>
               !component.state.unit.tags.some(function (val) {
-                return val.tag === tag;
+                return val.tag === tag
               })
-          );
+          )
         }
         component.setState({
           tagList: list,
-        });
-      });
+        })
+      })
   }
 
   getUnits(buildingId) {
-    const component = this;
+    const component = this
     global.internalApi
       .getBuildingUnits(buildingId)
       .then(function (data) {
@@ -955,62 +956,62 @@ class Directory extends Component {
           return {
             id: o.id,
             number: o.commaxId,
-          };
-        });
-        component.setState({ units: units });
+          }
+        })
+        component.setState({ units: units })
         const options = _.fromPairs(
           _.map(_.sortBy(units, ['number']), (unit) => {
-            return [`Suite ${unit.number}`, [unit.number]];
+            return [`Suite ${unit.number}`, [unit.number]]
           })
-        );
-        console.log('options', options);
-        component.setState({ addressOptions: options });
+        )
+        console.log('options', options)
+        component.setState({ addressOptions: options })
       })
       .then(function () {
         //component.getUnitByNumber(global.firstUnit);
         //component.getNotifications();
-      });
+      })
   }
 
   getunitId(number) {
     let o = _.filter(this.state.units, (o) => {
-      return o.number == number;
-    });
-    let v = null;
+      return o.number === number
+    })
+    let v = null
     if (o.length > 0) {
-      v = o[0].id;
+      v = o[0].id
     }
-    return v;
+    return v
   }
 
   getunitNumber(id) {
     let o = _.filter(this.state.units, (o) => {
-      return o.id == id;
-    });
-    let v = null;
+      return o.id === id
+    })
+    let v = null
     if (o.length > 0) {
-      v = o[0].number;
+      v = o[0].number
     }
-    return v;
+    return v
   }
 
   getUnitByNumber(number) {
-    this.getUnitById(this.getunitId(number));
+    this.getUnitById(this.getunitId(number))
   }
 
   getUnitById(unitId) {
-    const component = this;
-    const number = component.getunitNumber(unitId);
-    let unit = {};
-    let directoryEntries = [];
-    let emptyOccupant = {
-      id: 0,
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      unitId: unit.id,
-    };
+    const component = this
+    const number = component.getunitNumber(unitId)
+    let unit = {}
+    let directoryEntries = []
+    // let emptyOccupant = {
+    //   id: 0,
+    //   firstName: '',
+    //   lastName: '',
+    //   email: '',
+    //   phone: '',
+    //   unitId: unit.id,
+    // }
     global.internalApi
       .getUnit(unitId)
       .then(function (data) {
@@ -1022,15 +1023,15 @@ class Directory extends Component {
             email: o.email,
             phone: o.phone,
             unitId: o.propertyId,
-          };
-        });
+          }
+        })
         unit = {
           id: data.id,
           number: data.suite,
           tags: data.tags,
           occupants: occs,
           directoryEntries: [],
-        };
+        }
       })
       .then(function () {
         global.externalApi
@@ -1043,10 +1044,10 @@ class Directory extends Component {
                   name: o.username,
                   buildingId: d.building,
                   unitId: d.household,
-                });
-              });
-            });
-            unit.directoryEntries = directoryEntries;
+                })
+              })
+            })
+            unit.directoryEntries = directoryEntries
             component.setState({
               unit: unit,
               emptyOccupant: {
@@ -1063,14 +1064,14 @@ class Directory extends Component {
                 buildingId: global.buildingNum,
                 unitId: number,
               },
-            });
-          });
-      });
+            })
+          })
+      })
   }
 
   getNotifications(unitNum) {
-    const component = this;
-    if (unitNum == undefined) unitNum = component.state.unit.number;
+    const component = this
+    if (unitNum === undefined) unitNum = component.state.unit.number
     global.externalApi
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
@@ -1078,9 +1079,9 @@ class Directory extends Component {
           //console.log('message', msg)
           const allAddressees = _.uniq(
             _.map(msg.m_house, (addr) => {
-              return addr.House.split('-')[1];
+              return addr.House.split('-')[1]
             })
-          );
+          )
           const displayAddressees =
             msg.m_house.length > 4
               ? `${allAddressees[0]}, ${allAddressees[1]}, ${
@@ -1088,10 +1089,10 @@ class Directory extends Component {
                 } and ${allAddressees.length - 3} others`
               : _.sum(
                   _.map(allAddressees, (a) => {
-                    return a + ' ';
+                    return a + ' '
                   })
-                );
-          var parser = new DOMParser();
+                )
+          var parser = new DOMParser()
           return {
             id: msg.m_no,
             subject: parser.parseFromString(
@@ -1107,13 +1108,13 @@ class Directory extends Component {
             sentTo: displayAddressees,
             sendDate: moment(msg.m_wdate, 'YYYYMMDDHHmm').unix(),
             expires: moment(msg.m_edate, 'YYYYMMDDHHmm').unix(),
-          };
-        });
+          }
+        })
         const unitNotifications = _.filter(notifications, (msg) => {
-          return msg.allSentTo.includes(unitNum);
-        });
-        component.setState({ messages: unitNotifications });
-      });
+          return msg.allSentTo.includes(unitNum)
+        })
+        component.setState({ messages: unitNotifications })
+      })
     //const component = this;
     //global.externalApi.getNotifications().then((data)=> {
     //  const notifications = _.map(data, (msg) => {
@@ -1130,8 +1131,8 @@ class Directory extends Component {
   }
 
   getDirectoryEntity(buildingId, unitId) {
-    const component = this;
-    let directoryEntries = [];
+    const component = this
+    let directoryEntries = []
     global.externalApi
       .getDirectoryEntry(buildingId, unitId)
       .then(function (data) {
@@ -1142,47 +1143,47 @@ class Directory extends Component {
               name: o.username,
               buildingId: d.building,
               unitId: d.household,
-            });
-          });
-        });
-        let unit = component.state.unit;
-        unit.directoryEntries = directoryEntries;
+            })
+          })
+        })
+        let unit = component.state.unit
+        unit.directoryEntries = directoryEntries
         component.setState({
           unit: unit,
-        });
-      });
+        })
+      })
   }
 
   handleSearchChange(unit) {
-    console.log(`loading unit ${unit}`);
-    this.getUnitByNumber(unit);
-    this.getNotifications(unit[0]);
-    this.setState({ showSuite: true });
+    console.log(`loading unit ${unit}`)
+    this.getUnitByNumber(unit)
+    this.getNotifications(unit[0])
+    this.setState({ showSuite: true })
   }
 
   handleOccupantSave(entity) {
-    const component = this;
+    const component = this
     if (entity.id > 0) {
-      global.internalApi.updateOccupant(entity);
+      global.internalApi.updateOccupant(entity)
     } else {
-      global.internalApi.addOccupant(entity).then(function (data) {
-        component.getUnitById(entity.unitId);
-      });
+      global.internalApi.addOccupant(entity).then(function () {
+        component.getUnitById(entity.unitId)
+      })
     }
-    console.log('occupant updated: ', entity);
+    console.log('occupant updated: ', entity)
   }
 
   handleOccupantDelete(entities) {
-    const component = this;
+    const component = this
     _.each(entities, (entity) => {
-      global.internalApi.deleteOccupants(entity.id).then(function (data) {
-        component.getUnitByNumber(component.state.unit.number);
-      });
-    });
+      global.internalApi.deleteOccupants(entity.id).then(function () {
+        component.getUnitByNumber(component.state.unit.number)
+      })
+    })
   }
 
   formateName(name) {
-    return name.trim().replace(/\s\s+/g, ' ');
+    return name.trim().replace(/\s\s+/g, ' ')
   }
 
   isValueName(name) {
@@ -1190,7 +1191,7 @@ class Directory extends Component {
       return {
         valid: false,
         error: 'The # symbol cannot appear in the lobby directory.',
-      };
+      }
     }
     if (name.length > global.maxNameLength) {
       return {
@@ -1199,12 +1200,12 @@ class Directory extends Component {
           'The Maximum Length for Name is ' +
           global.maxNameLength +
           ' Characters.',
-      };
+      }
     }
-    let names = name.split(' ');
+    let names = name.split(' ')
     let tooLong = names.some(function (val) {
-      return val.length > global.maxWordLength;
-    });
+      return val.length > global.maxWordLength
+    })
     if (tooLong) {
       return {
         valid: false,
@@ -1212,160 +1213,157 @@ class Directory extends Component {
           'The Maximum Length for a First or Last Name is ' +
           global.maxWordLength +
           ' Characters.',
-      };
+      }
     }
-    return { valid: true, error: '' };
+    return { valid: true, error: '' }
   }
 
   handleDirectorySave(entity) {
-    const component = this;
-    let buildingId = entity.buildingId;
-    let unitId = entity.unitId;
-    entity.name = this.formateName(entity.name);
-    var result = this.isValueName(entity.name);
+    const component = this
+    let buildingId = entity.buildingId
+    let unitId = entity.unitId
+    entity.name = this.formateName(entity.name)
+    var result = this.isValueName(entity.name)
     if (result.valid) {
       let name = JSON.stringify([
         { hu_no: entity.id, username: entity.name },
-      ]).replace(/'/g, "''");
+      ]).replace(/'/g, "''")
       global.externalApi
         .setDirectoryEntry(buildingId, unitId, name)
-        .then(function (data) {
-          component.getDirectoryEntity(buildingId, unitId);
-        });
+        .then(function () {
+          component.getDirectoryEntity(buildingId, unitId)
+        })
     } else {
-      component.getDirectoryEntity(buildingId, unitId);
+      component.getDirectoryEntity(buildingId, unitId)
     }
-    return result.error;
+    return result.error
   }
 
   handleDirectoryAdd(entity) {
-    const component = this;
-    let buildingId = entity.buildingId;
-    let unitId = entity.unitId;
-    entity.name = this.formateName(entity.name);
-    var result = this.isValueName(entity.name);
+    const component = this
+    let buildingId = entity.buildingId
+    let unitId = entity.unitId
+    entity.name = this.formateName(entity.name)
+    var result = this.isValueName(entity.name)
     if (result.valid) {
-      let name = JSON.stringify([{ username: entity.name }]).replace(
-        /'/g,
-        "''"
-      );
+      let name = JSON.stringify([{ username: entity.name }]).replace(/'/g, "''")
       global.externalApi
         .addDirectoryEntry(buildingId, unitId, name)
-        .then(function (data) {
-          component.getDirectoryEntity(buildingId, unitId);
-        });
+        .then(function () {
+          component.getDirectoryEntity(buildingId, unitId)
+        })
     } else {
-      component.getDirectoryEntity(buildingId, unitId);
+      component.getDirectoryEntity(buildingId, unitId)
     }
-    return result.error;
+    return result.error
   }
 
   handleDirectoryDelete(entities) {
-    const component = this;
-    var name = [];
-    var buildingId = '';
-    var unitId = '';
+    const component = this
+    var name = []
+    var buildingId = ''
+    var unitId = ''
     _.each(entities, (entity) => {
-      buildingId = entity.buildingId;
-      unitId = entity.unitId;
-      name.push({ hu_no: entity.id });
-    });
-    let names = JSON.stringify(name).replace(/'/g, "''");
-    console.log('deleting ', buildingId, unitId, name);
+      buildingId = entity.buildingId
+      unitId = entity.unitId
+      name.push({ hu_no: entity.id })
+    })
+    let names = JSON.stringify(name).replace(/'/g, "''")
+    console.log('deleting ', buildingId, unitId, name)
     global.externalApi
       .deleteDirectoryEntry(buildingId, unitId, names)
-      .then(function (data) {
-        component.getDirectoryEntity(buildingId, unitId);
-      });
+      .then(function () {
+        component.getDirectoryEntity(buildingId, unitId)
+      })
   }
 
   handleAddTag() {
-    const component = this;
+    const component = this
     global.internalApi
       .getExistBuildingTags(global.buildingId)
       .then(function (data) {
-        let tags = data;
+        let tags = data
         if (component.state.unit) {
           tags = data.filter(
             (tag) =>
               !component.state.unit.tags.some(function (val) {
-                return val.tag === tag;
+                return val.tag === tag
               })
-          );
+          )
         }
         component.setState({
           showNewTag: !component.state.showNewTag,
           newTagValue: '',
           tagList: tags,
-        });
-      });
+        })
+      })
   }
 
   handleNewTagValueChange(value) {
-    this.setState({ newTagValue: _.capitalize(value) });
+    this.setState({ newTagValue: _.capitalize(value) })
   }
   handleFilterTag(searchText, key) {
     return (
       searchText !== '' &&
       key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
-    );
+    )
   }
 
   handleTagSave() {
-    const component = this;
+    const component = this
     let exist = component.state.unit.tags.some(function (val) {
-      return val.tag === component.state.newTagValue;
-    });
+      return val.tag === component.state.newTagValue
+    })
     if (exist) {
-      this.handleOpenAlert('The Same Tag Cannot be Added Twice.');
-      return;
+      this.handleOpenAlert('The Same Tag Cannot be Added Twice.')
+      return
     }
     const newTag = {
       tag: this.state.newTagValue,
       PropertyId: this.state.unit.id,
-    };
+    }
     global.internalApi.saveTag(newTag).then(function (data) {
       const addedTag = {
         id: data.id,
         tag: data.tag,
         PropertyId: data.PropertyId,
-      };
+      }
       component.setState({
         unit: _.assign(component.state.unit, {
           tags: component.state.unit.tags.concat(addedTag),
         }),
         showNewTag: false,
-      });
-    });
+      })
+    })
   }
 
   handleRemoveTag(tag) {
-    const component = this;
+    const component = this
     global.internalApi.deleteTag(tag).then(function () {
       component.setState({
         unit: _.assign(component.state.unit, {
           tags: _.without(component.state.unit.tags, tag),
         }),
         showNewTag: false,
-      });
-    });
+      })
+    })
   }
 
   handleMessageDelete(message) {
     global.externalApi.deleteNotification(message.id).then(() => {
-      this.getNotifications(this.state.unit.number);
-    });
+      this.getNotifications(this.state.unit.number)
+    })
   }
 
   render() {
     const actions = [
       <FlatButton
-        key='ok'
-        label='OK'
+        key="ok"
+        label="OK"
         primary={true}
         onClick={this.handleCloseAlert}
       />,
-    ];
+    ]
     return (
       <div>
         <AutoCompleteSearch
@@ -1378,7 +1376,7 @@ class Directory extends Component {
             this.state.addressOptions
           }
           handleAddressUpdate={this.handleSearchChange}
-          hintText='Suite number'
+          hintText="Suite number"
         />
         <div style={{ display: this.state.showSuite ? 'none' : 'block' }}>
           <span
@@ -1408,14 +1406,14 @@ class Directory extends Component {
                 return (
                   <Chip
                     onRequestDelete={() => {
-                      this.handleRemoveTag(tag);
+                      this.handleRemoveTag(tag)
                     }}
                     style={{ margin: 4 }}
                   >
                     {' '}
                     {tag.tag}{' '}
                   </Chip>
-                );
+                )
               })}
               <IconButton
                 iconStyle={{ width: 24, height: 24 }}
@@ -1435,11 +1433,11 @@ class Directory extends Component {
                 <AutoComplete
                   style={{ height: '36px', marginLeft: '10px' }}
                   listStyle={{ maxHeight: 200, overflow: 'auto' }}
-                  hintText='Tag'
+                  hintText="Tag"
                   searchText={this.state.newTagValue}
                   dataSource={this.state.tagList}
-                  onUpdateInput={(searchText, dataSource, params) => {
-                    this.handleNewTagValueChange(searchText);
+                  onUpdateInput={(searchText /**, dataSource, params*/) => {
+                    this.handleNewTagValueChange(searchText)
                   }}
                   filter={this.handleFilterTag}
                 />
@@ -1449,11 +1447,11 @@ class Directory extends Component {
                   onChange={(event, value)=>{this.handleNewTagValueChange(value)}}>
                 </TextField>*/}
                 <FlatButton
-                  label='Save'
+                  label="Save"
                   primary={true}
                   style={{ marginLeft: '10px' }}
                   onClick={() => {
-                    this.handleTagSave();
+                    this.handleTagSave()
                   }}
                 ></FlatButton>
               </div>
@@ -1475,8 +1473,8 @@ class Directory extends Component {
             <Grid container xs={5}>
               <Grid item xs={12}>
                 <EntityCrudSummaryCard
-                  searchHintText='First / last name'
-                  entityName='Occupants'
+                  searchHintText="First / last name"
+                  entityName="Occupants"
                   entityProperties={[
                     { label: 'first name', name: 'firstName' },
                     { label: 'last name', name: 'lastName' },
@@ -1497,8 +1495,8 @@ class Directory extends Component {
               </Grid>
               <Grid item xs={12}>
                 <EntityCrudSummaryCard
-                  searchHintText='Name'
-                  entityName='Directory Entries'
+                  searchHintText="Name"
+                  entityName="Directory Entries"
                   entityProperties={[{ label: 'name', name: 'name' }]}
                   entitySchema={[{ label: 'name', name: 'name', type: 'text' }]}
                   entities={this.state.unit.directoryEntries}
@@ -1516,7 +1514,7 @@ class Directory extends Component {
             <Grid container xs={7}>
               <Grid item xs={12}>
                 <Card style={{ textAlign: 'left', margin: '20px' }}>
-                  <CardTitle title='Notifications' />
+                  <CardTitle title="Notifications" />
                   <CardText>
                     <MessageList
                       onDelete={this.handleMessageDelete}
@@ -1540,26 +1538,26 @@ class Directory extends Component {
           {/*</Paper>*/}
         </div>
       </div>
-    );
+    )
   }
 }
 
 class Ownership extends Component {
   constructor(props) {
-    super(props);
-    this.getOwnershipTypes = this.getOwnershipTypes.bind(this);
-    this.getOwnershipPersonTypes = this.getOwnershipPersonTypes.bind(this);
-    this.getOwnershipByNumber = this.getOwnershipByNumber.bind(this);
-    this.getunitId = this.getunitId.bind(this);
-    this.handlePersonSave = this.handlePersonSave.bind(this);
-    this.handlePersonDelete = this.handlePersonDelete.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this);
-    this.getUnits = this.getUnits.bind(this);
-    this.getunitId = this.getunitId.bind(this);
-    this.handleOwnershipUnitSave = this.handleOwnershipUnitSave.bind(this);
-    this.handleOwnershipUnitDelete = this.handleOwnershipUnitDelete.bind(this);
-    this.handleOwnershipSave = this.handleOwnershipSave.bind(this);
-    this.handleTransfer = this.handleTransfer.bind(this);
+    super(props)
+    this.getOwnershipTypes = this.getOwnershipTypes.bind(this)
+    this.getOwnershipPersonTypes = this.getOwnershipPersonTypes.bind(this)
+    this.getOwnershipByNumber = this.getOwnershipByNumber.bind(this)
+    this.getunitId = this.getunitId.bind(this)
+    this.handlePersonSave = this.handlePersonSave.bind(this)
+    this.handlePersonDelete = this.handlePersonDelete.bind(this)
+    this.handleSearchChange = this.handleSearchChange.bind(this)
+    this.getUnits = this.getUnits.bind(this)
+    this.getunitId = this.getunitId.bind(this)
+    this.handleOwnershipUnitSave = this.handleOwnershipUnitSave.bind(this)
+    this.handleOwnershipUnitDelete = this.handleOwnershipUnitDelete.bind(this)
+    this.handleOwnershipSave = this.handleOwnershipSave.bind(this)
+    this.handleTransfer = this.handleTransfer.bind(this)
     this.state = {
       ownership: {
         id: 1,
@@ -1583,47 +1581,47 @@ class Ownership extends Component {
       showSuite: false,
       addressOptions: {},
       open: false,
-    };
+    }
     this.handleOpen = () => {
-      this.setState({ open: true });
-    };
+      this.setState({ open: true })
+    }
 
     this.handleClose = () => {
-      this.setState({ open: false });
-    };
-    this.getOwnershipTypes();
-    this.getOwnershipPersonTypes();
-    this.getUnits(global.buildingId);
+      this.setState({ open: false })
+    }
+    this.getOwnershipTypes()
+    this.getOwnershipPersonTypes()
+    this.getUnits(global.buildingId)
   }
 
   getOwnershipTypes() {
-    const component = this;
+    const component = this
     global.internalApi.getOwnershipTypes().then(function (data) {
       const types = _.map(data, (o) => {
         return {
           value: o.id,
           display: o.description,
-        };
-      });
-      component.setState({ ownershipTypes: types });
-    });
+        }
+      })
+      component.setState({ ownershipTypes: types })
+    })
   }
 
   getOwnershipPersonTypes() {
-    const component = this;
+    const component = this
     global.internalApi.getOwnershipPersonTypes().then(function (data) {
       const types = _.map(data, (o) => {
         return {
           value: o.id,
           display: o.description,
-        };
-      });
-      component.setState({ ownershipPersonTypes: types });
-    });
+        }
+      })
+      component.setState({ ownershipPersonTypes: types })
+    })
   }
 
   getUnits(buildingId) {
-    const component = this;
+    const component = this
     global.internalApi
       .getBuildingUnits(buildingId)
       .then(function (data) {
@@ -1631,78 +1629,78 @@ class Ownership extends Component {
           return {
             id: o.id,
             number: o.commaxId,
-          };
-        });
-        component.setState({ units: units, buildingId: buildingId });
+          }
+        })
+        component.setState({ units: units, buildingId: buildingId })
         const options = _.fromPairs(
           _.map(_.sortBy(units, ['number']), (unit) => {
-            return [`Suite ${unit.number}`, [unit.number]];
+            return [`Suite ${unit.number}`, [unit.number]]
           })
-        );
-        console.log('options', options);
-        component.setState({ addressOptions: options });
+        )
+        console.log('options', options)
+        component.setState({ addressOptions: options })
       })
       .then(function () {
         //component.getUnitByNumber(global.firstUnit);
         //component.getNotifications();
-      });
+      })
   }
 
   getunitId(number) {
     let o = _.filter(this.state.units, (o) => {
-      return o.number == number;
-    });
-    let v = null;
+      return o.number === number
+    })
+    let v = null
     if (o.length > 0) {
-      v = o[0].id;
+      v = o[0].id
     }
-    return v;
+    return v
   }
 
   getunitNumber(id) {
     let o = _.filter(this.state.units, (o) => {
-      return o.id == id;
-    });
-    let v = null;
+      return o.id === id
+    })
+    let v = null
     if (o.length > 0) {
-      v = o[0].number;
+      v = o[0].number
     }
-    return v;
+    return v
   }
 
   getOwnershipByNumber(number) {
-    const component = this;
-    const unitId = this.getunitId(number);
+    const component = this
+    const unitId = this.getunitId(number)
     component.setState({
       unitNumber: number,
       unitId: unitId,
-    });
-    this.getOwnershipById(unitId);
+    })
+    this.getOwnershipById(unitId)
   }
 
   getOwnershipById(unitId) {
-    const component = this;
-    let ownership = {};
-    this.handleClose();
+    const component = this
+    let ownership = {}
+    this.handleClose()
     global.internalApi
       .getOwnershipByUnit(unitId)
       .then(function (data) {
         const people = _.map(data.ownershipPersons, (o) => {
-          let fullAddress = o.address;
+          let fullAddress = o.address
           if (o.suite && o.suite.trim().length > 0) {
-            fullAddress += ' Suite ' + o.suite;
+            fullAddress += ' Suite ' + o.suite
           }
           if (o.city && o.city.trim().length > 0) {
-            fullAddress += ', ' + o.city;
+            fullAddress += ', ' + o.city
           }
           if (o.province && o.province.trim().length > 0) {
-            fullAddress += ', ' + o.province;
+            fullAddress += ', ' + o.province
           }
           if (o.postcodeZip && o.postcodeZip.trim().length > 0) {
-            fullAddress += ', ' + o.postcodeZip;
+            fullAddress += ', ' + o.postcodeZip
           }
           if (o.country && o.country.trim().length > 0) {
-            fullAddress += ', ' + o.country;
+            fullAddress += ', ' + o.country
           }
           return {
             id: o.id,
@@ -1724,8 +1722,8 @@ class Ownership extends Component {
             ownershipId: o.ownership,
             type: o.type.description,
             fullAddress: fullAddress,
-          };
-        });
+          }
+        })
         const properties = _.map(data.properties, (o) => {
           return {
             id: o.id,
@@ -1737,10 +1735,10 @@ class Ownership extends Component {
             size: o.size,
             typeId: o.typeId,
             type: o.type.description,
-          };
-        });
-        let activateDate = new Date(data.activateDate);
-        let inactivateDate = new Date(data.inActivateDate);
+          }
+        })
+        let activateDate = new Date(data.activateDate)
+        let inactivateDate = new Date(data.inActivateDate)
         ownership = {
           id: data.id,
           activateDate: activateDate,
@@ -1751,7 +1749,7 @@ class Ownership extends Component {
           typeId: data.typeId,
           people: people,
           properties: properties,
-        };
+        }
         let emptyPeople = {
           id: 0,
           salutation: '',
@@ -1771,16 +1769,16 @@ class Ownership extends Component {
           typeId: 1,
           ownershipId: ownership.id,
           type: '',
-        };
+        }
         let emptyproperty = {
           id: 0,
           ownershipId: ownership.id,
-        };
+        }
         component.setState({
           ownership: ownership,
           emptyPeople: emptyPeople,
           emptyproperty: emptyproperty,
-        });
+        })
       })
       .then(function () {
         global.internalApi
@@ -1790,105 +1788,105 @@ class Ownership extends Component {
               return {
                 value: d.id,
                 display: d.suite + ' - ' + d.type.description,
-              };
-            });
+              }
+            })
             component.setState({
               ownershipProperties: ownershipProperties,
-            });
-          });
-      });
+            })
+          })
+      })
   }
 
   handleSearchChange(unit) {
-    console.log(`loading unit ${unit}`);
-    this.getOwnershipByNumber(unit);
-    this.setState({ showSuite: true });
+    console.log(`loading unit ${unit}`)
+    this.getOwnershipByNumber(unit)
+    this.setState({ showSuite: true })
   }
 
   handlePersonSave(entity) {
-    const component = this;
+    const component = this
     if (entity.id > 0) {
-      global.internalApi.updateOwnershipPerson(entity).then(function (data) {
-        component.getOwnershipById(component.state.unitId);
-      });
+      global.internalApi.updateOwnershipPerson(entity).then(function () {
+        component.getOwnershipById(component.state.unitId)
+      })
     } else {
-      global.internalApi.addOwnershipPerson(entity).then(function (data) {
-        component.getOwnershipById(component.state.unitId);
-      });
+      global.internalApi.addOwnershipPerson(entity).then(function () {
+        component.getOwnershipById(component.state.unitId)
+      })
     }
-    console.log('Person updated: ', entity);
+    console.log('Person updated: ', entity)
   }
 
   handlePersonDelete(entities) {
-    const component = this;
+    const component = this
     _.each(entities, (entity) => {
-      global.internalApi.deleteOwnershipPerson(entity.id).then(function (data) {
-        component.getOwnershipById(component.state.unitId);
-      });
-    });
+      global.internalApi.deleteOwnershipPerson(entity.id).then(function () {
+        component.getOwnershipById(component.state.unitId)
+      })
+    })
   }
 
   handleOwnershipUnitSave(entity) {
-    const component = this;
+    const component = this
     if (entity.id > 0) {
       global.internalApi
         .addOwnershipUnit(entity.id, entity.ownershipId)
         .then(function () {
-          component.getOwnershipById(component.state.unitId);
-        });
+          component.getOwnershipById(component.state.unitId)
+        })
     }
   }
 
   handleOwnershipUnitDelete(entities) {
-    const component = this;
+    const component = this
     _.each(entities, (entity) => {
       global.internalApi
         .deleteOwnershipUnit(entity.id, entity.ownershipId)
-        .then(function (data) {
-          component.getOwnershipById(component.state.unitId);
-        });
-    });
+        .then(function () {
+          component.getOwnershipById(component.state.unitId)
+        })
+    })
   }
 
   handleOwnershipSave() {
-    const component = this;
+    const component = this
     if (this.state.ownership.id > 0) {
       global.internalApi
         .updateOwnership(this.state.ownership)
         .then(function () {
-          component.getOwnershipById(component.state.unitId);
-        });
+          component.getOwnershipById(component.state.unitId)
+        })
     }
   }
 
   handleTransfer() {
-    const component = this;
-    this.handleClose();
+    const component = this
+    this.handleClose()
     if (this.state.ownership.id > 0) {
       global.internalApi
         .transferOwnership(this.state.ownership.id)
         .then(function () {
-          component.getOwnershipById(component.state.unitId);
-        });
+          component.getOwnershipById(component.state.unitId)
+        })
     }
   }
 
   render() {
     const transferActions = [
       <FlatButton
-        key='cancel'
-        label='Cancel'
+        key="cancel"
+        label="Cancel"
         primary={true}
         onClick={this.handleClose}
       />,
       <FlatButton
-        key='submit'
-        label='Submit'
+        key="submit"
+        label="Submit"
         primary={true}
         disabled={false}
         onClick={this.handleTransfer}
       />,
-    ];
+    ]
     return (
       <div>
         <AutoCompleteSearch
@@ -1901,7 +1899,7 @@ class Ownership extends Component {
             this.state.addressOptions
           }
           handleAddressUpdate={this.handleSearchChange}
-          hintText='Suite number'
+          hintText="Suite number"
         />
         <div style={{ display: this.state.showSuite ? 'none' : 'block' }}>
           <span
@@ -1928,7 +1926,7 @@ class Ownership extends Component {
           </div>
         */}
           <Dialog
-            title='Transfer Ownership'
+            title="Transfer Ownership"
             actions={transferActions}
             modal={true}
             open={this.state.open}
@@ -1941,7 +1939,7 @@ class Ownership extends Component {
                 <Card style={{ textAlign: 'left', margin: '20px' }}>
                   <CardTitle
                     title={'Suite ' + this.state.unitNumber}
-                    subtitle='Ownership detail'
+                    subtitle="Ownership detail"
                   />
                   <CardText>
                     <Grid container>
@@ -1949,7 +1947,7 @@ class Ownership extends Component {
                         <Grid item xs={6}>
                           <div>
                             <DatePicker
-                              floatingLabelText='Activate Date'
+                              floatingLabelText="Activate Date"
                               floatingLabelFixed={true}
                               autoOk={true}
                               firstDayOfWeek={0}
@@ -1962,18 +1960,18 @@ class Ownership extends Component {
                               }
                               value={this.state.ownership.activateDate}
                               onChange={(event, value) => {
-                                let valueObj = {};
-                                valueObj['activateDate'] = value;
+                                let valueObj = {}
+                                valueObj['activateDate'] = value
                                 this.setState({
                                   ownership: _.assign(
                                     this.state.ownership,
                                     valueObj
                                   ),
-                                });
+                                })
                               }}
                             />
                             <DatePicker
-                              floatingLabelText='Inactivate Date'
+                              floatingLabelText="Inactivate Date"
                               floatingLabelFixed={true}
                               autoOk={true}
                               firstDayOfWeek={0}
@@ -1986,29 +1984,29 @@ class Ownership extends Component {
                               }
                               value={this.state.ownership.inactivateDate}
                               onChange={(event, value) => {
-                                let valueObj = {};
-                                valueObj['inactivateDate'] = value;
+                                let valueObj = {}
+                                valueObj['inactivateDate'] = value
                                 this.setState({
                                   ownership: _.assign(
                                     this.state.ownership,
                                     valueObj
                                   ),
-                                });
+                                })
                               }}
                             />
                             <EntityCrudSelectField
-                              label='Type'
+                              label="Type"
                               value={this.state.ownership.typeId}
                               optionValues={this.state.ownershipTypes}
                               handleChange={(value) => {
-                                let valueObj = {};
-                                valueObj['typeId'] = value;
+                                let valueObj = {}
+                                valueObj['typeId'] = value
                                 this.setState({
                                   ownership: _.assign(
                                     this.state.ownership,
                                     valueObj
                                   ),
-                                });
+                                })
                               }}
                             />
                           </div>
@@ -2016,7 +2014,7 @@ class Ownership extends Component {
                         <Grid item xs={6}>
                           <div>
                             <TextField
-                              floatingLabelText='Notes'
+                              floatingLabelText="Notes"
                               floatingLabelFixed={true}
                               fullWidth={true}
                               multiLine={true}
@@ -2024,14 +2022,14 @@ class Ownership extends Component {
                               rowsMax={5}
                               value={this.state.ownership.notes}
                               onChange={(event, value) => {
-                                let valueObj = {};
-                                valueObj['notes'] = value;
+                                let valueObj = {}
+                                valueObj['notes'] = value
                                 this.setState({
                                   ownership: _.assign(
                                     this.state.ownership,
                                     valueObj
                                   ),
-                                });
+                                })
                               }}
                             />
                           </div>
@@ -2041,13 +2039,13 @@ class Ownership extends Component {
                   </CardText>
                   <CardActions>
                     <RaisedButton
-                      label='Save'
+                      label="Save"
                       primary={true}
                       style={{ marginRight: '2em' }}
                       onClick={this.handleOwnershipSave}
                     />
                     <RaisedButton
-                      label='Transfer'
+                      label="Transfer"
                       primary={false}
                       style={{ marginRight: '2em' }}
                       onClick={this.handleOpen}
@@ -2057,8 +2055,8 @@ class Ownership extends Component {
               </Grid>
               <Grid item xs={7}>
                 <EntityCrudSummaryCard
-                  searchHintText='Suite number'
-                  entityName='Property'
+                  searchHintText="Suite number"
+                  entityName="Property"
                   entityProperties={[
                     { label: 'suite', name: 'suite' },
                     { label: 'type', name: 'type' },
@@ -2074,7 +2072,7 @@ class Ownership extends Component {
                     },
                   ]}
                   disableEdit={true}
-                  NewEntityLable='Parking\Locker'
+                  NewEntityLable="Parking\Locker"
                   entities={this.state.ownership.properties}
                   emptyEntity={this.state.emptyproperty}
                   onEntityAdd={this.handleOwnershipUnitSave}
@@ -2083,8 +2081,8 @@ class Ownership extends Component {
               </Grid>
               <Grid item xs={12}>
                 <EntityCrudSummaryCard
-                  searchHintText='First / last name'
-                  entityName='People'
+                  searchHintText="First / last name"
+                  entityName="People"
                   entityProperties={[
                     { label: 'Type', name: 'type' },
                     { label: 'first name', name: 'firstName' },
@@ -2136,87 +2134,87 @@ class Ownership extends Component {
           </Grid>
         </div>
       </div>
-    );
+    )
   }
 }
 
-class EditDirectoryCard extends Component {
-  constructor(props) {
-    super(props);
-    this.setDirectoryEntry = this.setDirectoryEntry.bind(this);
-    this.updateUnitId = this.updateUnitId.bind(this);
-    this.updateName = this.updateName.bind(this);
-    this.state = {
-      unitId: '',
-      name: '',
-      dataSource: ['101', '102', '103'],
-    };
-  }
+// class EditDirectoryCard extends Component {
+//   constructor(props) {
+//     super(props)
+//     this.setDirectoryEntry = this.setDirectoryEntry.bind(this)
+//     this.updateUnitId = this.updateUnitId.bind(this)
+//     this.updateName = this.updateName.bind(this)
+//     this.state = {
+//       unitId: '',
+//       name: '',
+//       dataSource: ['101', '102', '103'],
+//     }
+//   }
 
-  updateUnitId(id) {
-    this.setState({ unitId: id });
-  }
+//   updateUnitId(id) {
+//     this.setState({ unitId: id })
+//   }
 
-  updateName(event, name) {
-    this.setState({ name: name });
-  }
+//   updateName(event, name) {
+//     this.setState({ name: name })
+//   }
 
-  setDirectoryEntry() {
-    const component = this;
-    global.externalApi
-      .setDirectoryEntry(101, component.state.unitId, component.state.name)
-      .then(function (data) {
-        console.log(data);
-      });
-  }
+//   setDirectoryEntry() {
+//     const component = this
+//     global.externalApi
+//       .setDirectoryEntry(101, component.state.unitId, component.state.name)
+//       .then(function (data) {
+//         console.log(data)
+//       })
+//   }
 
-  render() {
-    return (
-      <Card style={{ textAlign: 'left', margin: '20px' }}>
-        <CardTitle title='Edit' subtitle='Edit a directory entry' />
-        <CardText>
-          <div>
-            <AutoComplete
-              hintText='Suite'
-              floatingLabelText='Suite'
-              fullWidth={true}
-              dataSource={this.state.dataSource}
-              onUpdateInput={this.updateUnitId}
-            />
-            <TextField
-              floatingLabelText='Lobby display name'
-              fullWidth={true}
-              onChange={this.updateName}
-            />
-          </div>
-        </CardText>
-        <CardActions>
-          <RaisedButton
-            label='Save'
-            primary={true}
-            style={{ marginRight: '2em' }}
-            onClick={this.setDirectoryEntry}
-          />
-          <FlatButton label='Cancel' />
-        </CardActions>
-      </Card>
-    );
-  }
-}
+//   render() {
+//     return (
+//       <Card style={{ textAlign: 'left', margin: '20px' }}>
+//         <CardTitle title="Edit" subtitle="Edit a directory entry" />
+//         <CardText>
+//           <div>
+//             <AutoComplete
+//               hintText="Suite"
+//               floatingLabelText="Suite"
+//               fullWidth={true}
+//               dataSource={this.state.dataSource}
+//               onUpdateInput={this.updateUnitId}
+//             />
+//             <TextField
+//               floatingLabelText="Lobby display name"
+//               fullWidth={true}
+//               onChange={this.updateName}
+//             />
+//           </div>
+//         </CardText>
+//         <CardActions>
+//           <RaisedButton
+//             label="Save"
+//             primary={true}
+//             style={{ marginRight: '2em' }}
+//             onClick={this.setDirectoryEntry}
+//           />
+//           <FlatButton label="Cancel" />
+//         </CardActions>
+//       </Card>
+//     )
+//   }
+// }
 
 class CommunityConfiguration extends Component {
   constructor(props) {
-    super(props);
-    this.handleOccupantSave = this.handleOccupantSave.bind(this);
-    this.handleOccupantDelete = this.handleOccupantDelete.bind(this);
-    this.handleDirectorySave = this.handleDirectorySave.bind(this);
-    this.handleDirectoryAdd = this.handleDirectoryAdd.bind(this);
-    this.handleDirectoryDelete = this.handleDirectoryDelete.bind(this);
-    this.getOccupants = this.getOccupants.bind(this);
-    this.getDirectoryEntity = this.getDirectoryEntity.bind(this);
-    this.getUnits = this.getUnits.bind(this);
-    this.getunitId = this.getunitId.bind(this);
-    this.getUnitById = this.getUnitById.bind(this);
+    super(props)
+    this.handleOccupantSave = this.handleOccupantSave.bind(this)
+    this.handleOccupantDelete = this.handleOccupantDelete.bind(this)
+    this.handleDirectorySave = this.handleDirectorySave.bind(this)
+    this.handleDirectoryAdd = this.handleDirectoryAdd.bind(this)
+    this.handleDirectoryDelete = this.handleDirectoryDelete.bind(this)
+    this.getOccupants = this.getOccupants.bind(this)
+    this.getDirectoryEntity = this.getDirectoryEntity.bind(this)
+    this.getUnits = this.getUnits.bind(this)
+    this.getunitId = this.getunitId.bind(this)
+    this.getUnitById = this.getUnitById.bind(this)
     this.state = {
       buildingId: global.buildingId,
       units: [],
@@ -2237,49 +2235,49 @@ class CommunityConfiguration extends Component {
         buildingId: global.buildingNum,
         unitId: '',
       },
-    };
-    this.getUnits(global.buildingId);
-    this.getOccupants(global.buildingId);
-    this.getDirectoryEntity();
+    }
+    this.getUnits(global.buildingId)
+    this.getOccupants(global.buildingId)
+    this.getDirectoryEntity()
   }
 
   getUnits(buildingId) {
-    const component = this;
+    const component = this
     global.internalApi.getBuildingUnits(buildingId).then(function (data) {
       const units = _.map(data, (o) => {
         return {
           id: o.id,
           number: o.commaxId,
-        };
-      });
-      component.setState({ units: units });
-    });
+        }
+      })
+      component.setState({ units: units })
+    })
   }
 
   getunitId(number) {
     let o = _.filter(this.state.units, (o) => {
-      return o.number == number;
-    });
-    let v = null;
+      return o.number === number
+    })
+    let v = null
     if (o.length > 0) {
-      v = o[0].id;
+      v = o[0].id
     }
-    return v;
+    return v
   }
 
   getUnitById(unitId) {
-    const component = this;
-    const number = component.getunitNumber(unitId);
-    let unit = {};
-    let directoryEntries = [];
-    let emptyOccupant = {
-      id: 0,
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      unitId: unit.id,
-    };
+    const component = this
+    const number = component.getunitNumber(unitId)
+    let unit = {}
+    let directoryEntries = []
+    // let emptyOccupant = {
+    //   id: 0,
+    //   firstName: '',
+    //   lastName: '',
+    //   email: '',
+    //   phone: '',
+    //   unitId: unit.id,
+    // }
     global.internalApi
       .getUnit(unitId)
       .then(function (data) {
@@ -2291,8 +2289,8 @@ class CommunityConfiguration extends Component {
             email: o.email,
             phone: o.phone,
             unitId: o.propertyId,
-          };
-        });
+          }
+        })
         unit = {
           id: data.id,
           number: data.suite,
@@ -2303,7 +2301,7 @@ class CommunityConfiguration extends Component {
           ],
           occupants: occs,
           directoryEntries: [],
-        };
+        }
       })
       .then(function () {
         global.externalApi
@@ -2316,10 +2314,10 @@ class CommunityConfiguration extends Component {
                   name: o.username,
                   buildingId: d.building,
                   unitId: d.household,
-                });
-              });
-            });
-            unit.directoryEntries = directoryEntries;
+                })
+              })
+            })
+            unit.directoryEntries = directoryEntries
             component.setState({
               unit: unit,
               emptyOccupant: {
@@ -2336,13 +2334,13 @@ class CommunityConfiguration extends Component {
                 buildingId: global.buildingNum,
                 unitId: number,
               },
-            });
-          });
-      });
+            })
+          })
+      })
   }
 
   getOccupants(buildingId) {
-    const component = this;
+    const component = this
     global.internalApi.getOccupants(buildingId).then(function (data) {
       const occupants = _.map(data, (occ) => {
         return {
@@ -2353,40 +2351,40 @@ class CommunityConfiguration extends Component {
           email: occ.email,
           phone: occ.phone,
           unitId: occ.propertyId,
-        };
-      });
-      component.setState({ occupants: occupants });
-    });
+        }
+      })
+      component.setState({ occupants: occupants })
+    })
   }
 
   handleOccupantSave(entity) {
     //NB: the EntityCrudSummaryCard will display the changes to the entity immediately,
     //regardless of what happens here
-    //let occupant = _.concat(_.filter(this.state.occupants, (o)=>{return o.id != entity.id}), entity);
-    const component = this;
-    entity.unitId = this.getunitId(entity.number);
+    //let occupant = _.concat(_.filter(this.state.occupants, (o)=>{return o.id !== entity.id}), entity);
+    const component = this
+    entity.unitId = this.getunitId(entity.number)
     if (entity.id > 0) {
-      global.internalApi.updateOccupant(entity);
+      global.internalApi.updateOccupant(entity)
     } else {
-      global.internalApi.addOccupant(entity).then(function (data) {
-        component.getOccupants(component.state.buildingId);
-      });
+      global.internalApi.addOccupant(entity).then(function () {
+        component.getOccupants(component.state.buildingId)
+      })
     }
-    console.log('occupant updated: ', entity);
+    console.log('occupant updated: ', entity)
   }
 
   handleOccupantDelete(entities) {
-    const component = this;
+    const component = this
     _.each(entities, (entity) => {
-      global.internalApi.deleteOccupants(entity.id).then(function (data) {
-        component.getUnitById(entity.unitId);
-      });
-    });
+      global.internalApi.deleteOccupants(entity.id).then(function () {
+        component.getUnitById(entity.unitId)
+      })
+    })
   }
 
   getDirectoryEntity() {
-    const component = this;
-    let directoryEntries = [];
+    const component = this
+    let directoryEntries = []
     global.externalApi.getAllDirectoryEntry().then(function (data) {
       _.map(data, (d) => {
         _.map(d.nickname, (o) => {
@@ -2395,54 +2393,54 @@ class CommunityConfiguration extends Component {
             name: o.username,
             buildingId: d.building,
             number: d.household,
-          });
-        });
-      });
+          })
+        })
+      })
       component.setState({
         directoryEntries: directoryEntries,
-      });
-    });
+      })
+    })
   }
 
   handleDirectorySave(entity) {
-    const component = this;
-    let buildingId = entity.buildingId;
-    let unitId = entity.number;
+    const component = this
+    let buildingId = entity.buildingId
+    let unitId = entity.number
     let name = JSON.stringify([
       { hu_no: entity.id, username: entity.name },
-    ]).replace(/'/g, "''");
+    ]).replace(/'/g, "''")
     global.externalApi
       .setDirectoryEntry(buildingId, unitId, name)
-      .then(function (data) {
-        component.getDirectoryEntity();
-      });
+      .then(function () {
+        component.getDirectoryEntity()
+      })
   }
 
   handleDirectoryAdd(entity) {
-    const component = this;
-    let buildingId = entity.buildingId;
-    let unitId = entity.number;
-    let name = JSON.stringify([{ username: entity.name }]).replace(/'/g, "''");
+    const component = this
+    let buildingId = entity.buildingId
+    let unitId = entity.number
+    let name = JSON.stringify([{ username: entity.name }]).replace(/'/g, "''")
     global.externalApi
       .addDirectoryEntry(buildingId, unitId, name)
-      .then(function (data) {
-        component.getDirectoryEntity();
-      });
+      .then(function () {
+        component.getDirectoryEntity()
+      })
   }
 
   handleDirectoryDelete(entities) {
-    const component = this;
+    const component = this
     _.each(entities, (entity) => {
-      let buildingId = entity.buildingId;
-      let unitId = entity.number;
-      let name = JSON.stringify([{ hu_no: entity.id }]).replace(/'/g, "''");
-      console.log('deleting ', buildingId, unitId, name);
+      let buildingId = entity.buildingId
+      let unitId = entity.number
+      let name = JSON.stringify([{ hu_no: entity.id }]).replace(/'/g, "''")
+      console.log('deleting ', buildingId, unitId, name)
       global.externalApi
         .deleteDirectoryEntry(buildingId, unitId, name)
-        .then(function (data) {
-          component.getDirectoryEntity();
-        });
-    });
+        .then(function () {
+          component.getDirectoryEntity()
+        })
+    })
   }
 
   render() {
@@ -2450,8 +2448,8 @@ class CommunityConfiguration extends Component {
       <Grid container>
         <Grid item xs={6}>
           <EntityCrudSummaryCard
-            searchHintText='Suite number, first / last name'
-            entityName='Suite Occupants'
+            searchHintText="Suite number, first / last name"
+            entityName="Suite Occupants"
             entityProperties={[
               { label: 'number', name: 'number' },
               { label: 'first name', name: 'firstName' },
@@ -2475,8 +2473,8 @@ class CommunityConfiguration extends Component {
         </Grid>
         <Grid item xs={6}>
           <EntityCrudSummaryCard
-            searchHintText='Suite number, name'
-            entityName='Directory Entries'
+            searchHintText="Suite number, name"
+            entityName="Directory Entries"
             entityProperties={[
               { label: 'Number', name: 'number' },
               { label: 'Name', name: 'name' },
@@ -2493,8 +2491,8 @@ class CommunityConfiguration extends Component {
           />
         </Grid>
       </Grid>
-    );
+    )
   }
 }
 
-export default App;
+export default App

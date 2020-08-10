@@ -16,11 +16,13 @@ body {
   left: 0;
   width: 61px;
   height: 100%;
-  background-color: rgba(36, 52, 58, 0.95); }
+  background-color: rgba(36, 52, 58, 0.95);
+}
 .sidebar .menu-item {
   width: 61px;
   height: 60px;
-  position: relative; }
+  position: relative;
+}
 .sidebar .menu-item .menu-item__logo {
   position: absolute;
   top: 50%;
@@ -35,9 +37,11 @@ body {
   background-color: white;
   /*background: url(smart1); }*/
 }
-.sidebar .menu-item .menu-item__link--active, .sidebar .menu-item .menu-item__link:hover {
+.sidebar .menu-item .menu-item__link--active,
+.sidebar .menu-item .menu-item__link:hover {
   background-color: #688389;
-  color: white !important; }
+  color: white !important;
+}
 .sidebar .menu-item .menu-item__link {
   width: 61px;
   height: 61px;
@@ -47,30 +51,42 @@ body {
   -webkit-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  cursor: pointer; }
+  cursor: pointer;
+}
 .sidebar .menu-item .menu-item__icon {
   position: absolute;
   top: 50%;
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%); }
-.sidebar .menu-item--home {
-  /*background-color: #31AA6B; }*/
+  transform: translate(-50%, -50%);
 }
+/* .sidebar .menu-item--home {
+  background-color: #31AA6B; }
+} */
 .sidebar .menu-item--top {
-  border-bottom: 1px solid #688389; }
-.sidebar .menu-item--bottom, .sidebar .menu-item--bottom-1, .sidebar .menu-item--bottom-2, .sidebar .menu-item--bottom-3, .sidebar .menu-item--bottom-4 {
-  border-top: 1px solid #688389;
-  position: absolute; }
-.sidebar .menu-item--bottom-1 {
-  bottom: 0px; }
-.sidebar .menu-item--bottom-2 {
-  bottom: 61px; }
-.sidebar .menu-item--bottom-3 {
-  bottom: 122px; }
+  border-bottom: 1px solid #688389;
+}
+.sidebar .menu-item--bottom,
+.sidebar .menu-item--bottom-1,
+.sidebar .menu-item--bottom-2,
+.sidebar .menu-item--bottom-3,
 .sidebar .menu-item--bottom-4 {
-  bottom: 183px; }
+  border-top: 1px solid #688389;
+  position: absolute;
+}
+.sidebar .menu-item--bottom-1 {
+  bottom: 0px;
+}
+.sidebar .menu-item--bottom-2 {
+  bottom: 61px;
+}
+.sidebar .menu-item--bottom-3 {
+  bottom: 122px;
+}
+.sidebar .menu-item--bottom-4 {
+  bottom: 183px;
+}
 .sidebar .avatar {
   position: absolute;
   top: 50%;
@@ -83,6 +99,8 @@ body {
   overflow: hidden;
   border-radius: 50%;
   -webkit-box-shadow: 0 0 0 2px white;
-  box-shadow: 0 0 0 2px white; }
+  box-shadow: 0 0 0 2px white;
+}
 .sidebar .avatar__img {
-  height: 100%; }
+  height: 100%;
+}

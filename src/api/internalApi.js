@@ -2,55 +2,55 @@
  * Created by bryan on 11/24/17.
  */
 
-import _ from 'lodash';
+// import _ from 'lodash'
 
 class InternalApiService {
   constructor(endpoint) {
-    this.endpoint = endpoint;
-    this.units = ['101', '102', '103'];
+    this.endpoint = endpoint
+    this.units = ['101', '102', '103']
   }
 
-  resolveAddressString(addressString) {}
+  resolveAddressString() {}
 
   getOccupants(buildingId) {
-    const request = `https://${this.endpoint}/api/PropertyOccupants/Building/${buildingId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/PropertyOccupants/Building/${buildingId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getBuildingUnits(buildingId) {
-    const request = `https://${this.endpoint}/api/properties/Building/${buildingId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/properties/Building/${buildingId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          const j = response.json();
-          console.log('building units json response', j);
-          return j;
+          const j = response.json()
+          console.log('building units json response', j)
+          return j
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getUnit(unitId) {
-    const request = `https://${this.endpoint}/api/properties/${unitId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/properties/${unitId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   updateOccupant(occupant) {
@@ -64,9 +64,9 @@ class InternalApiService {
       MiddleName: '',
       Salutation: '',
       PropertyId: occupant.unitId,
-    };
+    }
 
-    const request = `https://${this.endpoint}/api/PropertyOccupants/${occupant.id}`;
+    const request = `https://${this.endpoint}/api/PropertyOccupants/${occupant.id}`
     return fetch(request, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -74,8 +74,8 @@ class InternalApiService {
         'Content-Type': 'application/json',
       },
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   addOccupant(occupant) {
@@ -88,10 +88,10 @@ class InternalApiService {
       MiddleName: '',
       Salutation: '',
       PropertyId: occupant.unitId,
-    };
+    }
 
-    const request = `https://${this.endpoint}/api/PropertyOccupants`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/PropertyOccupants`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -100,26 +100,26 @@ class InternalApiService {
         },
       })
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   deleteOccupants(occupantId) {
-    const request = `https://${this.endpoint}/api/PropertyOccupants/${occupantId}`;
+    const request = `https://${this.endpoint}/api/PropertyOccupants/${occupantId}`
     return fetch(request, {
       method: 'DELETE',
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   saveTag(tag) {
-    const request = `https://${this.endpoint}/api/PropertyTags`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/PropertyTags`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request, {
         method: 'POST',
         body: JSON.stringify(tag),
@@ -128,88 +128,88 @@ class InternalApiService {
         },
       })
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getExistBuildingTags(buildingId) {
-    const request = `https://${this.endpoint}/api/propertytags/name/building/${buildingId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/propertytags/name/building/${buildingId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   deleteTag(tag) {
-    const request = `https://${this.endpoint}/api/PropertyTags/${tag.id}`;
+    const request = `https://${this.endpoint}/api/PropertyTags/${tag.id}`
     return fetch(request, {
       method: 'DELETE',
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   getBuildingOwnership(buildingId) {
-    const request = `https://${this.endpoint}/api/properties/Building/${buildingId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/properties/Building/${buildingId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          const j = response.json();
-          console.log('building ownership json response', j);
-          return j;
+          const j = response.json()
+          console.log('building ownership json response', j)
+          return j
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getOwnershipByUnit(unitId) {
-    const request = `https://${this.endpoint}/api/ownerships/Property/${unitId}`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/ownerships/Property/${unitId}`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getOwnershipTypes() {
-    const request = `https://${this.endpoint}/api/OwnershipTypes`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/OwnershipTypes`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   getOwnershipPersonTypes() {
-    const request = `https://${this.endpoint}/api/OwnershipPersonTypes`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/OwnershipPersonTypes`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   updateOwnershipPerson(person) {
@@ -231,9 +231,9 @@ class InternalApiService {
       workPhone: person.workPhone,
       typeId: person.typeId,
       ownershipId: person.ownershipId,
-    };
+    }
 
-    const request = `https://${this.endpoint}/api/OwnershipPerson/${person.id}`;
+    const request = `https://${this.endpoint}/api/OwnershipPerson/${person.id}`
     return fetch(request, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -241,8 +241,8 @@ class InternalApiService {
         'Content-Type': 'application/json',
       },
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   addOwnershipPerson(person) {
@@ -263,10 +263,10 @@ class InternalApiService {
       workPhone: person.workPhone,
       typeId: person.typeId,
       ownershipId: person.ownershipId,
-    };
+    }
 
-    const request = `https://${this.endpoint}/api/OwnershipPerson`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/OwnershipPerson`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -275,55 +275,55 @@ class InternalApiService {
         },
       })
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   deleteOwnershipPerson(personId) {
-    const request = `https://${this.endpoint}/api/OwnershipPerson/${personId}`;
+    const request = `https://${this.endpoint}/api/OwnershipPerson/${personId}`
     return fetch(request, {
       method: 'DELETE',
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   getBuildingOwnershipUnits(buildingId) {
-    const request = `https://${this.endpoint}/api/properties/building/${buildingId}/NoOwnership`;
-    return new Promise((resolve, reject) => {
+    const request = `https://${this.endpoint}/api/properties/building/${buildingId}/NoOwnership`
+    return new Promise((resolve /**, reject*/) => {
       fetch(request)
         .then((response) => {
-          return response.json();
+          return response.json()
         })
         .then((json) => {
-          resolve(json);
-        });
-    });
+          resolve(json)
+        })
+    })
   }
 
   addOwnershipUnit(propertyId, ownershipId) {
-    const request = `https://${this.endpoint}/api/Ownerships/${ownershipId}/Property/${propertyId}`;
+    const request = `https://${this.endpoint}/api/Ownerships/${ownershipId}/Property/${propertyId}`
     return fetch(request, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   deleteOwnershipUnit(propertyId, ownershipId) {
-    const request = `https://${this.endpoint}/api/Ownerships/${ownershipId}/Property/${propertyId}`;
+    const request = `https://${this.endpoint}/api/Ownerships/${ownershipId}/Property/${propertyId}`
     return fetch(request, {
       method: 'DELETE',
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   updateOwnership(ownership) {
@@ -338,9 +338,9 @@ class InternalApiService {
       notes: ownership.notes,
       typeId: ownership.typeId,
       active: ownership.active,
-    };
+    }
 
-    const request = `https://${this.endpoint}/api/Ownerships/${ownership.id}`;
+    const request = `https://${this.endpoint}/api/Ownerships/${ownership.id}`
     return fetch(request, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -348,21 +348,21 @@ class InternalApiService {
         'Content-Type': 'application/json',
       },
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 
   transferOwnership(ownershipId) {
-    const request = `https://${this.endpoint}/api/Ownerships/transfer/${ownershipId}`;
+    const request = `https://${this.endpoint}/api/Ownerships/transfer/${ownershipId}`
     return fetch(request, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     }).then((response) => {
-      return response;
-    });
+      return response
+    })
   }
 }
 
-export default InternalApiService;
+export default InternalApiService

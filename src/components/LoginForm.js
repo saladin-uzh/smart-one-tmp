@@ -1,9 +1,27 @@
 import React, { useState, useEffect } from 'react'
 
-import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
-import { Grid, Button, TextField } from '@material-ui/core'
+import {
+  ThemeProvider as MuiThemeProvider,
+  createMuiTheme,
+} from '@material-ui/core/styles'
+import { Grid } from '@material-ui/core'
 
 import { rememberMeAction } from '../store/login'
+
+import { colors } from '../constants'
+
+import { ButtonUI, TextFieldUI, TitleUI, LinkUI } from '../ui'
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: colors.main,
+    },
+    text: {
+      primary: colors.text,
+    },
+  },
+})
 
 const LoginForm = ({
   // email,
@@ -38,37 +56,40 @@ const LoginForm = ({
     return () => clearCache()
   }, [clearCache])
 
-  const msg = typeof error === 'string' ? error : ''
+  const hasError = Boolean(error)
 
   return (
-    <MuiThemeProvider>
+    <MuiThemeProvider theme={theme}>
       <form onSubmit={onFormSubmit}>
-        <Grid container spacing={16}>
+        <Grid container direction="column" spacing={5}>
           <Grid item xs={12}>
-            <h1>SmartONE Grandview</h1>
-            <TextField
-              value={usernameInput}
-              onChange={changeUsername}
-              hintText="Username"
-            />
-            <TextField
-              value={password}
-              onChange={changePassword}
-              hintText="Password"
-              type="password"
-              errorText={msg}
-              autoComplete="new-password"
-            />
-            <div style={{ marginTop: '30px' }}>
-              <Button variant="contained" primary type="submit">
-                Log in
-              </Button>
-            </div>
-            <div style={{ marginTop: '30px' }}>
-              <a href="!#" onClick={onShowReset}>
-                Forgot your password?
-              </a>
-            </div>
+            <TitleUI>SmartONE Grandview</TitleUI>
+          </Grid>
+          <Grid container item direction="column" spacing={4}>
+            <Grid item xs={12}>
+              <TextFieldUI
+                value={usernameInput}
+                onChange={changeUsername}
+                label="User name"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextFieldUI
+                type="password"
+                value={password}
+                onChange={changePassword}
+                label="Password"
+                helperText={error}
+                error={hasError}
+                autoComplete="new-password"
+              />
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <ButtonUI>Log in</ButtonUI>
+          </Grid>
+          <Grid item xs={12}>
+            <LinkUI onClick={onShowReset}>Forgot your password?</LinkUI>
           </Grid>
         </Grid>
       </form>

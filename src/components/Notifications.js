@@ -58,7 +58,6 @@ export default class Notifications extends Component {
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
         const notifications = _.map(data, (msg) => {
-          //console.log('message', msg)
           const allAddressees = _.uniq(
             _.map(msg.m_house, (addr) => {
               return addr.House.split('-')[1]
@@ -115,9 +114,6 @@ export default class Notifications extends Component {
     this.setState({ showCompose: true })
   }
 
-  //componentDidMount() {
-  //  this.getNotifications();
-  //}
   render() {
     return (
       <div>

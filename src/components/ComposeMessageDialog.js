@@ -85,16 +85,7 @@ export default class ComposeMessageDialog extends Component {
           onRequestClose={this.handleClose}
         >
           <AutoCompleteToAddress
-            addressOptions={
-              /*{
-              'All suites': ['101','102','105'],
-              'Suite 101': ['101'],
-              'Suite 102': ['102'],
-              'Suite 105': ['105'],
-              'Floor 1': ['101','102'],
-              'Floor 2': ['105']}*/
-              this.props.addressOptions
-            }
+            addressOptions={this.props.addressOptions}
             handleAddressUpdate={this.updateToAddress}
           />
           <br />

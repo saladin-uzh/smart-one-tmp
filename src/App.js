@@ -6,19 +6,6 @@ import { CognitoState, NewPasswordRequired } from 'react-cognito'
 import './styles/App.css'
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-// import Divider from 'material-ui/Divider'
-// import Paper from 'material-ui/Paper'
-// import SelectField from 'material-ui/SelectField'
-// import MenuItem from 'material-ui/MenuItem'
-// import {
-//   Table,
-//   TableBody,
-//   TableHeader,
-//   TableHeaderColumn,
-//   TableRow,
-//   TableRowColumn,
-// } from 'material-ui/Table'
-// import { Checkbox } from 'material-ui'
 
 import headerImage from './assets/1920-header.png'
 
@@ -34,28 +21,6 @@ import {
   NewPasswordForm,
   LoginAndReset,
 } from './components'
-
-//const App = ({state, user, attrs}) => {
-//  switch (state)
-//  render() {
-//
-//    switch()
-//    return (
-//    );
-//  }
-//}
-
-// const AppBase = ({state, user, attrs}) => {
-//   switch (state) {
-//     case CognitoState.LOGGING_IN:
-//     case CognitoState.LOGGED_IN:
-//       return mainPage();
-//     case CognitoState.NEW_PASSWORD_REQUIRED:
-//       return newPasswordPage();
-//     default:
-//       return loginPage();
-//   }
-// }
 
 const loginPage = ({ userLogin, dispatch, rememberMe }) => {
   if (userLogin) dispatch(rememberMeAction.setlogin)
@@ -169,14 +134,8 @@ const mainPage = ({ dispatch }) => (
 )
 
 class AppBase extends Component {
-  // constructor(props) {
-  //   super(props)
-  // }
-
   render() {
     switch (this.props.state) {
-      // case CognitoState.AUTHENTICATED:
-      // case CognitoState.LOGGING_IN:
       case CognitoState.LOGGED_IN:
         if (this.props.userLogin || this.props.rememberMe) {
           if (this.props.changePass) return сhangePasswordPage(this.props)

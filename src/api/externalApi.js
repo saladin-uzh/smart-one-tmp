@@ -25,7 +25,6 @@ class ExternalApiService {
           return response.json()
         })
         .then((json) => {
-          //console.log('notifications', json.data)
           resolve(json.data)
         })
     })
@@ -45,7 +44,6 @@ class ExternalApiService {
           return response.json()
         })
         .then((json) => {
-          //console.log('notifications', json.data)
           resolve(json.data)
         })
     })
@@ -61,14 +59,12 @@ class ExternalApiService {
           return response.json()
         })
         .then((json) => {
-          //console.log('notifications', json.data)
           resolve(json.data)
         })
     })
   }
 
   sendNotification(buildingId, unitIds, subject, message) {
-    //const toAddresses = this.internalApiService.resolveAddressString(to);
     console.log('sending message', buildingId, unitIds, subject, message)
     const request = `https://${this.endpoint}/postform/AddNotice`
     const unitAddr = JSON.stringify(
@@ -95,7 +91,6 @@ class ExternalApiService {
           return response.json()
         })
         .then((json) => {
-          //console.log('send message api response',json.data)
           resolve(json.data)
         })
     })

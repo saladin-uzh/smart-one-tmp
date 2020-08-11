@@ -11,14 +11,7 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table'
-import {
-  Card,
-  CardActions,
-  // CardHeader,
-  // CardMedia,
-  // CardTitle,
-  CardText,
-} from 'material-ui/Card'
+import { Card, CardActions, CardText } from 'material-ui/Card'
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from '.'
 

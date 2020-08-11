@@ -5,66 +5,6 @@ import Grid from 'material-ui-next/Grid'
 
 import { EntityCrudSummaryCard } from '.'
 
-// class EditDirectoryCard extends Component {
-//   constructor(props) {
-//     super(props)
-//     this.setDirectoryEntry = this.setDirectoryEntry.bind(this)
-//     this.updateUnitId = this.updateUnitId.bind(this)
-//     this.updateName = this.updateName.bind(this)
-//     this.state = {
-//       unitId: '',
-//       name: '',
-//       dataSource: ['101', '102', '103'],
-//     }
-//   }
-//   updateUnitId(id) {
-//     this.setState({ unitId: id })
-//   }
-//   updateName(event, name) {
-//     this.setState({ name: name })
-//   }
-//   setDirectoryEntry() {
-//     const component = this
-//     global.externalApi
-//       .setDirectoryEntry(101, component.state.unitId, component.state.name)
-//       .then(function (data) {
-//         console.log(data)
-//       })
-//   }
-//   render() {
-//     return (
-//       <Card style={{ textAlign: 'left', margin: '20px' }}>
-//         <CardTitle title="Edit" subtitle="Edit a directory entry" />
-//         <CardText>
-//           <div>
-//             <AutoComplete
-//               hintText="Suite"
-//               floatingLabelText="Suite"
-//               fullWidth={true}
-//               dataSource={this.state.dataSource}
-//               onUpdateInput={this.updateUnitId}
-//             />
-//             <TextField
-//               floatingLabelText="Lobby display name"
-//               fullWidth={true}
-//               onChange={this.updateName}
-//             />
-//           </div>
-//         </CardText>
-//         <CardActions>
-//           <RaisedButton
-//             label="Save"
-//             primary={true}
-//             style={{ marginRight: '2em' }}
-//             onClick={this.setDirectoryEntry}
-//           />
-//           <FlatButton label="Cancel" />
-//         </CardActions>
-//       </Card>
-//     )
-//   }
-// }
-
 export default class CommunityConfiguration extends Component {
   constructor(props) {
     super(props)
@@ -133,14 +73,6 @@ export default class CommunityConfiguration extends Component {
     const number = component.getunitNumber(unitId)
     let unit = {}
     let directoryEntries = []
-    // let emptyOccupant = {
-    //   id: 0,
-    //   firstName: '',
-    //   lastName: '',
-    //   email: '',
-    //   phone: '',
-    //   unitId: unit.id,
-    // }
     global.internalApi
       .getUnit(unitId)
       .then(function (data) {
@@ -223,7 +155,6 @@ export default class CommunityConfiguration extends Component {
   handleOccupantSave(entity) {
     //NB: the EntityCrudSummaryCard will display the changes to the entity immediately,
     //regardless of what happens here
-    //let occupant = _.concat(_.filter(this.state.occupants, (o)=>{return o.id !== entity.id}), entity);
     const component = this
     entity.unitId = this.getunitId(entity.number)
     if (entity.id > 0) {

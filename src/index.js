@@ -31,39 +31,6 @@ const awsmobile = {
   aws_user_pools_web_client_id: '4i8rk69ldlk9ho3nnhfcik06ob',
 }
 
-/*
-//Ten York
-const config = {
-  region: 'us-east-1',
-  userPool: 'us-east-1_U3Ph97H8o',
-  identityPool: 'us-east-1:1f2a4a52-981a-47a2-b574-7ab8edd2d7a8',
-  clientId: '1aap243odc5h5pbenhc73l3nai',
-};
-
-const awsmobile = {
-  aws_cognito_identity_pool_id:
-    'us-east-1:1f2a4a52-981a-47a2-b574-7ab8edd2d7a8',
-  aws_cognito_region: 'us-east-1',
-  aws_user_pools_id: 'us-east-1_U3Ph97H8o',
-  aws_user_pools_web_client_id: '1aap243odc5h5pbenhc73l3nai',
-};
-*/
-/*
-const config = {
-  region: 'us-east-1',
-  userPool: 'us-east-1_em9Yy3oMR',
-  identityPool: 'us-east-1:1f2a4a52-981a-47a2-b574-7ab8edd2d7a8',
-  clientId: '8hcgk8e6s0lu20o1v13tbfup4',
-};
-*/
-/*
-const config = {
-  region: 'us-east-1',
-  userPool: 'us-east-1_U3Ph97H8o',
-  identityPool: 'us-east-1:1f2a4a52-981a-47a2-b574-7ab8edd2d7a8',
-  clientId: '1aap243odc5h5pbenhc73l3nai',
-};
-*/
 Amplify.configure(awsmobile)
 
 const isProduction = true
@@ -92,10 +59,6 @@ global.firstUnit = '101'
 global.maxLobbyEntries = 4
 global.maxWordLength = 24
 global.maxNameLength = 48
-
-// String.isNullOrEmpty = function (value) {
-//   return !(typeof value === 'string' && value.length > 0)
-// }
 
 const persistLogin = 'loginState'
 
@@ -127,5 +90,4 @@ ReactDOM.render(
   document.getElementById('root')
 )
 
-//ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker()

@@ -2,13 +2,7 @@ import _ from 'lodash'
 import React, { Component } from 'react'
 import moment from 'moment'
 
-import {
-  Card,
-
-  // CardMedia,
-  CardTitle,
-  CardText,
-} from 'material-ui/Card'
+import { Card, CardTitle, CardText } from 'material-ui/Card'
 import FlatButton from 'material-ui/FlatButton'
 import AutoComplete from 'material-ui/AutoComplete'
 import Grid from 'material-ui-next/Grid'
@@ -75,10 +69,6 @@ export default class Directory extends Component {
     this.setState({ openAlert: false })
   }
 
-  componentWillReceiveProps() {
-    //this.getNotifications();
-  }
-
   getTagList(buildingId) {
     const component = this
     global.internalApi
@@ -105,28 +95,22 @@ export default class Directory extends Component {
 
   getUnits(buildingId) {
     const component = this
-    global.internalApi
-      .getBuildingUnits(buildingId)
-      .then(function (data) {
-        const units = _.map(data, (o) => {
-          return {
-            id: o.id,
-            number: o.commaxId,
-          }
+    global.internalApi.getBuildingUnits(buildingId).then(function (data) {
+      const units = _.map(data, (o) => {
+        return {
+          id: o.id,
+          number: o.commaxId,
+        }
+      })
+      component.setState({ units: units })
+      const options = _.fromPairs(
+        _.map(_.sortBy(units, ['number']), (unit) => {
+          return [`Suite ${unit.number}`, [unit.number]]
         })
-        component.setState({ units: units })
-        const options = _.fromPairs(
-          _.map(_.sortBy(units, ['number']), (unit) => {
-            return [`Suite ${unit.number}`, [unit.number]]
-          })
-        )
-        console.log('options', options)
-        component.setState({ addressOptions: options })
-      })
-      .then(function () {
-        //component.getUnitByNumber(global.firstUnit);
-        //component.getNotifications();
-      })
+      )
+      console.log('options', options)
+      component.setState({ addressOptions: options })
+    })
   }
 
   getunitId(number) {
@@ -160,14 +144,6 @@ export default class Directory extends Component {
     const number = component.getunitNumber(unitId)
     let unit = {}
     let directoryEntries = []
-    // let emptyOccupant = {
-    //   id: 0,
-    //   firstName: '',
-    //   lastName: '',
-    //   email: '',
-    //   phone: '',
-    //   unitId: unit.id,
-    // }
     global.internalApi
       .getUnit(unitId)
       .then(function (data) {
@@ -232,7 +208,6 @@ export default class Directory extends Component {
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
         const notifications = _.map(data, (msg) => {
-          //console.log('message', msg)
           const allAddressees = _.uniq(
             _.map(msg.m_house, (addr) => {
               return addr.House.split('-')[1]
@@ -271,19 +246,6 @@ export default class Directory extends Component {
         })
         component.setState({ messages: unitNotifications })
       })
-    //const component = this;
-    //global.externalApi.getNotifications().then((data)=> {
-    //  const notifications = _.map(data, (msg) => {
-    //    return {
-    //      subject: msg.m_subject,
-    //      type: msg.m_type,
-    //      message: msg.m_content,
-    //      sendDate: moment(msg.m_wdate, 'YYYYMMDDHHmm').format('l'),
-    //      expires: moment(msg.m_edate, "YYYYMMDDHHmm").unix()
-    //    }
-    //  });
-    //  this.setState({messages: notifications, showNotifications: true});
-    //});
   }
 
   getDirectoryEntity(buildingId, unitId) {
@@ -523,14 +485,7 @@ export default class Directory extends Component {
     return (
       <div>
         <AutoCompleteSearch
-          addressOptions={
-            /*{
-          'Suite 101': ['101'],
-          'Suite 102': ['102'],
-          'Suite 105': ['105']
-        }*/
-            this.state.addressOptions
-          }
+          addressOptions={this.state.addressOptions}
           handleAddressUpdate={this.handleSearchChange}
           hintText="Suite number"
         />

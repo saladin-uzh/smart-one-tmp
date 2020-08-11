@@ -11,9 +11,6 @@ import { rememberMeAction } from '../store/login'
 import { LogoutButton } from '.'
 
 export default class SidebarNav extends Component {
-  // constructor(props) {
-  //   super(props)
-  // }
   onChangePass = () => {
     this.props.dispatch(rememberMeAction.setChangePass(true))
   }

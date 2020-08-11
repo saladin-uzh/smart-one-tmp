@@ -2,8 +2,6 @@
  * Created by bryan on 11/24/17.
  */
 
-// import _ from 'lodash'
-
 class InternalApiService {
   constructor(endpoint) {
     this.endpoint = endpoint

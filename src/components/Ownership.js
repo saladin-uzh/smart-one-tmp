@@ -1,14 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import {
-  Card,
-  CardActions,
-
-  // CardMedia,
-  CardTitle,
-  CardText,
-} from 'material-ui/Card'
+import { Card, CardActions, CardTitle, CardText } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton'
 import TextField from 'material-ui/TextField'
@@ -102,28 +95,22 @@ export default class Ownership extends Component {
 
   getUnits(buildingId) {
     const component = this
-    global.internalApi
-      .getBuildingUnits(buildingId)
-      .then(function (data) {
-        const units = _.map(data, (o) => {
-          return {
-            id: o.id,
-            number: o.commaxId,
-          }
+    global.internalApi.getBuildingUnits(buildingId).then(function (data) {
+      const units = _.map(data, (o) => {
+        return {
+          id: o.id,
+          number: o.commaxId,
+        }
+      })
+      component.setState({ units: units, buildingId: buildingId })
+      const options = _.fromPairs(
+        _.map(_.sortBy(units, ['number']), (unit) => {
+          return [`Suite ${unit.number}`, [unit.number]]
         })
-        component.setState({ units: units, buildingId: buildingId })
-        const options = _.fromPairs(
-          _.map(_.sortBy(units, ['number']), (unit) => {
-            return [`Suite ${unit.number}`, [unit.number]]
-          })
-        )
-        console.log('options', options)
-        component.setState({ addressOptions: options })
-      })
-      .then(function () {
-        //component.getUnitByNumber(global.firstUnit);
-        //component.getNotifications();
-      })
+      )
+      console.log('options', options)
+      component.setState({ addressOptions: options })
+    })
   }
 
   getunitId(number) {
@@ -370,14 +357,7 @@ export default class Ownership extends Component {
     return (
       <div>
         <AutoCompleteSearch
-          addressOptions={
-            /*{
-          'Suite 101': ['101'],
-          'Suite 102': ['102'],
-          'Suite 105': ['105']
-        }*/
-            this.state.addressOptions
-          }
+          addressOptions={this.state.addressOptions}
           handleAddressUpdate={this.handleSearchChange}
           hintText="Suite number"
         />

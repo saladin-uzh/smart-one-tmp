@@ -27,9 +27,6 @@ export default class AutoCompleteToAddress extends Component {
       searchText !== '' &&
       key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     )
-    //let searchTextWords = searchText.toLowerCase().split(' ');
-    //let lowerKey = key.toLowerCase();
-    //return _.reduce(searchTextWords, (found, word)=> {return found || lowerKey.indexOf(word) !== -1}, false);
   }
 
   handleUpdateInput(searchText) {

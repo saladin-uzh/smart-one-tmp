@@ -3,9 +3,6 @@ import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
 
 export default class EntityCrudTextField extends Component {
-  // constructor(props) {
-  // super(props)
-  // }
   render() {
     return (
       <TextField

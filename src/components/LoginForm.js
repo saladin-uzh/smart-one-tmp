@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { Component } from 'react'
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui-next/Grid'
+
 import { rememberMeAction } from '../store/login'
 
-export default class LoginForm extends React.Component {
+export default class LoginForm extends Component {
   constructor(props) {
     super(props)
     this.state = {

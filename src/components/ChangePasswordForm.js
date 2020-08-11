@@ -1,16 +1,14 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { changePassword } from 'react-cognito'
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui-next/Grid'
-import {
-  // EmailVerification,
-  // Confirm,
-  changePassword,
-} from 'react-cognito'
+
 import { rememberMeAction } from '../store/login'
 
-export default class ChangePasswordForm extends React.Component {
+export default class ChangePasswordForm extends Component {
   constructor(props) {
     super(props)
     this.state = {

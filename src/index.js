@@ -1,17 +1,21 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import './styles/index.css'
-import App from './App'
-import registerServiceWorker from './utils/registerServiceWorker'
-import ExternalApiService from './api/externalApi'
-import InternalApiService from './api/internalApi'
-import { Provider } from 'react-redux'
 import { combineReducers, createStore } from 'redux'
+import { Provider } from 'react-redux'
 import { setupCognito, cognito } from 'react-cognito'
-import { loginReducer, rememberMeAction } from './store/login'
 import Amplify from 'aws-amplify'
 
-//import config from './config';
+import './styles/index.css'
+
+import ExternalApiService from './api/externalApi'
+import InternalApiService from './api/internalApi'
+
+import { loginReducer, rememberMeAction } from './store/login'
+
+import registerServiceWorker from './utils/registerServiceWorker'
+
+import App from './App'
+
 const config = {
   region: 'us-east-1',
   userPool: 'us-east-1_nj08HRZEB',
@@ -63,6 +67,7 @@ const config = {
 Amplify.configure(awsmobile)
 
 const isProduction = true
+
 if (isProduction) {
   global.internalApi = new InternalApiService(
     'api-grandview.smartonesolutions.ca'
@@ -88,22 +93,25 @@ global.maxLobbyEntries = 4
 global.maxWordLength = 24
 global.maxNameLength = 48
 
-const login = loginReducer
-const persistLogin = 'loginState'
+// String.isNullOrEmpty = function (value) {
+//   return !(typeof value === 'string' && value.length > 0)
+// }
 
-String.isNullOrEmpty = function (value) {
-  return !(typeof value === 'string' && value.length > 0)
-}
+const persistLogin = 'loginState'
 
 const loginState = localStorage.getItem(persistLogin)
   ? JSON.parse(localStorage.getItem(persistLogin))
   : {}
+
+const login = loginReducer
 const reducers = combineReducers({ cognito, login })
+
 let store = createStore(
   reducers,
   { login: loginState },
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 )
+
 store.subscribe(() => {
   localStorage.setItem(persistLogin, JSON.stringify(store.getState().login))
 })

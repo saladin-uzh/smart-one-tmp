@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { Component } from 'react'
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import RaisedButton from 'material-ui/RaisedButton'
 import TextField from 'material-ui/TextField'
 import Grid from 'material-ui-next/Grid'
 
-export default class PasswordResetForm extends React.Component {
+export default class PasswordResetForm extends Component {
   constructor(props) {
     super(props)
     this.state = {

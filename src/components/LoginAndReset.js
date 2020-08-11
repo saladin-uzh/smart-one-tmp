@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Login, PasswordReset } from 'react-cognito'
 
 import { PasswordResetForm, LoginForm } from '.'
 
-export default class LoginAndReset extends React.Component {
+export default class LoginAndReset extends Component {
   constructor(props) {
     super(props)
     this.state = {

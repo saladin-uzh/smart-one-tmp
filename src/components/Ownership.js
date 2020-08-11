@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
+
 import {
   Card,
   CardActions,
@@ -14,11 +15,12 @@ import TextField from 'material-ui/TextField'
 import Grid from 'material-ui-next/Grid'
 import DatePicker from 'material-ui/DatePicker'
 import Dialog from 'material-ui/Dialog'
+
 import {
   AutoCompleteSearch,
   EntityCrudSummaryCard,
   EntityCrudSelectField,
-} from '../utils/foundation'
+} from '.'
 
 export default class Ownership extends Component {
   constructor(props) {

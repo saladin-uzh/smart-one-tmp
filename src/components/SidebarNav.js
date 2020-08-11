@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import Tooltip from 'material-ui-next/Tooltip'
 import { Logout } from 'react-cognito'
+
+import Tooltip from 'material-ui-next/Tooltip'
+
 import smart1 from '../assets/ONElogo_ns.png'
+
 import { rememberMeAction } from '../store/login'
+
 import { LogoutButton } from '.'
 
 export default class SidebarNav extends Component {

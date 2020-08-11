@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
+import moment from 'moment'
+
 import {
   Card,
 
@@ -14,12 +16,8 @@ import Chip from 'material-ui/Chip'
 import Dialog from 'material-ui/Dialog'
 import IconButton from 'material-ui/IconButton'
 import ContentAdd from 'material-ui/svg-icons/content/add'
-import moment from 'moment'
-import {
-  AutoCompleteSearch,
-  MessageList,
-  EntityCrudSummaryCard,
-} from '../utils/foundation'
+
+import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from '.'
 
 export default class Directory extends Component {
   constructor(props) {

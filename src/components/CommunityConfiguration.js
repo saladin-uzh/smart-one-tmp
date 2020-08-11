@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 
 import Grid from 'material-ui-next/Grid'
 
-import { EntityCrudSummaryCard } from '../utils/foundation'
+import { EntityCrudSummaryCard } from '.'
 
 // class EditDirectoryCard extends Component {
 //   constructor(props) {

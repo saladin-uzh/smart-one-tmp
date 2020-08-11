@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import { List } from 'material-ui/List'
+import { List } from '@material-ui/core'
 
 import { SearchAutoSuggest, MessageListItem } from '.'
 

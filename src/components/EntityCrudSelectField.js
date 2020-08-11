@@ -1,8 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import MenuItem from 'material-ui/MenuItem'
-import SelectField from 'material-ui/SelectField'
+import { MenuItem, Select } from '@material-ui/core'
 
 export default class EntityCrudSelectField extends Component {
   constructor(props) {
@@ -14,7 +13,7 @@ export default class EntityCrudSelectField extends Component {
 
   render() {
     return (
-      <SelectField
+      <Select
         floatingLabelText={this.props.label}
         floatingLabelFixed={true}
         fullWidth={true}
@@ -26,7 +25,7 @@ export default class EntityCrudSelectField extends Component {
         {_.map(this.props.optionValues, (v) => {
           return <MenuItem value={v.value} primaryText={v.display} />
         })}
-      </SelectField>
+      </Select>
     )
   }
 }

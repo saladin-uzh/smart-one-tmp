@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { changePassword } from 'react-cognito'
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
-import Grid from 'material-ui-next/Grid'
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
+
+import { Button, TextField, Grid } from '@material-ui/core'
 
 import { rememberMeAction } from '../store/login'
 
@@ -82,9 +81,9 @@ export default class ChangePasswordForm extends Component {
                   errorText={this.state.error}
                 />
                 <div style={{ marginTop: '30px' }}>
-                  <RaisedButton primary type="submit">
+                  <Button variant="contained" primary type="submit">
                     Change password
-                  </RaisedButton>
+                  </Button>
                 </div>
               </Grid>
             </Grid>

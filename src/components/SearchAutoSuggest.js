@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
-import Search from 'material-ui/svg-icons/action/search'
-import TextField from 'material-ui/TextField'
+import { Search } from '@material-ui/icons'
+import { TextField } from '@material-ui/core'
 
 export default class SearchAutoSuggest extends Component {
   constructor(props) {

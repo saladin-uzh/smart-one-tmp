@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import Search from 'material-ui/svg-icons/action/search'
-import AutoComplete from 'material-ui/AutoComplete'
+import { Search } from '@material-ui/icons'
+import { Autocomplete } from '@material-ui/lab'
 
 export default class AutoCompleteSearch extends Component {
   constructor(props) {
@@ -53,11 +53,11 @@ export default class AutoCompleteSearch extends Component {
     return (
       <div>
         <Search style={{ marginRight: 24 }} />
-        <AutoComplete
+        <Autocomplete
           dataSource={_.keys(this.props.addressOptions)}
-          searchText={this.state.searchText}
+          value={this.state.searchText}
           hintText={this.props.hintText}
-          filter={this.filterOptions}
+          filterOptions={this.filterOptions}
           onNewRequest={this.handleSelection}
           onUpdateInput={this.handleUpdateInput}
         />

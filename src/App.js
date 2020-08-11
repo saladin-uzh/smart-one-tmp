@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { CognitoState, NewPasswordRequired } from 'react-cognito'
 
 import './styles/App.css'
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
 
 import headerImage from './assets/1920-header.png'
 
@@ -25,7 +25,7 @@ import {
 const loginPage = ({ userLogin, dispatch, rememberMe }) => {
   if (userLogin) dispatch(rememberMeAction.setlogin)
 
-  return <LoginAndReset {...{ rememberMe, dispatch }}></LoginAndReset>
+  return <LoginAndReset rememberMe={rememberMe} dispatch={dispatch} />
 }
 
 const newPasswordPage = () => (
@@ -39,7 +39,7 @@ const сhangePasswordPage = (props) => <ChangePasswordForm {...props} />
 const mainPage = ({ dispatch }) => (
   <Router>
     <MuiThemeProvider>
-      <div className="App" style={{ width: '1900px' }}>
+      <div className="main-page">
         <SidebarNav dispatch={dispatch}></SidebarNav>
         <div>
           <header className="App-header">
@@ -133,22 +133,26 @@ const mainPage = ({ dispatch }) => (
   </Router>
 )
 
-class AppBase extends Component {
-  render() {
-    switch (this.props.state) {
+const AppBase = (props) => {
+  const getPage = () => {
+    const { state, userLogin, rememberMe, changePass } = props
+
+    switch (state) {
+      case CognitoState.AUTHENTICATED:
+      case CognitoState.LOGGING_IN:
       case CognitoState.LOGGED_IN:
-        if (this.props.userLogin || this.props.rememberMe) {
-          if (this.props.changePass) return сhangePasswordPage(this.props)
-          else return mainPage(this.props)
-        } else {
-          return loginPage(this.props)
-        }
+        if (userLogin || rememberMe) {
+          if (changePass) return сhangePasswordPage(props)
+          else return mainPage(props)
+        } else return loginPage(props)
       case CognitoState.NEW_PASSWORD_REQUIRED:
         return newPasswordPage()
       default:
-        return loginPage(this.props)
+        return loginPage(props)
     }
   }
+
+  return <div className="App">{getPage()}</div>
 }
 
 const mapStateToProps = ({ cognito, login }) => ({

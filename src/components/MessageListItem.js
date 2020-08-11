@@ -2,14 +2,15 @@ import _ from 'lodash'
 import React, { Component } from 'react'
 import moment from 'moment'
 
-import { ListItem } from 'material-ui/List'
-import Divider from 'material-ui/Divider'
-import Avatar from 'material-ui/Avatar'
-import { grey400 /**, darkBlack, lightBlack*/ } from 'material-ui/styles/colors'
-import IconButton from 'material-ui/IconButton'
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert'
-import IconMenu from 'material-ui/IconMenu'
-import MenuItem from 'material-ui/MenuItem'
+import {
+  Divider,
+  IconButton,
+  ListItem,
+  MenuItem,
+  Avatar,
+  colors,
+} from '@material-ui/core'
+import { MoreVert as MoreVertIcon } from '@material-ui/icons'
 
 export default class MessageListItem extends Component {
   constructor(props) {
@@ -29,14 +30,14 @@ export default class MessageListItem extends Component {
   render() {
     const iconButtonElement = (
       <IconButton touch={true} tooltip="more" tooltipPosition="bottom-left">
-        <MoreVertIcon color={grey400} />
+        <MoreVertIcon color={colors.grey[400]} />
       </IconButton>
     )
 
     const rightIconMenu = (
-      <IconMenu iconButtonElement={iconButtonElement}>
+      <IconButton iconButtonElement={iconButtonElement}>
         <MenuItem onClick={this.handleDelete}>Delete</MenuItem>
-      </IconMenu>
+      </IconButton>
     )
 
     const messagelines = this.props.message.message.split('\n')

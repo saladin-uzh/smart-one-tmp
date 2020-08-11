@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import Grid from 'material-ui-next/Grid'
+import { Grid } from '@material-ui/core'
 
 import { EntityCrudSummaryCard } from '.'
 

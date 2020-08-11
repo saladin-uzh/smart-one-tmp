@@ -1,17 +1,17 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import RaisedButton from 'material-ui/RaisedButton'
-import FlatButton from 'material-ui/FlatButton'
 import {
+  Card,
+  CardActions,
+  CardContent,
+  Button,
   Table,
   TableBody,
-  TableHeader,
-  TableHeaderColumn,
+  TableHead,
   TableRow,
-  TableRowColumn,
-} from 'material-ui/Table'
-import { Card, CardActions, CardText } from 'material-ui/Card'
+  TableCell,
+} from '@material-ui/core'
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from '.'
 
@@ -99,7 +99,7 @@ export default class EntityCrudSummaryCard extends Component {
     return (
       <div>
         <Card style={{ textAlign: 'left', margin: '20px' }}>
-          <CardText style={{ padding: '0 16px 0 16px' }}>
+          <CardContent style={{ padding: '0 16px 0 16px' }}>
             <span
               style={{
                 fontSize: '24px',
@@ -153,17 +153,15 @@ export default class EntityCrudSummaryCard extends Component {
                   this.handleEntitySelection(selectedIndices)
                 }}
               >
-                <TableHeader>
+                <TableHead>
                   <TableRow>
                     {_.map(this.props.entityProperties, (Property) => {
                       return (
-                        <TableHeaderColumn>
-                          {_.capitalize(Property.label)}
-                        </TableHeaderColumn>
+                        <TableCell>{_.capitalize(Property.label)}</TableCell>
                       )
                     })}
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody
                   displayRowCheckbox={true}
                   showRowHover={true}
@@ -173,11 +171,7 @@ export default class EntityCrudSummaryCard extends Component {
                     return (
                       <TableRow>
                         {_.map(this.props.entityProperties, (Property) => {
-                          return (
-                            <TableRowColumn>
-                              {entity[Property.name]}
-                            </TableRowColumn>
-                          )
+                          return <TableCell>{entity[Property.name]}</TableCell>
                         })}
                       </TableRow>
                     )
@@ -185,9 +179,10 @@ export default class EntityCrudSummaryCard extends Component {
                 </TableBody>
               </Table>
             </div>
-          </CardText>
+          </CardContent>
           <CardActions>
-            <RaisedButton
+            <Button
+              variant="contained"
               label="New"
               primary={false}
               style={{ marginRight: '2em' }}
@@ -200,7 +195,7 @@ export default class EntityCrudSummaryCard extends Component {
               }}
             />
             {!this.props.disableDelete ? (
-              <FlatButton label="Delete" onClick={this.handleEntitiesDelete} />
+              <Button label="Delete" onClick={this.handleEntitiesDelete} />
             ) : (
               ''
             )}

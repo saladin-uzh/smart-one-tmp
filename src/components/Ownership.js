@@ -1,13 +1,17 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import { Card, CardActions, CardTitle, CardText } from 'material-ui/Card'
-import RaisedButton from 'material-ui/RaisedButton'
-import FlatButton from 'material-ui/FlatButton'
-import TextField from 'material-ui/TextField'
-import Grid from 'material-ui-next/Grid'
-import DatePicker from 'material-ui/DatePicker'
-import Dialog from 'material-ui/Dialog'
+import {
+  Grid,
+  Dialog,
+  Button,
+  TextField,
+  Card,
+  CardActions,
+  CardHeader,
+  CardContent,
+} from '@material-ui/core'
+import { DatePicker } from '@material-ui/pickers'
 
 import {
   AutoCompleteSearch,
@@ -340,13 +344,13 @@ export default class Ownership extends Component {
 
   render() {
     const transferActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose}
       />,
-      <FlatButton
+      <Button
         key="submit"
         label="Submit"
         primary={true}
@@ -392,11 +396,11 @@ export default class Ownership extends Component {
             <Grid container xs={12}>
               <Grid item xs={5}>
                 <Card style={{ textAlign: 'left', margin: '20px' }}>
-                  <CardTitle
+                  <CardHeader
                     title={'Suite ' + this.state.unitNumber}
                     subtitle="Ownership detail"
                   />
-                  <CardText>
+                  <CardContent>
                     <Grid container>
                       <Grid container xs={12}>
                         <Grid item xs={6}>
@@ -491,15 +495,17 @@ export default class Ownership extends Component {
                         </Grid>
                       </Grid>
                     </Grid>
-                  </CardText>
+                  </CardContent>
                   <CardActions>
-                    <RaisedButton
+                    <Button
+                      variant="contained"
                       label="Save"
                       primary={true}
                       style={{ marginRight: '2em' }}
                       onClick={this.handleOwnershipSave}
                     />
-                    <RaisedButton
+                    <Button
+                      variant="contained"
                       label="Transfer"
                       primary={false}
                       style={{ marginRight: '2em' }}

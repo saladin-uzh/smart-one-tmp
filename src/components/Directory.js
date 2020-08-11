@@ -2,14 +2,16 @@ import _ from 'lodash'
 import React, { Component } from 'react'
 import moment from 'moment'
 
-import { Card, CardTitle, CardText } from 'material-ui/Card'
-import FlatButton from 'material-ui/FlatButton'
-import AutoComplete from 'material-ui/AutoComplete'
-import Grid from 'material-ui-next/Grid'
-import Chip from 'material-ui/Chip'
-import Dialog from 'material-ui/Dialog'
-import IconButton from 'material-ui/IconButton'
-import ContentAdd from 'material-ui/svg-icons/content/add'
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  Button,
+  IconButton,
+} from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab'
+import { Grid, Chip, Dialog } from '@material-ui/core'
+import { Add as ContentAdd } from '@material-ui/icons'
 
 import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from '.'
 
@@ -475,7 +477,7 @@ export default class Directory extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="ok"
         label="OK"
         primary={true}
@@ -540,7 +542,7 @@ export default class Directory extends Component {
               <div
                 style={{ display: this.state.showNewTag ? 'block' : 'none' }}
               >
-                <AutoComplete
+                <Autocomplete
                   style={{ height: '36px', marginLeft: '10px' }}
                   listStyle={{ maxHeight: 200, overflow: 'auto' }}
                   hintText="Tag"
@@ -552,14 +554,14 @@ export default class Directory extends Component {
                   filter={this.handleFilterTag}
                 />
 
-                <FlatButton
+                <Button
                   label="Save"
                   primary={true}
                   style={{ marginLeft: '10px' }}
                   onClick={() => {
                     this.handleTagSave()
                   }}
-                ></FlatButton>
+                ></Button>
               </div>
             </div>
             <span
@@ -620,15 +622,15 @@ export default class Directory extends Component {
             <Grid container xs={7}>
               <Grid item xs={12}>
                 <Card style={{ textAlign: 'left', margin: '20px' }}>
-                  <CardTitle title="Notifications" />
-                  <CardText>
+                  <CardHeader title="Notifications" />
+                  <CardContent>
                     <MessageList
                       onDelete={this.handleMessageDelete}
                       unitId={this.state.unit.id}
                       messages={this.state.messages}
                       style={{ height: '400px' }}
                     />
-                  </CardText>
+                  </CardContent>
                 </Card>
               </Grid>
             </Grid>

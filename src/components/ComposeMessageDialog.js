@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
 
-import TextField from 'material-ui/TextField'
-import Dialog from 'material-ui/Dialog'
-import FlatButton from 'material-ui/FlatButton'
-import FloatingActionButton from 'material-ui/FloatingActionButton'
-import ContentAdd from 'material-ui/svg-icons/content/add'
+import { Dialog, Button, Fab, TextField } from '@material-ui/core'
+import { Add as ContentAdd } from '@material-ui/icons'
 
 import { AutoCompleteToAddress } from '.'
 
@@ -60,13 +57,13 @@ export default class ComposeMessageDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose}
       />,
-      <FlatButton
+      <Button
         key="send"
         label="Send"
         primary={true}
@@ -109,12 +106,12 @@ export default class ComposeMessageDialog extends Component {
             onChange={this.updateMessage}
           />
         </Dialog>
-        <FloatingActionButton
+        <Fab
           style={{ position: 'absolute', right: '20px' }}
           onClick={this.handleOpen}
         >
           <ContentAdd />
-        </FloatingActionButton>
+        </Fab>
       </div>
     )
   }

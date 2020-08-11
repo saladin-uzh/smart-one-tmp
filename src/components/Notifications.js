@@ -2,8 +2,7 @@ import _ from 'lodash'
 import React, { Component } from 'react'
 import moment from 'moment'
 
-import { Card, CardHeader, CardText } from 'material-ui/Card'
-import Grid from 'material-ui-next/Grid'
+import { Grid, Card, CardHeader, CardContent } from '@material-ui/core'
 
 import { MessageList, ComposeMessageDialog } from '.'
 
@@ -121,12 +120,12 @@ export default class Notifications extends Component {
           <Grid item xs={12}>
             <Card style={{ margin: '20px' }}>
               <CardHeader></CardHeader>
-              <CardText>
+              <CardContent>
                 <MessageList
                   messages={this.state.messages}
                   onDelete={this.handleMessageDelete}
                 ></MessageList>
-              </CardText>
+              </CardContent>
             </Card>
           </Grid>
         </Grid>

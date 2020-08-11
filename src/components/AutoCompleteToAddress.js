@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import AutoComplete from 'material-ui/AutoComplete'
-import Chip from 'material-ui/Chip'
+import { Autocomplete } from '@material-ui/lab'
+import { Chip } from '@material-ui/core'
 
 export default class AutoCompleteToAddress extends Component {
   constructor(props) {
@@ -94,7 +94,7 @@ export default class AutoCompleteToAddress extends Component {
     return (
       <div>
         <div style={{ width: '100%' }}>{this.state.selectedChips}</div>
-        <AutoComplete
+        <Autocomplete
           dataSource={_.keys(this.props.addressOptions)}
           floatingLabelText="To"
           floatingLabelFixed={true}

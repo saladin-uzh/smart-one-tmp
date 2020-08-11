@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import RaisedButton from 'material-ui/RaisedButton'
-import TextField from 'material-ui/TextField'
-import Grid from 'material-ui-next/Grid'
+import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
+import { Grid, Button, TextField } from '@material-ui/core'
 
 export default class PasswordResetForm extends Component {
   constructor(props) {
@@ -94,9 +92,9 @@ export default class PasswordResetForm extends Component {
             errorText={msg}
           />
           <div style={{ marginTop: '30px' }}>
-            <RaisedButton primary type="submit">
+            <Button variant="contained" primary type="submit">
               Submit
-            </RaisedButton>
+            </Button>
           </div>
         </div>
       )
@@ -125,9 +123,13 @@ export default class PasswordResetForm extends Component {
             errorText={msg}
           />
           <div style={{ marginTop: '30px' }}>
-            <RaisedButton onClick={this.sendVerificationCode} primary>
+            <Button
+              variant="contained"
+              onClick={this.sendVerificationCode}
+              primary
+            >
               Send code
-            </RaisedButton>
+            </Button>
           </div>
         </div>
       )

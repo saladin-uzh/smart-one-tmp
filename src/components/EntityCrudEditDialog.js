@@ -1,8 +1,7 @@
 import _ from 'lodash'
 import React, { Component } from 'react'
 
-import Dialog from 'material-ui/Dialog'
-import FlatButton from 'material-ui/FlatButton'
+import { Dialog, Button } from '@material-ui/core'
 
 import { EntityCrudSelectField, EntityCrudTextField } from '.'
 
@@ -29,13 +28,13 @@ export default class EntityCrudEditDialog extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.props.handleClose}
       />,
-      <FlatButton
+      <Button
         key="save"
         label="Save"
         primary={true}
@@ -50,7 +49,7 @@ export default class EntityCrudEditDialog extends Component {
     ]
 
     const alertActions = [
-      <FlatButton
+      <Button
         key="ok"
         label="OK"
         primary={true}

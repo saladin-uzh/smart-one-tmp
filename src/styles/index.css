@@ -8,6 +8,10 @@ body {
   display: flex;
 }
 
+#root {
+  flex-grow: 1;
+}
+
 .sidebar {
   -ms-flex: 0 0 61px;
   flex: 0 0 61px;

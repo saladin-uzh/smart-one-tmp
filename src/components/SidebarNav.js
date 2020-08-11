@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { Logout } from 'react-cognito'
 
-import Tooltip from 'material-ui-next/Tooltip'
+import { Tooltip } from '@material-ui/core'
 
 import smart1 from '../assets/ONElogo_ns.png'
 

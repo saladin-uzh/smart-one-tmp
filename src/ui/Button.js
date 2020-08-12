@@ -2,14 +2,14 @@ import React from 'react'
 
 import { withStyles, Button } from '@material-ui/core'
 
-import { colors } from '../constants'
+import { colors, radii } from '../constants'
 
 const StyledButton = withStyles({
   root: {
     color: colors.white,
     textTransform: 'none',
     fontWeight: 'bold',
-    borderRadius: '8px',
+    borderRadius: radii.border,
   },
   label: {
     position: 'relative',

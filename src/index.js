@@ -5,8 +5,6 @@ import { Provider } from 'react-redux'
 import { setupCognito, cognito } from 'react-cognito'
 import Amplify from 'aws-amplify'
 
-import './styles/index.css'
-
 import ExternalApiService from './api/externalApi'
 import InternalApiService from './api/internalApi'
 

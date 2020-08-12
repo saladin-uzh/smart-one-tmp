@@ -1,35 +1,35 @@
-import React from 'react'
+import React from "react";
 
-import { withStyles, TextField } from '@material-ui/core'
+import { withStyles, TextField } from "@material-ui/core";
 
-import { colors, spacings } from '../constants'
+import { colors, spacings, radii } from "../constants";
 
 const StyledTextField = withStyles({
   root: {
-    '& .MuiInputLabel-outlined': {
-      transform: `translate(${spacings.small}, -${spacings.large}) scale(.9)`,
-      fontWeight: 'bold',
-      '&.MuiInputLabel-shrink': {
-        transform: `translate(${spacings.large}, -${spacings.small}) scale(.725)`,
+    "& .MuiOutlinedInput-root": {
+      borderRadius: radii.border,
+      "& fieldset": {
+        borderColor: colors.main,
+      },
+      "&:hover fieldset": {
+        borderColor: colors.main,
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: colors.main,
       },
     },
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '8px',
-      '& fieldset': {
-        borderColor: colors.main,
-      },
-      '&:hover fieldset': {
-        borderColor: colors.main,
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: colors.main,
+    "& .MuiInputLabel-outlined": {
+      transform: `translate(${spacings.xxSmall}, -${spacings.small}) scale(.9)`,
+      fontWeight: "bold",
+      "&.MuiInputLabel-shrink": {
+        transform: `translate(${spacings.small}, -${spacings.xxSmall}) scale(.725)`,
       },
     },
   },
-})(TextField)
+})(TextField);
 
 const TextFieldUI = (props) => (
   <StyledTextField variant="outlined" size="small" color="primary" {...props} />
-)
+);
 
-export default TextFieldUI
+export default TextFieldUI;

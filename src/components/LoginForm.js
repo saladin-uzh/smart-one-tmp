@@ -1,27 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react"
 
-import {
-  ThemeProvider as MuiThemeProvider,
-  createMuiTheme,
-} from '@material-ui/core/styles'
-import { Grid } from '@material-ui/core'
+import { Grid } from "@material-ui/core"
 
-import { rememberMeAction } from '../store/login'
+import { rememberMeAction } from "../store/login"
 
-import { colors } from '../constants'
-
-import { ButtonUI, TextFieldUI, TitleUI, LinkUI } from '../ui'
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: colors.main,
-    },
-    text: {
-      primary: colors.text,
-    },
-  },
-})
+import { ButtonUI, TextFieldUI, TitleUI, LinkUI } from "../ui"
 
 const LoginForm = ({
   // email,
@@ -30,12 +13,13 @@ const LoginForm = ({
   dispatch,
   onSubmit,
   onShowReset,
-  error,
   clearCache,
 }) => {
   // const [emailInput, setEmailInput] = useState(email)
   const [usernameInput, setUsernameInput] = useState(username)
-  const [password, setPassword] = useState('')
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState(false)
+  const [helperText, setHelperText] = useState("")
   // const [rememberMeInput, setRememberMeInput] = useState(rememberMe)
 
   const onFormSubmit = (event) => {
@@ -43,7 +27,10 @@ const LoginForm = ({
 
     dispatch(rememberMeAction.set(rememberMe, true))
 
-    onSubmit(username, password)
+    onSubmit(usernameInput, password).catch(({ message }) => {
+      setError(true)
+      setHelperText(message)
+    })
   }
 
   const changeUsername = (event) => setUsernameInput(event.target.value)
@@ -56,44 +43,43 @@ const LoginForm = ({
     return () => clearCache()
   }, [clearCache])
 
-  const hasError = Boolean(error)
-
   return (
-    <MuiThemeProvider theme={theme}>
-      <form onSubmit={onFormSubmit}>
-        <Grid container direction="column" spacing={5}>
+    <form onSubmit={onFormSubmit}>
+      <Grid container direction="column" spacing={5}>
+        <Grid item xs={12}>
+          <TitleUI>SmartONE Grandview</TitleUI>
+        </Grid>
+        <Grid container item direction="column" spacing={4}>
           <Grid item xs={12}>
-            <TitleUI>SmartONE Grandview</TitleUI>
-          </Grid>
-          <Grid container item direction="column" spacing={4}>
-            <Grid item xs={12}>
-              <TextFieldUI
-                value={usernameInput}
-                onChange={changeUsername}
-                label="User name"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextFieldUI
-                type="password"
-                value={password}
-                onChange={changePassword}
-                label="Password"
-                helperText={error}
-                error={hasError}
-                autoComplete="new-password"
-              />
-            </Grid>
+            <TextFieldUI
+              value={usernameInput}
+              onChange={changeUsername}
+              label="User name"
+              helperText={helperText}
+              error={error}
+            />
           </Grid>
           <Grid item xs={12}>
-            <ButtonUI>Log in</ButtonUI>
-          </Grid>
-          <Grid item xs={12}>
-            <LinkUI onClick={onShowReset}>Forgot your password?</LinkUI>
+            <TextFieldUI
+              type="password"
+              value={password}
+              onChange={changePassword}
+              label="Password"
+              helperText={helperText}
+              error={error}
+              autoComplete="new-password"
+              required
+            />
           </Grid>
         </Grid>
-      </form>
-    </MuiThemeProvider>
+        <Grid item xs={12}>
+          <ButtonUI type="submit">Log in</ButtonUI>
+        </Grid>
+        <Grid item xs={12}>
+          <LinkUI onClick={onShowReset}>Forgot your password?</LinkUI>
+        </Grid>
+      </Grid>
+    </form>
   )
 }
 

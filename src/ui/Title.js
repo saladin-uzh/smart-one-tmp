@@ -20,7 +20,7 @@ const TitleUI = ({ children, ...props }) => (
       style={{
         display: 'inline-block',
         maxHeight: spacings.xxLarge,
-        transform: `translate(-${spacings.medium}, ${spacings.small})`,
+        transform: `translate(-${spacings.xSmall}, ${spacings.xxSmall})`,
       }}
     />
     {children}

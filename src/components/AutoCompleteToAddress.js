@@ -1,65 +1,51 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _ from "lodash"
+import React, { useState } from "react"
 
-import { Autocomplete } from '@material-ui/lab'
-import { Chip } from '@material-ui/core'
+import { Autocomplete } from "@material-ui/lab"
+import { Chip } from "@material-ui/core"
 
-export default class AutoCompleteToAddress extends Component {
-  constructor(props) {
-    super(props)
-    this.filterOptions = this.filterOptions.bind(this)
-    this.handleUpdateInput = this.handleUpdateInput.bind(this)
-    this.renderSelected = this.renderSelected.bind(this)
-    this.handleSelection = this.handleSelection.bind(this)
-    this.handleDeleteSelection = this.handleDeleteSelection.bind(this)
-    this.state = {
-      searchText: '',
-      selected: [],
-      selectedChips: [],
-    }
-  }
+export default ({ handleAddressUpdate, addressOptions }) => {
+  const [searchText, setSearchText] = useState("")
+  const [selected, setSelected] = useState([])
+  const [selectedChips, setSelectedChips] = useState([])
 
-  filterOptions(searchText, key) {
-    if (_.isEmpty(searchText) || _.isEmpty(key)) {
-      return false
-    }
+  const filterOptions = (searchText, key) => {
+    if (_.isEmpty(searchText) || _.isEmpty(key)) return false
+
     return (
-      searchText !== '' &&
+      searchText !== "" &&
       key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
     )
   }
 
-  handleUpdateInput(searchText) {
+  const handleUpdateInput = (searchText) => {
     this.setState({
       searchText: searchText,
     })
   }
 
-  renderSelected(selected) {
-    return _.map(selected, (item) => {
-      return (
-        <Chip
-          style={{ display: 'inline-flex', margin: '0 10px 0 0' }}
-          onRequestDelete={() => {
-            this.handleDeleteSelection(item)
-          }}
-        >
-          {item}
-        </Chip>
-      )
-    })
+  const renderSelected = (selected) => {
+    return _.map(selected, (item) => (
+      <Chip
+        style={{ display: "inline-flex", margin: "0 10px 0 0" }}
+        onRequestDelete={() => {
+          handleDeleteSelection(item)
+        }}
+      >
+        {item}
+      </Chip>
+    ))
   }
 
-  handleSelection(chosen, index) {
+  const handleSelection = (chosen, index) => {
     if (index !== -1) {
-      let selected = this.state.selected
       let newSelected = _.concat(selected, chosen)
-      this.setState({
-        selected: newSelected,
-        selectedChips: this.renderSelected(newSelected),
-        searchText: '',
-      })
-      this.props.handleAddressUpdate(
+
+      setSelected(newSelected)
+      setSelectedChips(renderSelected(newSelected))
+      setSearchText("")
+
+      handleAddressUpdate(
         _.uniq(
           _.flatten(
             _.map(newSelected, (s) => {
@@ -73,39 +59,37 @@ export default class AutoCompleteToAddress extends Component {
     }
   }
 
-  handleDeleteSelection(chosen) {
-    let newSelected = _.without(this.state.selected, chosen)
-    this.setState({
-      selected: newSelected,
-      selectedChips: this.renderSelected(newSelected),
-    })
-    this.props.handleAddressUpdate(
+  const handleDeleteSelection = (chosen) => {
+    let newSelected = _.without(selected, chosen)
+
+    setSelected(newSelected)
+    setSelectedChips(this.renderSelected(newSelected))
+
+    handleAddressUpdate(
       _.uniq(
         _.flatten(
           _.map(newSelected, (s) => {
-            return this.props.addressOptions[s]
+            return addressOptions[s]
           })
         )
       )
     )
   }
 
-  render() {
-    return (
-      <div>
-        <div style={{ width: '100%' }}>{this.state.selectedChips}</div>
-        <Autocomplete
-          dataSource={_.keys(this.props.addressOptions)}
-          floatingLabelText="To"
-          floatingLabelFixed={true}
-          fullWidth={true}
-          searchText={this.state.searchText}
-          filter={this.filterOptions}
-          onNewRequest={this.handleSelection}
-          onUpdateInput={this.handleUpdateInput}
-          listStyle={{ maxHeight: 200, overflow: 'auto' }}
-        />
-      </div>
-    )
-  }
+  return (
+    <div>
+      <div style={{ width: "100%" }}>{selectedChips}</div>
+      <Autocomplete
+        dataSource={_.keys(addressOptions)}
+        floatingLabelText="To"
+        floatingLabelFixed={true}
+        fullWidth={true}
+        searchText={searchText}
+        filter={filterOptions}
+        onNewRequest={handleSelection}
+        onUpdateInput={handleUpdateInput}
+        listStyle={{ maxHeight: 200, overflow: "auto" }}
+      />
+    </div>
+  )
 }

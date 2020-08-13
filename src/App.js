@@ -1,9 +1,9 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { CognitoState, NewPasswordRequired } from 'react-cognito'
+import React from "react"
+import { connect } from "react-redux"
+import { BrowserRouter as Router, Route } from "react-router-dom"
+import { CognitoState, NewPasswordRequired } from "react-cognito"
 
-import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/styles"
 import {
   CommunityConfiguration,
   Ownership,
@@ -13,13 +13,13 @@ import {
   ChangePasswordForm,
   NewPasswordForm,
   LoginAndReset,
-} from './components'
+} from "./components"
 
-import headerImage from './assets/1920-header.png'
+import headerImage from "./assets/1920-header.png"
 
-import { rememberMeAction } from './store/login'
+import { rememberMeAction } from "./store/login"
 
-import { GlobalStylesProvider } from './AppStyles'
+import GlobalStylesProvider from "./AppStyles"
 
 const loginPage = ({ userLogin, dispatch, rememberMe }) => {
   if (userLogin) dispatch(rememberMeAction.setlogin)
@@ -40,93 +40,93 @@ const mainPage = ({ dispatch }) => (
     <MuiThemeProvider theme={{}}>
       <div
         style={{
-          textAlign: 'center',
-          display: 'flex',
-          height: '100%',
+          textAlign: "center",
+          display: "flex",
+          height: "100%",
         }}
       >
         <SidebarNav dispatch={dispatch}></SidebarNav>
         <div>
           <header className="App-header">
             <div
-              style={{ width: '1900px', height: '120px', overflow: 'hidden' }}
+              style={{ width: "1900px", height: "120px", overflow: "hidden" }}
             >
-              <img src={headerImage} alt="logo" style={{ opacity: '0.33' }} />
+              <img src={headerImage} alt="logo" style={{ opacity: "0.33" }} />
             </div>
 
             <div
               style={{
-                position: 'absolute',
-                top: '3%',
-                width: '100%',
-                textAlign: 'center',
-                color: 'rgba(36, 52, 58, 0.95)',
-                fontSize: '4em',
+                position: "absolute",
+                top: "3%",
+                width: "100%",
+                textAlign: "center",
+                color: "rgba(36, 52, 58, 0.95)",
+                fontSize: "4em",
               }}
             >
               <Route
                 key={0}
-                path={'/'}
+                path={"/"}
                 exact={true}
                 component={() => <span>Home</span>}
               />
               <Route
                 key={1}
-                path={'/notifications'}
+                path={"/notifications"}
                 exact={true}
                 component={() => <span>Notifications</span>}
               />
               <Route
                 key={2}
-                path={'/directory'}
+                path={"/directory"}
                 exact={true}
                 component={() => <span>Suite Information</span>}
               />
               <Route
                 key={3}
-                path={'/community'}
+                path={"/community"}
                 exact={true}
                 component={() => <span>Building Configuration</span>}
               />
               <Route
                 key={4}
-                path={'/ownership'}
+                path={"/ownership"}
                 exact={true}
                 component={() => <span>Ownership</span>}
               />
             </div>
           </header>
-          <div style={{ height: '700px' }}>
+          <div style={{ height: "700px" }}>
             <Route
               key={0}
-              path={'/'}
+              path={"/"}
               exact={true}
               component={Directory}
             ></Route>
 
             <Route
               key={1}
-              path={'/notifications'}
+              path={"/notifications"}
               exact={true}
               component={Notifications}
             ></Route>
 
             <Route
               key={2}
-              path={'/directory'}
+              path={"/directory"}
               exact={true}
               component={Directory}
             ></Route>
             <Route
               key={3}
-              path={'/community'}
+              path={"/community"}
               exact={true}
               component={CommunityConfiguration}
             ></Route>
 
             <Route
               key={4}
-              path={'/ownership'}
+              path={"/ownership"}
               exact={true}
               component={Ownership}
             ></Route>
@@ -137,7 +137,7 @@ const mainPage = ({ dispatch }) => (
   </Router>
 )
 
-const AppBase = (props) => {
+const App = (props) => {
   const getPage = () => {
     const { state, userLogin, rememberMe, changePass } = props
 
@@ -172,6 +172,4 @@ const mapStateToProps = ({ cognito, login }) => ({
   changePass: login.changePass,
 })
 
-const App = connect(mapStateToProps, null)(AppBase)
-
-export default App
+export default connect(mapStateToProps, null)(App)

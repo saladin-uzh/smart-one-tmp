@@ -1,140 +1,138 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
-import moment from 'moment'
+import _ from "lodash"
+import React, { useState, useEffect } from "react"
+import moment from "moment"
 
-import { Grid, Card, CardHeader, CardContent } from '@material-ui/core'
+import { Grid, Card, CardHeader, CardContent } from "@material-ui/core"
 
-import { MessageList, ComposeMessageDialog } from '.'
+import { MessageList, ComposeMessageDialog } from "."
 
-export default class Notifications extends Component {
-  constructor(props) {
-    super(props)
-    this.getNotifications = this.getNotifications.bind(this)
-    this.handleMessageSend = this.handleMessageSend.bind(this)
-    this.handleMessageDelete = this.handleMessageDelete.bind(this)
-    this.getUnits = this.getUnits.bind(this)
-    this.state = {
-      messages: [],
-    }
-    this.getNotifications()
-    this.getUnits()
-  }
+export default () => {
+  const [messages, setMessages] = useState([])
+  const [addressOptions, setAddressOptions] = useState({})
 
-  getUnits() {
-    const component = this
-    global.internalApi
-      .getBuildingUnits(global.buildingId)
-      .then(function (data) {
-        const units = data
-        let options = { 'All suites': _.map(units, 'suite') }
-        const suiteOptions = _.fromPairs(
-          _.map(_.sortBy(units, ['suite']), (unit) => {
-            return [`Suite ${unit.suite}`, [unit.suite]]
-          })
-        )
-        const tags = _.reduce(
-          _.flatMap(units, (unit) => {
-            return _.map(unit.tags, (tag) => {
-              return { tag: tag.tag, unit: unit.suite }
-            })
-          }),
-          (result, tag) => {
-            if (result[tag.tag] || (result[tag.tag] = []))
-              result[tag.tag].push(tag.unit)
-            return result
-          },
-          {}
-        )
-        _.merge(options, suiteOptions, tags)
-        console.log('options', options)
-        component.setState({ addressOptions: options })
-      })
-  }
+  useEffect(() => {
+    getNotifications()
+    getUnits()
+  }, [])
 
-  getNotifications() {
-    const component = this
-    global.externalApi
-      .getBuildingNotifications(global.buildingNum)
-      .then((data) => {
-        const notifications = _.map(data, (msg) => {
-          const allAddressees = _.uniq(
-            _.map(msg.m_house, (addr) => {
-              return addr.House.split('-')[1]
-            })
-          )
-          const displayAddressees =
-            msg.m_house.length > 4
-              ? `${allAddressees[0]}, ${allAddressees[1]}, ${
-                  allAddressees[2]
-                } and ${allAddressees.length - 3} others`
-              : _.sum(
-                  _.map(allAddressees, (a) => {
-                    return a + ' '
-                  })
-                )
-          var parser = new DOMParser()
-          return {
-            id: msg.m_no,
-            subject: parser.parseFromString(
-              '<!doctype html><body>' + msg.m_subject,
-              'text/html'
-            ).body.textContent,
-            type: msg.m_type,
-            message: parser.parseFromString(
-              '<!doctype html><body>' + msg.m_content,
-              'text/html'
-            ).body.textContent,
-            allSentTo: allAddressees,
-            sentTo: displayAddressees,
-            sendDate: moment(msg.m_wdate, 'YYYYMMDDHHmm').unix(),
-            expires: moment(msg.m_edate, 'YYYYMMDDHHmm').unix(),
-          }
-        })
-        component.setState({ messages: notifications })
-      })
-  }
+  const getUnits = () => {
+    global.internalApi.getBuildingUnits(global.buildingId).then((data) => {
+      const units = data
+      let options = { "All suites": _.map(units, "suite") }
 
-  handleMessageSend(buildingId, toAddr, msgSubject, msgMessage) {
-    console.log('sending message to ', toAddr)
-    global.externalApi
-      .sendNotification(buildingId, toAddr, msgSubject, msgMessage)
-      .then(() => {
-        this.getNotifications()
-      })
-  }
+      const suiteOptions = _.fromPairs(
+        _.map(_.sortBy(units, ["suite"]), ({ suite }) => [
+          `Suite ${suite}`,
+          [suite],
+        ])
+      )
 
-  handleMessageDelete(message) {
-    global.externalApi.deleteNotification(message.id).then(() => {
-      this.getNotifications()
+      const tags = _.reduce(
+        _.flatMap(units, ({ tags, suite: unit }) =>
+          _.map(tags, ({ tag }) => ({ tag, unit }))
+        ),
+        (result, { tag, unit }) => {
+          if (result[tag] || (result[tag] = [])) result[tag].push(unit)
+          return result
+        },
+        {}
+      )
+
+      options = _.merge(options, suiteOptions, tags)
+
+      console.log("options", options)
+
+      setAddressOptions(options)
     })
   }
 
-  showComposeDialog() {
-    this.setState({ showCompose: true })
+  const getNotifications = () => {
+    global.externalApi
+      .getBuildingNotifications(global.buildingNum)
+      .then((data) => {
+        const notifications = _.map(
+          data,
+          ({
+            m_house,
+            m_no: id,
+            m_subject,
+            m_type: type,
+            m_content,
+            m_wdate,
+            m_edate,
+          }) => {
+            const allAddressees = _.uniq(
+              _.map(m_house, ({ House }) => House.split("-")[1])
+            )
+
+            const displayAddressees =
+              m_house.length > 4
+                ? `${allAddressees[0]}, ${allAddressees[1]}, ${
+                    allAddressees[2]
+                  } and ${allAddressees.length - 3} others`
+                : _.sum(_.map(allAddressees, (a) => a + " "))
+
+            const parser = new DOMParser()
+
+            return {
+              id,
+              subject: parser.parseFromString(
+                "<!doctype html><body>" + m_subject,
+                "text/html"
+              ).body.textContent,
+              type,
+              message: parser.parseFromString(
+                "<!doctype html><body>" + m_content,
+                "text/html"
+              ).body.textContent,
+              allSentTo: allAddressees,
+              sentTo: displayAddressees,
+              sendDate: moment(m_wdate, "YYYYMMDDHHmm").unix(),
+              expires: moment(m_edate, "YYYYMMDDHHmm").unix(),
+            }
+          }
+        )
+
+        setMessages(notifications)
+      })
   }
 
-  render() {
-    return (
-      <div>
-        <Grid container spacing={16}>
-          <Grid item xs={12}>
-            <Card style={{ margin: '20px' }}>
-              <CardHeader></CardHeader>
-              <CardContent>
-                <MessageList
-                  messages={this.state.messages}
-                  onDelete={this.handleMessageDelete}
-                ></MessageList>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-        <ComposeMessageDialog
-          buildingId={global.buildingNum}
-          onSend={this.handleMessageSend}
-          addressOptions={this.state.addressOptions}
-        />
-      </div>
-    )
+  const handleMessageSend = (buildingId, toAddr, msgSubject, msgMessage) => {
+    console.log("sending message to ", toAddr)
+
+    global.externalApi
+      .sendNotification(buildingId, toAddr, msgSubject, msgMessage)
+      .then(() => {
+        getNotifications()
+      })
   }
+
+  const handleMessageDelete = ({ id }) => {
+    global.externalApi.deleteNotification(id).then(() => {
+      getNotifications()
+    })
+  }
+
+  return (
+    <div>
+      <Grid container spacing={16}>
+        <Grid item xs={12}>
+          <Card style={{ margin: "20px" }}>
+            <CardHeader></CardHeader>
+            <CardContent>
+              <MessageList
+                messages={messages}
+                onDelete={handleMessageDelete}
+              ></MessageList>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+      <ComposeMessageDialog
+        buildingId={global.buildingNum}
+        onSend={handleMessageSend}
+        addressOptions={addressOptions}
+      />
+    </div>
+  )
 }

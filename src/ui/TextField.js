@@ -1,8 +1,8 @@
-import React from "react";
+import React from "react"
 
-import { withStyles, TextField } from "@material-ui/core";
+import { withStyles, TextField } from "@material-ui/core"
 
-import { colors, spacings, radii } from "../constants";
+import { colors, spacings, radii } from "../constants"
 
 const StyledTextField = withStyles({
   root: {
@@ -26,10 +26,8 @@ const StyledTextField = withStyles({
       },
     },
   },
-})(TextField);
+})(TextField)
 
-const TextFieldUI = (props) => (
+export default (props) => (
   <StyledTextField variant="outlined" size="small" color="primary" {...props} />
-);
-
-export default TextFieldUI;
+)

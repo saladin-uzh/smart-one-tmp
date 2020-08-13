@@ -1,120 +1,96 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _, { property } from "lodash"
+import React, { useState } from "react"
 
-import { Dialog, Button } from '@material-ui/core'
+import { Dialog, Button } from "@material-ui/core"
 
-import { EntityCrudSelectField, EntityCrudTextField } from '.'
+import { EntityCrudSelectField, EntityCrudTextField } from "."
 
-export default class EntityCrudEditDialog extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      entity: this.props.entity,
-      action: this.props.action,
-      openAlert: false,
-      AlertMessage: '',
+export default ({
+  entity: initialEntity,
+  action,
+  title,
+  entityName,
+  open,
+  handleClose,
+  onEntitySave,
+  entitySchema,
+}) => {
+  const [entity, setEntity] = useState(initialEntity)
+  const [openAlert, setOpenAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+
+  const handleOpenAlert = (message) => {
+    setOpenAlert(true)
+    setAlertMessage(message)
+  }
+
+  const handleCloseAlert = () => setOpenAlert(false)
+
+  const handleSave = () => {
+    const value = onEntitySave(entity)
+
+    if (!String.isNullOrEmpty(value)) {
+      handleOpenAlert(value)
     }
-    this.handleOpenAlert = this.handleOpenAlert.bind(this)
-    this.handleCloseAlert = this.handleCloseAlert.bind(this)
   }
 
-  handleOpenAlert(alertMessage) {
-    this.setState({ openAlert: true, AlertMessage: alertMessage })
-  }
+  const handleChange = (value) =>
+    setEntity(_.assign(entity, { [property.name]: value }))
 
-  handleCloseAlert() {
-    this.setState({ openAlert: false })
-  }
+  const actions = [
+    <Button key="cancel" label="Cancel" primary={true} onClick={handleClose} />,
+    <Button
+      key="save"
+      label="Save"
+      primary={true}
+      keyboardFocused={true}
+      onClick={handleSave}
+    />,
+  ]
 
-  render() {
-    const actions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.props.handleClose}
-      />,
-      <Button
-        key="save"
-        label="Save"
-        primary={true}
-        keyboardFocused={true}
-        onClick={() => {
-          var value = this.props.onEntitySave(this.state.entity)
-          if (!String.isNullOrEmpty(value)) {
-            this.handleOpenAlert(value)
+  const alertActions = [
+    <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
+  ]
+
+  return (
+    <div>
+      <Dialog
+        title={title ? title : `${action} ${entityName}`}
+        actions={actions}
+        modal={false}
+        open={open}
+        onRequestClose={handleClose}
+        autoScrollBodyContent={true}
+      >
+        {_.map(entitySchema, (property) => {
+          if (property.type === "text") {
+            return (
+              <EntityCrudTextField
+                label={_.capitalize(property.label)}
+                value={entity[property.name]}
+                handleChange={handleChange}
+              />
+            )
+          } else if (property.type === "options") {
+            return (
+              <EntityCrudSelectField
+                label={_.capitalize(property.label)}
+                value={entity[property.name]}
+                optionValues={property.optionValues}
+                handleChange={handleChange}
+              />
+            )
           }
-        }}
-      />,
-    ]
-
-    const alertActions = [
-      <Button
-        key="ok"
-        label="OK"
-        primary={true}
-        onClick={this.handleCloseAlert}
-      />,
-    ]
-
-    const component = this
-
-    return (
-      <div>
+        })}
         <Dialog
-          title={
-            this.props.title
-              ? this.props.title
-              : `${this.state.action} ${this.props.entityName}`
-          }
-          actions={actions}
-          modal={false}
-          open={this.props.open}
-          onRequestClose={this.props.handleClose}
-          autoScrollBodyContent={true}
+          actions={alertActions}
+          modal={true}
+          open={openAlert}
+          onRequestClose={handleCloseAlert}
         >
-          {_.map(this.props.entitySchema, (property) => {
-            if (property.type === 'text') {
-              return (
-                <EntityCrudTextField
-                  label={_.capitalize(property.label)}
-                  value={component.state.entity[property.name]}
-                  handleChange={(value) => {
-                    let valueObj = {}
-                    valueObj[property.name] = value
-                    component.setState({
-                      entity: _.assign(component.state.entity, valueObj),
-                    })
-                  }}
-                />
-              )
-            } else if (property.type === 'options') {
-              return (
-                <EntityCrudSelectField
-                  label={_.capitalize(property.label)}
-                  value={component.state.entity[property.name]}
-                  optionValues={property.optionValues}
-                  handleChange={(value) => {
-                    let valueObj = {}
-                    valueObj[property.name] = value
-                    component.setState({
-                      entity: _.assign(component.state.entity, valueObj),
-                    })
-                  }}
-                />
-              )
-            }
-          })}
-          <Dialog
-            actions={alertActions}
-            modal={true}
-            open={this.state.openAlert}
-            onRequestClose={this.handleCloseAlert}
-          >
-            {this.state.AlertMessage}
-          </Dialog>
+          {alertMessage}
         </Dialog>
-      </div>
-    )
-  }
+      </Dialog>
+    </div>
+  )
 }

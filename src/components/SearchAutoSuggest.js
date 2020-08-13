@@ -1,27 +1,15 @@
-import React, { Component } from 'react'
+import React from "react"
 
-import { Search } from '@material-ui/icons'
-import { TextField } from '@material-ui/core'
+import { Search } from "@material-ui/icons"
+import { TextField } from "@material-ui/core"
 
-export default class SearchAutoSuggest extends Component {
-  constructor(props) {
-    super(props)
-    this.handleChange = this.handleChange.bind(this)
-  }
+export default ({ style, hintText, onSearchChange }) => {
+  const handleChange = (e) => onSearchChange(e.target.value)
 
-  handleChange(e) {
-    this.props.onSearchChange(e.target.value)
-  }
-
-  render() {
-    return (
-      <div style={this.props.style}>
-        <Search style={{ marginRight: 24 }} />
-        <TextField
-          onChange={this.handleChange}
-          hintText={this.props.hintText}
-        />
-      </div>
-    )
-  }
+  return (
+    <div style={style}>
+      <Search style={{ marginRight: 24 }} />
+      <TextField onChange={handleChange} hintText={hintText} />
+    </div>
+  )
 }

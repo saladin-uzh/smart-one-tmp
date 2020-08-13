@@ -1,27 +1,19 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _ from "lodash"
+import React, { useState } from "react"
 
-import { Search } from '@material-ui/icons'
-import { Autocomplete } from '@material-ui/lab'
+import { Search } from "@material-ui/icons"
+import { Autocomplete } from "@material-ui/lab"
 
-export default class AutoCompleteSearch extends Component {
-  constructor(props) {
-    super(props)
-    this.filterOptions = this.filterOptions.bind(this)
-    this.handleUpdateInput = this.handleUpdateInput.bind(this)
-    this.handleSelection = this.handleSelection.bind(this)
-    this.state = {
-      searchText: '',
-      selected: [],
-    }
-  }
+export default ({ handleAddressUpdate, addressOptions, hintText }) => {
+  // const [selected, setSelected] = useState([])
+  const [searchText, setSearchText] = useState([])
 
-  filterOptions(searchText, key) {
+  const filterOptions = (searchText, key) => {
     if (_.isEmpty(searchText) || _.isEmpty(key)) {
       return false
     }
 
-    let searchTextWords = searchText.toLowerCase().split(' ')
+    let searchTextWords = searchText.toLowerCase().split(" ")
     let lowerKey = key.toLowerCase()
     return _.reduce(
       searchTextWords,
@@ -32,36 +24,29 @@ export default class AutoCompleteSearch extends Component {
     )
   }
 
-  handleUpdateInput(searchText) {
-    this.setState({
-      searchText: searchText,
-    })
-  }
+  const handleUpdateInput = (searchText) => setSearchText(searchText)
 
-  handleSelection(chosen, index) {
+  const handleSelection = (chosen, index) => {
     if (index !== -1) {
-      this.setState({
-        selected: chosen,
-        searchText: '',
-      })
-      console.log('selected:', chosen)
-      this.props.handleAddressUpdate(this.props.addressOptions[chosen])
+      // setSelected(chosen)
+      setSearchText("")
+
+      console.log("selected:", chosen)
+      handleAddressUpdate(addressOptions[chosen])
     }
   }
 
-  render() {
-    return (
-      <div>
-        <Search style={{ marginRight: 24 }} />
-        <Autocomplete
-          dataSource={_.keys(this.props.addressOptions)}
-          value={this.state.searchText}
-          hintText={this.props.hintText}
-          filterOptions={this.filterOptions}
-          onNewRequest={this.handleSelection}
-          onUpdateInput={this.handleUpdateInput}
-        />
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Search style={{ marginRight: 24 }} />
+      <Autocomplete
+        dataSource={_.keys(addressOptions)}
+        value={searchText}
+        hintText={hintText}
+        filterOptions={filterOptions}
+        onNewRequest={handleSelection}
+        onUpdateInput={handleUpdateInput}
+      />
+    </div>
+  )
 }

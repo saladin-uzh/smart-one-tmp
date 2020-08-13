@@ -1,21 +1,21 @@
-import React, { Component } from 'react'
+import React from "react"
 
-import { TextField } from '@material-ui/core'
+import { TextField } from "@material-ui/core"
 
-export default class EntityCrudTextField extends Component {
-  render() {
-    return (
-      <TextField
-        floatingLabelText={this.props.label}
-        floatingLabelFixed={true}
-        multiLine={true}
-        rows={1}
-        fullWidth={true}
-        value={this.props.value}
-        onChange={(event, value) => {
-          this.props.handleChange(value)
-        }}
-      />
-    )
+export default ({ label, value, handleChange }) => {
+  const onChange = (event, value) => {
+    handleChange(value)
   }
+
+  return (
+    <TextField
+      floatingLabelText={label}
+      floatingLabelFixed={true}
+      multiLine={true}
+      rows={1}
+      fullWidth={true}
+      value={value}
+      onChange={onChange}
+    />
+  )
 }

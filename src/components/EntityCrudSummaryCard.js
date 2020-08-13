@@ -1,5 +1,5 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _ from "lodash"
+import React, { memo, useState, useEffect } from "react"
 
 import {
   Card,
@@ -11,155 +11,158 @@ import {
   TableHead,
   TableRow,
   TableCell,
-} from '@material-ui/core'
+} from "@material-ui/core"
 
-import { EntityCrudEditDialog, SearchAutoSuggest } from '.'
+import { EntityCrudEditDialog, SearchAutoSuggest } from "."
 
-export default class EntityCrudSummaryCard extends Component {
-  constructor(props) {
-    super(props)
-    this.handleEntitySave = this.handleEntitySave.bind(this)
-    this.handleEntityAdd = this.handleEntityAdd.bind(this)
-    this.handleSearchChange = this.handleSearchChange.bind(this)
-    this.handleEntitySelection = this.handleEntitySelection.bind(this)
-    this.handleEntitiesDelete = this.handleEntitiesDelete.bind(this)
-    this.state = {
-      filteredEntities: this.props.entities,
-      clickedEntity: {},
-      selectedEntities: {},
-      emptyEntity: { ...this.props.emptyEntity },
-      showEditDialog: false,
-      showAddDialog: false,
+export default memo(
+  ({
+    entities,
+    emptyEntity,
+    onEntitySave,
+    onEntityAdd,
+    onEntitiesDelete,
+    entityName,
+    searchHintText,
+    entityProperties,
+    disableAdd,
+    disableDelete,
+    disableEdit,
+    EditEntityLable,
+    entitySchema,
+    NewEntityLable,
+  }) => {
+    const [filteredEntities, setFilteredEntities] = useState(entities)
+    const [clickedEntity, setClickedEntity] = useState({})
+    const [selectedEntities, setSelectedEntities] = useState({})
+    const [showEditDialog, setShowEditDialog] = useState(false)
+    const [showAddDialog, setShowAddDialog] = useState(false)
+
+    useEffect(() => {
+      setFilteredEntities(entities)
+    }, [entities])
+
+    const handleEntitySave = (entity) => {
+      var value = onEntitySave(entity)
+
+      if (!String.isNullOrEmpty(value)) return value
+
+      setShowEditDialog(false)
+      return ""
     }
-  }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({ filteredEntities: nextProps.entities })
-  }
+    const handleEntityAdd = (entity) => {
+      var value = onEntityAdd(entity)
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.filteredEntities !== this.state.filteredEntities) return true
-    if (nextState.showEditDialog !== this.state.showEditDialog) return true
-    if (nextState.showAddDialog !== this.state.showAddDialog) return true
-    return false
-  }
+      if (!String.isNullOrEmpty(value)) return value
 
-  handleEntitySave(entity) {
-    var value = this.props.onEntitySave(entity)
-    if (!String.isNullOrEmpty(value)) {
-      return value
-    } else {
-      this.setState({ showEditDialog: false })
-      return ''
+      setShowAddDialog(false)
+      return ""
     }
-  }
 
-  handleEntityAdd(entity) {
-    var value = this.props.onEntityAdd(entity)
-    if (!String.isNullOrEmpty(value)) {
-      return value
-    } else {
-      this.setState({ showAddDialog: false })
-      return ''
-    }
-  }
+    const handleEntitiesDelete = () => onEntitiesDelete(selectedEntities)
 
-  handleEntitiesDelete() {
-    this.props.onEntitiesDelete(this.state.selectedEntities)
-  }
-
-  handleSearchChange(searchText) {
-    if (_.isEmpty(searchText)) {
-      this.setState({ filteredEntities: this.props.entities })
-    } else {
-      let foundEntities = _.filter(this.props.entities, (ent) => {
-        return !_.isUndefined(
-          _.find(ent, (value) => {
-            return value
-              .toString()
-              .toLowerCase()
-              .includes(searchText.toLowerCase())
-          })
+    const handleSearchChange = (searchText) => {
+      if (_.isEmpty(searchText)) setFilteredEntities(entities)
+      else {
+        const foundEntities = _.filter(
+          entities,
+          (ent) =>
+            !_.isUndefined(
+              _.find(ent, (value) =>
+                value
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchText.toLowerCase())
+              )
+            )
         )
-      })
-      this.setState({ filteredEntities: foundEntities })
+
+        setFilteredEntities(foundEntities)
+      }
     }
-  }
 
-  handleEntitySelection(selectedIndices) {
-    const selectedEntities = _.map(selectedIndices, (i) => {
-      return this.state.filteredEntities[i]
-    })
+    const handleEntitySelection = (selectedIndices) => {
+      const newSelectedEntities = _.map(
+        selectedIndices,
+        (i) => filteredEntities[i]
+      )
 
-    this.setState({ selectedEntities: selectedEntities })
-  }
+      setSelectedEntities(newSelectedEntities)
+    }
 
-  render() {
-    const component = this
+    const handleCellCLick = (row, column) => {
+      console.log(`clicked row ${row}, column ${column}`)
+
+      if (column >= 0) {
+        setClickedEntity(filteredEntities[row])
+        setShowEditDialog(true)
+        setShowAddDialog(false)
+      }
+    }
+
+    const handleRowClick = (selected) => {
+      console.log("selected rows", selected)
+
+      let selectedIndices = []
+
+      if (Array.isArray(selected)) selectedIndices = selected
+      else {
+        if (selected === "all") {
+          selectedIndices = _.range(filteredEntities.length)
+        }
+        if (selected === "none") {
+          selectedIndices = []
+        }
+      }
+
+      handleEntitySelection(selectedIndices)
+    }
+
+    const handleAddClick = () => {
+      setShowEditDialog(false)
+      setShowAddDialog(true)
+    }
+
+    const onEditDialogClose = () => setShowEditDialog(false)
+
+    const onAddDialogClose = () => setShowAddDialog(false)
+
     return (
       <div>
-        <Card style={{ textAlign: 'left', margin: '20px' }}>
-          <CardContent style={{ padding: '0 16px 0 16px' }}>
+        <Card style={{ textAlign: "left", margin: "20px" }}>
+          <CardContent style={{ padding: "0 16px 0 16px" }}>
             <span
               style={{
-                fontSize: '24px',
-                color: 'rgba(0,0,0,0.87)',
-                lineHeight: '36px',
+                fontSize: "24px",
+                color: "rgba(0,0,0,0.87)",
+                lineHeight: "36px",
               }}
             >
-              {this.props.entityName}
+              {entityName}
             </span>
             <SearchAutoSuggest
-              onSearchChange={this.handleSearchChange}
-              hintText={this.props.searchHintText}
+              onSearchChange={handleSearchChange}
+              hintText={searchHintText}
               style={{
-                display: 'inline-block',
-                height: '36px',
-                marginLeft: '50px',
+                display: "inline-block",
+                height: "36px",
+                marginLeft: "50px",
               }}
             />
             <div>
               <Table
-                height={'150px'}
+                height={"150px"}
                 selectable={true}
                 multiSelectable={true}
-                onCellClick={(row, column) => {
-                  console.log(`clicked row ${row}, column ${column}`)
-                  if (column >= 0) {
-                    component.setState({
-                      clickedEntity: component.state.filteredEntities[row],
-                      showEditDialog: true,
-                      showAddDialog: false,
-                    })
-                  }
-                }}
-                onRowSelection={(selected) => {
-                  console.log('selected rows', selected)
-                  let selectedIndices = []
-
-                  if (Array.isArray(selected)) {
-                    selectedIndices = selected
-                  } else {
-                    if (selected === 'all') {
-                      selectedIndices = _.range(
-                        this.state.filteredEntities.length
-                      )
-                    }
-                    if (selected === 'none') {
-                      selectedIndices = []
-                    }
-                  }
-
-                  this.handleEntitySelection(selectedIndices)
-                }}
+                onCellClick={handleCellCLick}
+                onRowSelection={handleRowClick}
               >
                 <TableHead>
                   <TableRow>
-                    {_.map(this.props.entityProperties, (Property) => {
-                      return (
-                        <TableCell>{_.capitalize(Property.label)}</TableCell>
-                      )
-                    })}
+                    {_.map(entityProperties, ({ label }) => (
+                      <TableCell>{_.capitalize(label)}</TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody
@@ -167,15 +170,13 @@ export default class EntityCrudSummaryCard extends Component {
                   showRowHover={true}
                   deselectOnClickaway={false}
                 >
-                  {_.map(this.state.filteredEntities, (entity) => {
-                    return (
-                      <TableRow>
-                        {_.map(this.props.entityProperties, (Property) => {
-                          return <TableCell>{entity[Property.name]}</TableCell>
-                        })}
-                      </TableRow>
-                    )
-                  })}
+                  {_.map(filteredEntities, (entity) => (
+                    <TableRow>
+                      {_.map(entityProperties, ({ name }) => (
+                        <TableCell>{entity[name]}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
@@ -185,55 +186,44 @@ export default class EntityCrudSummaryCard extends Component {
               variant="contained"
               label="New"
               primary={false}
-              style={{ marginRight: '2em' }}
-              disabled={this.props.disableAdd}
-              onClick={() => {
-                component.setState({
-                  showEditDialog: false,
-                  showAddDialog: true,
-                })
-              }}
+              style={{ marginRight: "2em" }}
+              disabled={disableAdd}
+              onClick={handleAddClick}
             />
-            {!this.props.disableDelete ? (
-              <Button label="Delete" onClick={this.handleEntitiesDelete} />
-            ) : (
-              ''
+            {!disableDelete && (
+              <Button label="Delete" onClick={handleEntitiesDelete} />
             )}
           </CardActions>
         </Card>
-        {this.state.showEditDialog && !this.props.disableEdit ? (
+        {showEditDialog && !disableEdit && (
           <EntityCrudEditDialog
-            entityName={this.props.entityName}
-            title={this.props.EditEntityLable}
-            entitySchema={this.props.entitySchema}
-            entity={this.state.clickedEntity}
+            entityName={entityName}
+            title={EditEntityLable}
+            entitySchema={entitySchema}
+            entity={clickedEntity}
             action="Edit"
             open={true}
-            onEntitySave={this.handleEntitySave}
-            handleClose={() => {
-              this.setState({ showEditDialog: false })
-            }}
+            onEntitySave={handleEntitySave}
+            handleClose={onEditDialogClose}
           />
-        ) : (
-          ''
         )}
-        {this.state.showAddDialog && !this.props.disableAdd ? (
+        {showAddDialog && !disableAdd && (
           <EntityCrudEditDialog
-            entityName={this.props.entityName}
-            title={this.props.NewEntityLable}
-            entitySchema={this.props.entitySchema}
-            entity={{ ...this.props.emptyEntity }}
+            entityName={entityName}
+            title={NewEntityLable}
+            entitySchema={entitySchema}
+            entity={emptyEntity}
             action="New"
             open={true}
-            onEntitySave={this.handleEntityAdd}
-            handleClose={() => {
-              this.setState({ showAddDialog: false })
-            }}
+            onEntitySave={handleEntityAdd}
+            handleClose={onAddDialogClose}
           />
-        ) : (
-          ''
         )}
       </div>
     )
-  }
-}
+  },
+  (prev, next) =>
+    next.filteredEntities === prev.filteredEntities &&
+    next.showEditDialog === prev.showEditDialog &&
+    next.showAddDialog === prev.showAddDialog
+)

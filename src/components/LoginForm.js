@@ -6,7 +6,7 @@ import { rememberMeAction } from "../store/login"
 
 import { ButtonUI, TextFieldUI, TitleUI, LinkUI } from "../ui"
 
-const LoginForm = ({
+export default ({
   // email,
   username,
   rememberMe,
@@ -82,5 +82,3 @@ const LoginForm = ({
     </form>
   )
 }
-
-export default LoginForm

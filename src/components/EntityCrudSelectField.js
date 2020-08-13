@@ -1,31 +1,22 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _ from "lodash"
+import React from "react"
 
-import { MenuItem, Select } from '@material-ui/core'
+import { MenuItem, Select } from "@material-ui/core"
 
-export default class EntityCrudSelectField extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      value: 1,
-    }
-  }
+export default ({ value, label, handleChange, optionValues }) => {
+  const onChange = (event, index, value) => handleChange(value)
 
-  render() {
-    return (
-      <Select
-        floatingLabelText={this.props.label}
-        floatingLabelFixed={true}
-        fullWidth={true}
-        value={this.props.value}
-        onChange={(event, index, value) => {
-          this.props.handleChange(value)
-        }}
-      >
-        {_.map(this.props.optionValues, (v) => {
-          return <MenuItem value={v.value} primaryText={v.display} />
-        })}
-      </Select>
-    )
-  }
+  return (
+    <Select
+      floatingLabelText={label}
+      floatingLabelFixed={true}
+      fullWidth={true}
+      value={value}
+      onChange={onChange}
+    >
+      {_.map(optionValues, ({ value, display }) => (
+        <MenuItem value={value} primaryText={display} />
+      ))}
+    </Select>
+  )
 }

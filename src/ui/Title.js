@@ -1,16 +1,16 @@
-import React from 'react'
+import React from "react"
 
-import { colors, spacings } from '../constants'
+import { colors, spacings } from "../constants"
 
-import logo from '../assets/ONElogo_ns.png'
+import logo from "../assets/ONElogo_ns.png"
 
-const TitleUI = ({ children, ...props }) => (
+export default ({ children, ...props }) => (
   <h1
     style={{
       color: colors.text,
-      fontWeight: 'bold',
+      fontWeight: "bold",
       maxHeight: spacings.xxLarge,
-      pointerEvents: 'none',
+      pointerEvents: "none",
     }}
     {...props}
   >
@@ -18,7 +18,7 @@ const TitleUI = ({ children, ...props }) => (
       src={logo}
       alt="Welcome to "
       style={{
-        display: 'inline-block',
+        display: "inline-block",
         maxHeight: spacings.xxLarge,
         transform: `translate(-${spacings.xSmall}, ${spacings.xxSmall})`,
       }}
@@ -26,5 +26,3 @@ const TitleUI = ({ children, ...props }) => (
     {children}
   </h1>
 )
-
-export default TitleUI

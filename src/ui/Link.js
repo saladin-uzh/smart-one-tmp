@@ -1,20 +1,20 @@
-import React from 'react'
-import { spacings } from '../constants'
+import React from "react"
+import { spacings } from "../constants"
 
-const { withStyles, Button } = require('@material-ui/core')
+const { withStyles, Button } = require("@material-ui/core")
 
 const StyledButton = withStyles({
   root: {
-    textTransform: 'none',
-    fontWeight: 'bold',
+    textTransform: "none",
+    fontWeight: "bold",
     padding: `0 ${spacings.xxLarge}`,
-    '&:hover, &:active, &:focus': {
-      textDecoration: 'underline',
+    "&:hover, &:active, &:focus": {
+      textDecoration: "underline",
     },
   },
 })(Button)
 
-const LinkUI = ({ children, ...props }) => {
+export default ({ children, ...props }) => {
   return (
     <StyledButton
       size="small"
@@ -28,5 +28,3 @@ const LinkUI = ({ children, ...props }) => {
     </StyledButton>
   )
 }
-
-export default LinkUI

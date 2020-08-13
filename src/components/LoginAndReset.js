@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
-import { Login, PasswordReset } from 'react-cognito'
+import React, { useState } from "react"
+import { Login, PasswordReset } from "react-cognito"
 
-import { PasswordResetForm, LoginForm } from '.'
+import { PasswordResetForm, LoginForm } from "."
 
-const LoginAndReset = ({ rememberMe, dispatch }) => {
+export default ({ rememberMe, dispatch }) => {
   const [showReset, setShowReset] = useState(false)
 
   const onShowReset = () => setShowReset((showReset) => !showReset)
@@ -22,5 +22,3 @@ const LoginAndReset = ({ rememberMe, dispatch }) => {
     </Login>
   )
 }
-
-export default LoginAndReset

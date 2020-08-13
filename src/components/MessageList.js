@@ -1,73 +1,55 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
+import _ from "lodash"
+import React, { useState, useEffect } from "react"
 
-import { List } from '@material-ui/core'
+import { List } from "@material-ui/core"
 
-import { SearchAutoSuggest, MessageListItem } from '.'
+import { SearchAutoSuggest, MessageListItem } from "."
 
-export default class MessageList extends Component {
-  constructor(props) {
-    super(props)
-    if (props.sendMessage) {
-      this.sendMessage = props.sendMessage.bind(this)
-    }
-    this.handleSearchChange = this.handleSearchChange.bind(this)
-    this.handleDelete = this.handleDelete.bind(this)
-    this.state = {
-      messages: props.messages,
-      filteredMessages: props.messages,
-    }
-  }
+export default ({ messages: initialMessages, onDelete }) => {
+  const [messages, setMessages] = useState(initialMessages)
+  const [filteredMessages, setFilteredMessages] = useState(initialMessages)
 
-  componentWillReceiveProps(props) {
-    this.setState({
-      messages: props.messages,
-      filteredMessages: props.messages,
-    })
-  }
+  useEffect(() => {
+    setMessages(initialMessages)
+    setFilteredMessages(initialMessages)
+  }, [initialMessages])
 
-  handleSearchChange(searchText) {
-    if (_.isEmpty(searchText)) {
-      this.setState({ filteredMessages: this.state.messages })
-    } else {
-      let foundMessages = _.filter(this.state.messages, (msg) => {
-        return (
+  const handleSearchChange = (searchText) => {
+    if (_.isEmpty(searchText)) setFilteredMessages(initialMessages)
+    else {
+      const foundMessages = _.filter(
+        messages,
+        (msg) =>
           msg.message.toLowerCase().includes(searchText.toLowerCase()) ||
-          _.findIndex(msg.allSentTo, (addr) => {
-            return addr.toLowerCase().includes(searchText.toLowerCase())
-          }) >= 0
-        )
-      })
-      this.setState({ filteredMessages: foundMessages })
+          _.findIndex(msg.allSentTo, (addr) =>
+            addr.toLowerCase().includes(searchText.toLowerCase())
+          ) >= 0
+      )
+
+      setFilteredMessages(foundMessages)
     }
   }
 
-  handleDelete(entity) {
-    this.props.onDelete(entity)
-  }
+  const handleDelete = (entity) => onDelete(entity)
 
-  render() {
-    return (
-      <div>
-        <SearchAutoSuggest
-          onSearchChange={this.handleSearchChange}
-          hintText="Unit number, riser, floor"
-        />
-        <List
-          style={{
-            textAlign: 'left',
-            height: '400px',
-            maxHeight: '50%',
-            overflowY: 'auto',
-          }}
-        >
-          {_.map(this.state.filteredMessages, (msg) => {
-            return (
-              <MessageListItem message={msg} onDelete={this.handleDelete} />
-            )
-          })}
-        </List>
-      </div>
-    )
-  }
+  return (
+    <div>
+      <SearchAutoSuggest
+        onSearchChange={handleSearchChange}
+        hintText="Unit number, riser, floor"
+      />
+      <List
+        style={{
+          textAlign: "left",
+          height: "400px",
+          maxHeight: "50%",
+          overflowY: "auto",
+        }}
+      >
+        {_.map(filteredMessages, (msg) => (
+          <MessageListItem message={msg} onDelete={handleDelete} />
+        ))}
+      </List>
+    </div>
+  )
 }

@@ -1,102 +1,89 @@
-import React, { Component } from 'react'
-import { changePassword } from 'react-cognito'
+import React, { useState } from "react"
+import { changePassword } from "react-cognito"
 
-import { ThemeProvider as MuiThemeProvider } from '@material-ui/styles'
+import { ThemeProvider as MuiThemeProvider } from "@material-ui/styles"
 
-import { Button, TextField, Grid } from '@material-ui/core'
+import { Button, TextField, Grid } from "@material-ui/core"
 
-import { rememberMeAction } from '../store/login'
+import { rememberMeAction } from "../store/login"
 
-export default class ChangePasswordForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      error: '',
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-      loginDisplay: 'none',
-      formDisplay: 'block',
-    }
-  }
+export default ({ user, dispatch, rememberMe }) => {
+  const [error, setError] = useState("")
+  const [oldPassword, setOldPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [loginDisplay, setLoginDisplay] = useState("name")
+  const [formDisplay, setFormDisplay] = useState("block")
 
-  onSubmit = (event) => {
-    if (this.state.newPassword !== this.state.confirmPassword)
-      this.setState({
-        error: 'Your new password and confirmation password do not match.',
-      })
+  const onSubmit = (event) => {
+    event.preventDefault()
+
+    if (newPassword !== confirmPassword)
+      setError("Your new password and confirmation password do not match.")
     else {
-      const user = this.props.user.user
-      event.preventDefault()
-      changePassword(user, this.state.oldPassword, this.state.newPassword).then(
+      const targetUser = user.user
+
+      changePassword(targetUser, oldPassword, newPassword).then(
         () => {
-          this.setState({ loginDisplay: 'block', formDisplay: 'none' })
+          setLoginDisplay("block")
+          setFormDisplay("none")
         },
-        (error) => this.setState({ error })
+        (err) => setError(err)
       )
     }
   }
 
-  onShowLogin = () => {
-    this.props.dispatch(rememberMeAction.set(this.props.rememberMe))
-  }
+  const onShowLogin = () => dispatch(rememberMeAction.set(rememberMe))
 
-  changeOldPassword = (event) => {
-    this.setState({ oldPassword: event.target.value })
-  }
+  const changeOldPassword = (event) => setOldPassword(event.target.value)
 
-  changeNewPassword = (event) => {
-    this.setState({ newPassword: event.target.value })
-  }
+  const changeNewPassword = (event) => setNewPassword(event.target.value)
 
-  changeConfirmPassword = (event) => {
-    this.setState({ confirmPassword: event.target.value })
-  }
+  const changeConfirmPassword = (event) =>
+    setConfirmPassword(event.target.value)
 
-  render = () => {
-    return (
-      <MuiThemeProvider>
-        <div style={{ display: this.state.formDisplay }}>
-          <form onSubmit={this.onSubmit}>
-            <Grid container spacing={16}>
-              <Grid item xs={4} />
-              <Grid item xs={8}>
-                <h1>SmartONE Ten York</h1>
-                <h2>Change Password</h2>
-                <TextField
-                  onChange={this.changeOldPassword}
-                  hintText="Old Password"
-                  type="password"
-                />
-                <br />
-                <TextField
-                  onChange={this.changeNewPassword}
-                  hintText="New Password"
-                  type="password"
-                />
-                <TextField
-                  onChange={this.changeConfirmPassword}
-                  hintText="Confirmation Password"
-                  type="password"
-                  errorText={this.state.error}
-                />
-                <div style={{ marginTop: '30px' }}>
-                  <Button variant="contained" primary type="submit">
-                    Change password
-                  </Button>
-                </div>
-              </Grid>
+  return (
+    <MuiThemeProvider>
+      <div style={{ display: formDisplay }}>
+        <form onSubmit={onSubmit}>
+          <Grid container spacing={16}>
+            <Grid item xs={4} />
+            <Grid item xs={8}>
+              <h1>SmartONE Ten York</h1>
+              <h2>Change Password</h2>
+              <TextField
+                onChange={changeOldPassword}
+                hintText="Old Password"
+                type="password"
+              />
+              <br />
+              <TextField
+                onChange={changeNewPassword}
+                hintText="New Password"
+                type="password"
+              />
+              <TextField
+                onChange={changeConfirmPassword}
+                hintText="Confirmation Password"
+                type="password"
+                errorText={error}
+              />
+              <div style={{ marginTop: "30px" }}>
+                <Button variant="contained" primary type="submit">
+                  Change password
+                </Button>
+              </div>
             </Grid>
-          </form>
-        </div>
-        <div style={{ marginTop: '30px', display: this.state.loginDisplay }}>
-          Password changed successfully.{' '}
-          <a href="!#" onClick={this.onShowLogin}>
-            Login
-          </a>{' '}
-          with new password.
-        </div>
-      </MuiThemeProvider>
-    )
-  }
+          </Grid>
+        </form>
+      </div>
+      <div style={{ marginTop: "30px", display: loginDisplay }}>
+        Password changed successfully.{" "}
+        <a href="!#" onClick={onShowLogin}>
+          Login
+        </a>{" "}
+        with new password.
+      </div>
+    </MuiThemeProvider>
+  )
 }

@@ -6,7 +6,7 @@ import { colors, spacings } from "../constants"
 
 import { TitleUI, ButtonUI, TextFieldUI } from "../ui"
 
-const PasswordResetForm = ({ username, setPassword, sendVerificationCode }) => {
+export default ({ username, setPassword, sendVerificationCode }) => {
   const [usernameInput, setUsernameInput] = useState(username)
   const [code, setCode] = useState("")
   const [passwordInput, setPasswordInput] = useState("")
@@ -130,5 +130,3 @@ const PasswordResetForm = ({ username, setPassword, sendVerificationCode }) => {
     </form>
   )
 }
-
-export default PasswordResetForm

@@ -1,6 +1,6 @@
-import _ from 'lodash'
-import React, { Component } from 'react'
-import moment from 'moment'
+import _ from "lodash"
+import React, { useState, useEffect } from "react"
+import moment from "moment"
 
 import {
   Card,
@@ -8,643 +8,570 @@ import {
   CardContent,
   Button,
   IconButton,
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
-import { Grid, Chip, Dialog } from '@material-ui/core'
-import { Add as ContentAdd } from '@material-ui/icons'
+} from "@material-ui/core"
+import { Autocomplete } from "@material-ui/lab"
+import { Grid, Chip, Dialog } from "@material-ui/core"
+import { Add as ContentAdd } from "@material-ui/icons"
 
-import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from '.'
+import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from "."
 
-export default class Directory extends Component {
-  constructor(props) {
-    super(props)
-    this.getUnitByNumber = this.getUnitByNumber.bind(this)
-    this.getunitId = this.getunitId.bind(this)
-    this.handleOccupantSave = this.handleOccupantSave.bind(this)
-    this.handleOccupantDelete = this.handleOccupantDelete.bind(this)
-    this.handleDirectorySave = this.handleDirectorySave.bind(this)
-    this.handleDirectoryAdd = this.handleDirectoryAdd.bind(this)
-    this.handleDirectoryDelete = this.handleDirectoryDelete.bind(this)
-    this.handleSearchChange = this.handleSearchChange.bind(this)
-    this.getUnits = this.getUnits.bind(this)
-    this.getunitId = this.getunitId.bind(this)
-    this.getNotifications = this.getNotifications.bind(this)
-    this.getDirectoryEntity = this.getDirectoryEntity.bind(this)
-    //this.getTagList = this.getTagList.bind(this);
-    this.handleAddTag = this.handleAddTag.bind(this)
-    this.handleNewTagValueChange = this.handleNewTagValueChange.bind(this)
-    this.handleTagSave = this.handleTagSave.bind(this)
-    this.handleRemoveTag = this.handleRemoveTag.bind(this)
-    this.handleFilterTag = this.handleFilterTag.bind(this)
-    this.handleMessageDelete = this.handleMessageDelete.bind(this)
-    this.handleOpenAlert = this.handleOpenAlert.bind(this)
-    this.handleCloseAlert = this.handleCloseAlert.bind(this)
-    this.isValueName = this.isValueName.bind(this)
-    this.formateName = this.formateName.bind(this)
-    this.state = {
-      unit: {
-        id: 1,
-        number: '',
-        tags: [],
+export default () => {
+  const [unit, setUnit] = useState({
+    id: 1,
+    number: "",
+    tags: [],
+    occupants: [],
+    directoryEntries: [],
+  })
+  const [emptyOccupant, setEmptyOccupant] = useState({})
+  const [emptyDirectory, setEmptyDirectory] = useState({})
+  const [units, setUnits] = useState([])
+  const [showSuite, setShowSuite] = useState(false)
+  const [showNewTag, setShowNewTag] = useState(false)
+  const [addressOptions, setAddressOptions] = useState({})
+  const [tagList, setTagList] = useState([])
+  const [openAlert, setOpenAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+  const [messages, setMessages] = useState([])
+  const [newTagValue, setNewTagValue] = useState("")
 
-        occupants: [],
-        directoryEntries: [],
-      },
-      emptyOccupant: {},
-      emptyDirectory: {},
-      units: [],
-      showSuite: false,
-      showNewTag: false,
-      addressOptions: {},
-      tagList: [],
-      openAlert: false,
-      AlertMessage: '',
-    }
-    this.getUnits(global.buildingId)
+  useEffect(() => {
+    getUnits(global.buildingId)
+  }, [])
+
+  const handleOpenAlert = (message) => {
+    setOpenAlert(true)
+    setAlertMessage(message)
   }
 
-  handleOpenAlert(alertMessage) {
-    this.setState({ openAlert: true, AlertMessage: alertMessage })
-  }
+  const handleCloseAlert = () => setOpenAlert(false)
 
-  handleCloseAlert() {
-    this.setState({ openAlert: false })
-  }
+  const getUnits = (buildingId) => {
+    global.internalApi.getBuildingUnits(buildingId).then((data) => {
+      const newUnits = _.map(data, ({ id, commaxId: number }) => ({
+        id,
+        number,
+      }))
 
-  getTagList(buildingId) {
-    const component = this
-    global.internalApi
-      .getExistBuildingTags(buildingId)
-      .then(function (data) {
-        const tags = data
-        component.setState({ buildingTagList: tags })
-      })
-      .then(function () {
-        let list = component.state.buildingTagList
-        if (component.state.unit) {
-          list = component.state.buildingTagList.filter(
-            (tag) =>
-              !component.state.unit.tags.some(function (val) {
-                return val.tag === tag
-              })
-          )
-        }
-        component.setState({
-          tagList: list,
-        })
-      })
-  }
+      setUnits(newUnits)
 
-  getUnits(buildingId) {
-    const component = this
-    global.internalApi.getBuildingUnits(buildingId).then(function (data) {
-      const units = _.map(data, (o) => {
-        return {
-          id: o.id,
-          number: o.commaxId,
-        }
-      })
-      component.setState({ units: units })
       const options = _.fromPairs(
-        _.map(_.sortBy(units, ['number']), (unit) => {
+        _.map(_.sortBy(newUnits, ["number"]), (unit) => {
           return [`Suite ${unit.number}`, [unit.number]]
         })
       )
-      console.log('options', options)
-      component.setState({ addressOptions: options })
+
+      console.log("options", options)
+
+      setAddressOptions(options)
     })
   }
 
-  getunitId(number) {
-    let o = _.filter(this.state.units, (o) => {
-      return o.number === number
-    })
-    let v = null
-    if (o.length > 0) {
-      v = o[0].id
-    }
-    return v
+  const getunitId = (number) => {
+    let o = _.filter(units, (o) => o.number === number)
+
+    return o.length > 0 ? o[0].id : null
   }
 
-  getunitNumber(id) {
-    let o = _.filter(this.state.units, (o) => {
-      return o.id === id
-    })
-    let v = null
-    if (o.length > 0) {
-      v = o[0].number
-    }
-    return v
+  const getunitNumber = (id) => {
+    let o = _.filter(units, (o) => o.id === id)
+
+    return o.length > 0 ? o[0].number : null
   }
 
-  getUnitByNumber(number) {
-    this.getUnitById(this.getunitId(number))
-  }
+  const getUnitByNumber = (number) => getUnitById(getunitId(number))
 
-  getUnitById(unitId) {
-    const component = this
-    const number = component.getunitNumber(unitId)
+  const getUnitById = (unitId) => {
+    const number = getunitNumber(unitId)
     let unit = {}
-    let directoryEntries = []
+    const newDirectoryEntries = []
+
     global.internalApi
       .getUnit(unitId)
-      .then(function (data) {
-        const occs = _.map(data.properyOccupants, (o) => {
-          return {
-            id: o.id,
-            firstName: o.firstName,
-            lastName: o.lastName,
-            email: o.email,
-            phone: o.phone,
-            unitId: o.propertyId,
-          }
-        })
+      .then(({ properyOccupants, id, suite: number, tags }) => {
+        const occs = _.map(
+          properyOccupants,
+          ({ id, firstName, lastName, email, phone, propertyId: unitId }) => ({
+            id,
+            firstName,
+            lastName,
+            email,
+            phone,
+            unitId,
+          })
+        )
+
         unit = {
-          id: data.id,
-          number: data.suite,
-          tags: data.tags,
+          id,
+          number,
+          tags: tags,
           occupants: occs,
           directoryEntries: [],
         }
       })
-      .then(function () {
+      .then(() => {
         global.externalApi
           .getDirectoryEntry(global.buildingNum, number)
-          .then(function (data) {
-            _.map(data, (d) => {
-              _.map(d.nickname, (o) => {
-                directoryEntries.push({
+          .then((data) => {
+            _.map(data, ({ nickname, building, household }) => {
+              _.map(nickname, (o) => {
+                newDirectoryEntries.push({
                   id: o.hu_no,
                   name: o.username,
-                  buildingId: d.building,
-                  unitId: d.household,
+                  buildingId: building,
+                  unitId: household,
                 })
               })
             })
-            unit.directoryEntries = directoryEntries
-            component.setState({
-              unit: unit,
-              emptyOccupant: {
-                id: 0,
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
-                unitId: unit.id,
-              },
-              emptyDirectory: {
-                id: 0,
-                name: '',
-                buildingId: global.buildingNum,
-                unitId: number,
-              },
+
+            unit.directoryEntries = newDirectoryEntries
+
+            setUnit(unit)
+
+            setEmptyOccupant({
+              id: 0,
+              firstName: "",
+              lastName: "",
+              email: "",
+              phone: "",
+              unitId: unit.id,
+            })
+
+            setEmptyDirectory({
+              id: 0,
+              name: "",
+              buildingId: global.buildingNum,
+              unitId: number,
             })
           })
       })
   }
 
-  getNotifications(unitNum) {
-    const component = this
-    if (unitNum === undefined) unitNum = component.state.unit.number
+  const getNotifications = (unitNum) => {
+    if (!unitNum) unitNum = unit.number
+
     global.externalApi
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
-        const notifications = _.map(data, (msg) => {
-          const allAddressees = _.uniq(
-            _.map(msg.m_house, (addr) => {
-              return addr.House.split('-')[1]
-            })
-          )
-          const displayAddressees =
-            msg.m_house.length > 4
-              ? `${allAddressees[0]}, ${allAddressees[1]}, ${
-                  allAddressees[2]
-                } and ${allAddressees.length - 3} others`
-              : _.sum(
-                  _.map(allAddressees, (a) => {
-                    return a + ' '
-                  })
-                )
-          var parser = new DOMParser()
-          return {
-            id: msg.m_no,
-            subject: parser.parseFromString(
-              '<!doctype html><body>' + msg.m_subject,
-              'text/html'
-            ).body.textContent,
-            type: msg.m_type,
-            message: parser.parseFromString(
-              '<!doctype html><body>' + msg.m_content,
-              'text/html'
-            ).body.textContent,
-            allSentTo: allAddressees,
-            sentTo: displayAddressees,
-            sendDate: moment(msg.m_wdate, 'YYYYMMDDHHmm').unix(),
-            expires: moment(msg.m_edate, 'YYYYMMDDHHmm').unix(),
+        const notifications = _.map(
+          data,
+          ({
+            m_house,
+            m_no: id,
+            m_subject,
+            m_type: type,
+            m_content,
+            m_wdate,
+            m_edate,
+          }) => {
+            const allAddressees = _.uniq(
+              _.map(m_house, (addr) => addr.House.split("-")[1])
+            )
+
+            const displayAddressees =
+              m_house.length > 4
+                ? `${allAddressees[0]}, ${allAddressees[1]}, ${
+                    allAddressees[2]
+                  } and ${allAddressees.length - 3} others`
+                : _.sum(
+                    _.map(allAddressees, (a) => {
+                      return a + " "
+                    })
+                  )
+
+            const parser = new DOMParser()
+
+            return {
+              id,
+              type,
+              subject: parser.parseFromString(
+                "<!doctype html><body>" + m_subject,
+                "text/html"
+              ).body.textContent,
+              message: parser.parseFromString(
+                "<!doctype html><body>" + m_content,
+                "text/html"
+              ).body.textContent,
+              allSentTo: allAddressees,
+              sentTo: displayAddressees,
+              sendDate: moment(m_wdate, "YYYYMMDDHHmm").unix(),
+              expires: moment(m_edate, "YYYYMMDDHHmm").unix(),
+            }
           }
-        })
-        const unitNotifications = _.filter(notifications, (msg) => {
-          return msg.allSentTo.includes(unitNum)
-        })
-        component.setState({ messages: unitNotifications })
+        )
+
+        const unitNotifications = _.filter(notifications, (msg) =>
+          msg.allSentTo.includes(unitNum)
+        )
+
+        setMessages(unitNotifications)
       })
   }
 
-  getDirectoryEntity(buildingId, unitId) {
-    const component = this
-    let directoryEntries = []
-    global.externalApi
-      .getDirectoryEntry(buildingId, unitId)
-      .then(function (data) {
-        _.map(data, (d) => {
-          _.map(d.nickname, (o) => {
-            directoryEntries.push({
-              id: o.hu_no,
-              name: o.username,
-              buildingId: d.building,
-              unitId: d.household,
+  const getDirectoryEntity = (buildingId, unitId) => {
+    let newDirectoryEntries = []
+
+    global.externalApi.getDirectoryEntry(buildingId, unitId).then((data) => {
+      _.map(data, ({ nickname }) => {
+        _.map(
+          nickname,
+          ({
+            hu_no: id,
+            username: name,
+            building: buildingId,
+            household: number,
+          }) => {
+            newDirectoryEntries.push({
+              id,
+              name,
+              buildingId,
+              number,
             })
-          })
-        })
-        let unit = component.state.unit
-        unit.directoryEntries = directoryEntries
-        component.setState({
-          unit: unit,
-        })
+          }
+        )
       })
+
+      setUnit((unit) => ({ ...unit, newDirectoryEntries }))
+    })
   }
 
-  handleSearchChange(unit) {
+  const handleSearchChange = (unit) => {
     console.log(`loading unit ${unit}`)
-    this.getUnitByNumber(unit)
-    this.getNotifications(unit[0])
-    this.setState({ showSuite: true })
+
+    getUnitByNumber(unit)
+    getNotifications(unit[0])
+    setShowSuite(true)
   }
 
-  handleOccupantSave(entity) {
-    const component = this
-    if (entity.id > 0) {
-      global.internalApi.updateOccupant(entity)
-    } else {
-      global.internalApi.addOccupant(entity).then(function () {
-        component.getUnitById(entity.unitId)
-      })
-    }
-    console.log('occupant updated: ', entity)
+  const handleOccupantSave = (entity) => {
+    if (entity.id > 0) global.internalApi.updateOccupant(entity)
+    else
+      global.internalApi
+        .addOccupant(entity)
+        .then(() => getUnitById(entity.unitId))
+
+    console.log("occupant updated: ", entity)
   }
 
-  handleOccupantDelete(entities) {
-    const component = this
+  const handleOccupantDelete = (entities) => {
     _.each(entities, (entity) => {
-      global.internalApi.deleteOccupants(entity.id).then(function () {
-        component.getUnitByNumber(component.state.unit.number)
+      global.internalApi.deleteOccupants(entity.id).then(() => {
+        getUnitByNumber(unit.number)
       })
     })
   }
 
-  formateName(name) {
-    return name.trim().replace(/\s\s+/g, ' ')
-  }
+  const formateName = (name) => name.trim().replace(/\s\s+/g, " ")
 
-  isValueName(name) {
-    if (name.includes('#')) {
+  const isValueName = (name) => {
+    if (name.includes("#")) {
       return {
         valid: false,
-        error: 'The # symbol cannot appear in the lobby directory.',
+        error: "The # symbol cannot appear in the lobby directory.",
       }
     }
+
     if (name.length > global.maxNameLength) {
       return {
         valid: false,
-        error:
-          'The Maximum Length for Name is ' +
-          global.maxNameLength +
-          ' Characters.',
+        error: `The Maximum Length for Name is ${global.maxNameLength} Characters.`,
       }
     }
-    let names = name.split(' ')
-    let tooLong = names.some(function (val) {
-      return val.length > global.maxWordLength
-    })
+
+    const names = name.split(" ")
+    const tooLong = names.some((val) => val.length > global.maxWordLength)
+
     if (tooLong) {
       return {
         valid: false,
-        error:
-          'The Maximum Length for a First or Last Name is ' +
-          global.maxWordLength +
-          ' Characters.',
+        error: `The Maximum Length for a First or Last Name is ${global.maxWordLength} Characters.`,
       }
     }
-    return { valid: true, error: '' }
+
+    return { valid: true, error: "" }
   }
 
-  handleDirectorySave(entity) {
-    const component = this
-    let buildingId = entity.buildingId
-    let unitId = entity.unitId
-    entity.name = this.formateName(entity.name)
-    var result = this.isValueName(entity.name)
+  const handleDirectorySave = ({ buildingId, unitId, name, id: hu_no }) => {
+    const username = formateName(name)
+
+    let result = isValueName(name)
+
     if (result.valid) {
-      let name = JSON.stringify([
-        { hu_no: entity.id, username: entity.name },
-      ]).replace(/'/g, "''")
+      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
+
       global.externalApi
-        .setDirectoryEntry(buildingId, unitId, name)
-        .then(function () {
-          component.getDirectoryEntity(buildingId, unitId)
+        .setDirectoryEntry(buildingId, unitId, dirName)
+        .then(() => {
+          getDirectoryEntity(buildingId, unitId)
         })
-    } else {
-      component.getDirectoryEntity(buildingId, unitId)
-    }
+    } else getDirectoryEntity(buildingId, unitId)
+
     return result.error
   }
 
-  handleDirectoryAdd(entity) {
-    const component = this
-    let buildingId = entity.buildingId
-    let unitId = entity.unitId
-    entity.name = this.formateName(entity.name)
-    var result = this.isValueName(entity.name)
+  const handleDirectoryAdd = ({ buildingId, unitId, name, id: hu_no }) => {
+    const username = formateName(name)
+
+    let result = isValueName(name)
+
     if (result.valid) {
-      let name = JSON.stringify([{ username: entity.name }]).replace(/'/g, "''")
+      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
+
       global.externalApi
-        .addDirectoryEntry(buildingId, unitId, name)
-        .then(function () {
-          component.getDirectoryEntity(buildingId, unitId)
+        .addDirectoryEntry(buildingId, unitId, dirName)
+        .then(() => {
+          getDirectoryEntity(buildingId, unitId)
         })
-    } else {
-      component.getDirectoryEntity(buildingId, unitId)
-    }
+    } else getDirectoryEntity(buildingId, unitId)
+
     return result.error
   }
 
-  handleDirectoryDelete(entities) {
-    const component = this
-    var name = []
-    var buildingId = ''
-    var unitId = ''
-    _.each(entities, (entity) => {
-      buildingId = entity.buildingId
-      unitId = entity.unitId
-      name.push({ hu_no: entity.id })
+  const handleDirectoryDelete = (entities) => {
+    const name = []
+    let newBuildingId = ""
+    let newUnitId = ""
+
+    _.each(entities, ({ buildingId, unitId, id: hu_no }) => {
+      newBuildingId = buildingId
+      newUnitId = unitId
+
+      name.push({ hu_no })
     })
-    let names = JSON.stringify(name).replace(/'/g, "''")
-    console.log('deleting ', buildingId, unitId, name)
+
+    const dirName = JSON.stringify(name).replace(/'/g, "''")
+
+    console.log("deleting ", newBuildingId, newUnitId, name)
+
     global.externalApi
-      .deleteDirectoryEntry(buildingId, unitId, names)
-      .then(function () {
-        component.getDirectoryEntity(buildingId, unitId)
+      .deleteDirectoryEntry(newBuildingId, newUnitId, dirName)
+      .then(() => {
+        getDirectoryEntity(newBuildingId, newUnitId)
       })
   }
 
-  handleAddTag() {
-    const component = this
-    global.internalApi
-      .getExistBuildingTags(global.buildingId)
-      .then(function (data) {
-        let tags = data
-        if (component.state.unit) {
-          tags = data.filter(
-            (tag) =>
-              !component.state.unit.tags.some(function (val) {
-                return val.tag === tag
-              })
-          )
-        }
-        component.setState({
-          showNewTag: !component.state.showNewTag,
-          newTagValue: '',
-          tagList: tags,
-        })
-      })
-  }
+  const handleAddTag = () =>
+    global.internalApi.getExistBuildingTags(global.buildingId).then((data) => {
+      let tags = data
 
-  handleNewTagValueChange(value) {
-    this.setState({ newTagValue: _.capitalize(value) })
-  }
-  handleFilterTag(searchText, key) {
-    return (
-      searchText !== '' &&
-      key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
-    )
-  }
+      if (unit) {
+        tags = data.filter((tag) => !unit.tags.some((val) => val.tag === tag))
+      }
 
-  handleTagSave() {
-    const component = this
-    let exist = component.state.unit.tags.some(function (val) {
-      return val.tag === component.state.newTagValue
+      setShowNewTag((showNewTag) => !showNewTag)
+      setNewTagValue("")
+      setTagList(tags)
     })
+
+  const handleNewTagValueChange = (value) => setNewTagValue(_.capitalize(value))
+
+  const handleFilterTag = (searchText, key) =>
+    searchText !== "" &&
+    key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+
+  const handleTagSave = () => {
+    let exist = unit.tags.some((val) => val.tag === newTagValue)
+
     if (exist) {
-      this.handleOpenAlert('The Same Tag Cannot be Added Twice.')
+      handleOpenAlert("The Same Tag Cannot be Added Twice.")
       return
     }
+
     const newTag = {
-      tag: this.state.newTagValue,
-      PropertyId: this.state.unit.id,
+      tag: newTagValue,
+      PropertyId: unit.id,
     }
-    global.internalApi.saveTag(newTag).then(function (data) {
+
+    global.internalApi.saveTag(newTag).then(({ id, tag, PropertyId }) => {
       const addedTag = {
-        id: data.id,
-        tag: data.tag,
-        PropertyId: data.PropertyId,
+        id,
+        tag,
+        PropertyId,
       }
-      component.setState({
-        unit: _.assign(component.state.unit, {
-          tags: component.state.unit.tags.concat(addedTag),
-        }),
-        showNewTag: false,
-      })
+
+      setUnit((unit) =>
+        _.assign(unit, {
+          tags: unit.tags.concat(addedTag),
+        })
+      )
+      setShowNewTag(false)
     })
   }
 
-  handleRemoveTag(tag) {
-    const component = this
-    global.internalApi.deleteTag(tag).then(function () {
-      component.setState({
-        unit: _.assign(component.state.unit, {
-          tags: _.without(component.state.unit.tags, tag),
-        }),
-        showNewTag: false,
-      })
+  const handleRemoveTag = (tag) =>
+    global.internalApi.deleteTag(tag).then(() => {
+      setUnit((unit) =>
+        _.assign(unit, {
+          tags: _.without(unit.tags, tag),
+        })
+      )
+      setShowNewTag(false)
     })
-  }
 
-  handleMessageDelete(message) {
-    global.externalApi.deleteNotification(message.id).then(() => {
-      this.getNotifications(this.state.unit.number)
+  const handleMessageDelete = ({ id }) =>
+    global.externalApi.deleteNotification(id).then(() => {
+      getNotifications(unit.number)
     })
-  }
 
-  render() {
-    const actions = [
-      <Button
-        key="ok"
-        label="OK"
-        primary={true}
-        onClick={this.handleCloseAlert}
-      />,
-    ]
-    return (
-      <div>
-        <AutoCompleteSearch
-          addressOptions={this.state.addressOptions}
-          handleAddressUpdate={this.handleSearchChange}
-          hintText="Suite number"
-        />
-        <div style={{ display: this.state.showSuite ? 'none' : 'block' }}>
-          <span
-            style={{
-              fontSize: '24px',
-              color: 'rgba(0,0,0,0.87)',
-              lineHeight: '48px',
-            }}
-          >
-            Please select a suite using the search above
-          </span>
-        </div>
-        <div
+  const actions = [
+    <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
+  ]
+
+  return (
+    <div>
+      <AutoCompleteSearch
+        addressOptions={addressOptions}
+        handleAddressUpdate={handleSearchChange}
+        hintText="Suite number"
+      />
+      <div style={{ display: showSuite ? "none" : "block" }}>
+        <span
           style={{
-            display: this.state.showSuite ? 'block' : 'none',
-            height: '730px',
-            overflowY: 'scroll',
-            marginTop: '10px',
+            fontSize: "24px",
+            color: "rgba(0,0,0,0.87)",
+            lineHeight: "48px",
           }}
         >
-          <div style={{ marginLeft: '15px', height: '48px' }}>
-            <div
-              style={{ marginLeft: '15px', display: 'flex', flexWrap: 'wrap' }}
-            >
-              {_.map(this.state.unit.tags, (tag) => {
-                return (
-                  <Chip
-                    onRequestDelete={() => {
-                      this.handleRemoveTag(tag)
-                    }}
-                    style={{ margin: 4 }}
-                  >
-                    {' '}
-                    {tag.tag}{' '}
-                  </Chip>
-                )
-              })}
-              <IconButton
-                iconStyle={{ width: 24, height: 24 }}
-                style={{
-                  width: 36,
-                  height: 36,
-                  position: 'relative',
-                  top: '-5px',
-                }}
-                onClick={this.handleAddTag}
-              >
-                <ContentAdd />
-              </IconButton>
-              <div
-                style={{ display: this.state.showNewTag ? 'block' : 'none' }}
-              >
-                <Autocomplete
-                  style={{ height: '36px', marginLeft: '10px' }}
-                  listStyle={{ maxHeight: 200, overflow: 'auto' }}
-                  hintText="Tag"
-                  searchText={this.state.newTagValue}
-                  dataSource={this.state.tagList}
-                  onUpdateInput={(searchText /**, dataSource, params*/) => {
-                    this.handleNewTagValueChange(searchText)
-                  }}
-                  filter={this.handleFilterTag}
-                />
-
-                <Button
-                  label="Save"
-                  primary={true}
-                  style={{ marginLeft: '10px' }}
-                  onClick={() => {
-                    this.handleTagSave()
-                  }}
-                ></Button>
-              </div>
-            </div>
-            <span
-              style={{
-                fontSize: '36px',
-                color: 'rgba(0,0,0,0.87)',
-                lineHeight: '48px',
-                position: 'relative',
-                top: '-48px',
-              }}
-            >
-              Suite {this.state.unit.number}{' '}
-            </span>
-          </div>
-
-          <Grid container>
-            <Grid container xs={5}>
-              <Grid item xs={12}>
-                <EntityCrudSummaryCard
-                  searchHintText="First / last name"
-                  entityName="Occupants"
-                  entityProperties={[
-                    { label: 'first name', name: 'firstName' },
-                    { label: 'last name', name: 'lastName' },
-                    { label: 'phone', name: 'phone' },
-                  ]}
-                  entitySchema={[
-                    { label: 'first name', name: 'firstName', type: 'text' },
-                    { label: 'last name', name: 'lastName', type: 'text' },
-                    { label: 'phone', name: 'phone', type: 'text' },
-                    { label: 'email', name: 'email', type: 'text' },
-                  ]}
-                  entities={this.state.unit.occupants}
-                  emptyEntity={this.state.emptyOccupant}
-                  onEntitySave={this.handleOccupantSave}
-                  onEntityAdd={this.handleOccupantSave}
-                  onEntitiesDelete={this.handleOccupantDelete}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <EntityCrudSummaryCard
-                  searchHintText="Name"
-                  entityName="Directory Entries"
-                  entityProperties={[{ label: 'name', name: 'name' }]}
-                  entitySchema={[{ label: 'name', name: 'name', type: 'text' }]}
-                  entities={this.state.unit.directoryEntries}
-                  emptyEntity={this.state.emptyDirectory}
-                  onEntitySave={this.handleDirectorySave}
-                  onEntityAdd={this.handleDirectoryAdd}
-                  onEntitiesDelete={this.handleDirectoryDelete}
-                  disableAdd={
-                    this.state.unit.directoryEntries.length >=
-                    global.maxLobbyEntries
-                  }
-                />
-              </Grid>
-            </Grid>
-            <Grid container xs={7}>
-              <Grid item xs={12}>
-                <Card style={{ textAlign: 'left', margin: '20px' }}>
-                  <CardHeader title="Notifications" />
-                  <CardContent>
-                    <MessageList
-                      onDelete={this.handleMessageDelete}
-                      unitId={this.state.unit.id}
-                      messages={this.state.messages}
-                      style={{ height: '400px' }}
-                    />
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-            <Dialog
-              actions={actions}
-              modal={true}
-              open={this.state.openAlert}
-              onRequestClose={this.handleCloseAlert}
-            >
-              {this.state.AlertMessage}
-            </Dialog>
-          </Grid>
-        </div>
+          Please select a suite using the search above
+        </span>
       </div>
-    )
-  }
+      <div
+        style={{
+          display: showSuite ? "block" : "none",
+          height: "730px",
+          overflowY: "scroll",
+          marginTop: "10px",
+        }}
+      >
+        <div style={{ marginLeft: "15px", height: "48px" }}>
+          <div
+            style={{ marginLeft: "15px", display: "flex", flexWrap: "wrap" }}
+          >
+            {_.map(unit.tags, (tag) => (
+              <Chip
+                onRequestDelete={() => {
+                  handleRemoveTag(tag)
+                }}
+                style={{ margin: 4 }}
+              >
+                {" "}
+                {tag.tag}{" "}
+              </Chip>
+            ))}
+            <IconButton
+              iconStyle={{ width: 24, height: 24 }}
+              style={{
+                width: 36,
+                height: 36,
+                position: "relative",
+                top: "-5px",
+              }}
+              onClick={handleAddTag}
+            >
+              <ContentAdd />
+            </IconButton>
+            <div style={{ display: showNewTag ? "block" : "none" }}>
+              <Autocomplete
+                style={{ height: "36px", marginLeft: "10px" }}
+                listStyle={{ maxHeight: 200, overflow: "auto" }}
+                hintText="Tag"
+                searchText={newTagValue}
+                dataSource={tagList}
+                onUpdateInput={(searchText /**, dataSource, params*/) => {
+                  handleNewTagValueChange(searchText)
+                }}
+                filter={handleFilterTag}
+              />
+
+              <Button
+                label="Save"
+                primary={true}
+                style={{ marginLeft: "10px" }}
+                onClick={() => {
+                  handleTagSave()
+                }}
+              ></Button>
+            </div>
+          </div>
+          <span
+            style={{
+              fontSize: "36px",
+              color: "rgba(0,0,0,0.87)",
+              lineHeight: "48px",
+              position: "relative",
+              top: "-48px",
+            }}
+          >
+            Suite {unit.number}{" "}
+          </span>
+        </div>
+
+        <Grid container>
+          <Grid container xs={5}>
+            <Grid item xs={12}>
+              <EntityCrudSummaryCard
+                searchHintText="First / last name"
+                entityName="Occupants"
+                entityProperties={[
+                  { label: "first name", name: "firstName" },
+                  { label: "last name", name: "lastName" },
+                  { label: "phone", name: "phone" },
+                ]}
+                entitySchema={[
+                  { label: "first name", name: "firstName", type: "text" },
+                  { label: "last name", name: "lastName", type: "text" },
+                  { label: "phone", name: "phone", type: "text" },
+                  { label: "email", name: "email", type: "text" },
+                ]}
+                entities={unit.occupants}
+                emptyEntity={emptyOccupant}
+                onEntitySave={handleOccupantSave}
+                onEntityAdd={handleOccupantSave}
+                onEntitiesDelete={handleOccupantDelete}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <EntityCrudSummaryCard
+                searchHintText="Name"
+                entityName="Directory Entries"
+                entityProperties={[{ label: "name", name: "name" }]}
+                entitySchema={[{ label: "name", name: "name", type: "text" }]}
+                entities={unit.directoryEntries}
+                emptyEntity={emptyDirectory}
+                onEntitySave={handleDirectorySave}
+                onEntityAdd={handleDirectoryAdd}
+                onEntitiesDelete={handleDirectoryDelete}
+                disableAdd={
+                  unit.directoryEntries.length >= global.maxLobbyEntries
+                }
+              />
+            </Grid>
+          </Grid>
+          <Grid container xs={7}>
+            <Grid item xs={12}>
+              <Card style={{ textAlign: "left", margin: "20px" }}>
+                <CardHeader title="Notifications" />
+                <CardContent>
+                  <MessageList
+                    onDelete={handleMessageDelete}
+                    unitId={unit.id}
+                    messages={messages}
+                    style={{ height: "400px" }}
+                  />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+          <Dialog
+            actions={actions}
+            modal={true}
+            open={openAlert}
+            onRequestClose={handleCloseAlert}
+          >
+            {alertMessage}
+          </Dialog>
+        </Grid>
+      </div>
+    </div>
+  )
 }

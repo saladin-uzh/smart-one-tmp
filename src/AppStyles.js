@@ -4,7 +4,7 @@ import React from "react"
 import { colors, spacings } from "./constants"
 import avenirFont from "./fonts/AvenirLT-Book.ttf"
 
-export const SmartOneTheme = createMuiTheme({
+const SmartOneTheme = createMuiTheme({
   overrides: {
     MuiCssBaseline: {
       "@global": {
@@ -59,7 +59,7 @@ export const SmartOneTheme = createMuiTheme({
   spacing: [...Object.values(spacings), null, null, null, null, null],
 })
 
-export const GlobalStylesProvider = ({ children }) => {
+export default ({ children }) => {
   return (
     <ThemeProvider theme={SmartOneTheme}>
       <CssBaseline />

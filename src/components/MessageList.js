@@ -1,9 +1,10 @@
 import _ from "lodash"
 import React, { useState, useEffect } from "react"
 
-import { List } from "@material-ui/core"
+import { List, Card, CardContent, CardHeader } from "@material-ui/core"
 
 import { SearchAutoSuggest, MessageListItem } from "."
+import { spacings, colors } from "../constants"
 
 export default ({ messages: initialMessages, onDelete }) => {
   const [messages, setMessages] = useState(initialMessages)
@@ -33,23 +34,31 @@ export default ({ messages: initialMessages, onDelete }) => {
   const handleDelete = (entity) => onDelete(entity)
 
   return (
-    <div>
-      <SearchAutoSuggest
-        onSearchChange={handleSearchChange}
-        hintText="Unit number, riser, floor"
+    <Card>
+      <CardHeader
+        title="Notifications"
+        action={
+          <SearchAutoSuggest
+            type="messages"
+            onSearchChange={handleSearchChange}
+            options={messages}
+            hintText="Unit number, riser, floor"
+          />
+        }
       />
-      <List
-        style={{
-          textAlign: "left",
-          height: "400px",
-          maxHeight: "50%",
-          overflowY: "auto",
-        }}
-      >
-        {_.map(filteredMessages, (msg) => (
-          <MessageListItem message={msg} onDelete={handleDelete} />
-        ))}
-      </List>
-    </div>
+      <CardContent>
+        <List
+          style={{ padding: spacings.medium, backgroundColor: colors.whiteBg }}
+        >
+          {_.map(filteredMessages, (msg) => (
+            <MessageListItem
+              key={`h-M25_ql-${msg.sendDate}`}
+              message={msg}
+              onDelete={handleDelete}
+            />
+          ))}
+        </List>
+      </CardContent>
+    </Card>
   )
 }

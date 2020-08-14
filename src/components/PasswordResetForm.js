@@ -1,10 +1,10 @@
 import React, { useState, Fragment } from "react"
 
-import { Grid } from "@material-ui/core"
+import { Grid, Button } from "@material-ui/core"
 
 import { colors, spacings } from "../constants"
 
-import { TitleUI, ButtonUI, TextFieldUI } from "../ui"
+import { TitleUI, TextFieldUI } from "../ui"
 
 export default ({ username, setPassword, sendVerificationCode }) => {
   const [usernameInput, setUsernameInput] = useState(username)
@@ -96,9 +96,7 @@ export default ({ username, setPassword, sendVerificationCode }) => {
                     </Grid>
                   </Grid>
                   <Grid item xs={12} style={{ paddingTop: spacings.xLarge }}>
-                    <ButtonUI onClick={handleVerificationCodeSend}>
-                      Submit
-                    </ButtonUI>
+                    <Button onClick={handleVerificationCodeSend}>Submit</Button>
                   </Grid>
                 </Grid>
               </Fragment>
@@ -119,9 +117,7 @@ export default ({ username, setPassword, sendVerificationCode }) => {
                 />
               </Grid>
               <Grid item xs={12} style={{ paddingTop: spacings.xLarge }}>
-                <ButtonUI onClick={handleVerificationCodeSend}>
-                  Send code
-                </ButtonUI>
+                <Button onClick={handleVerificationCodeSend}>Send code</Button>
               </Grid>
             </Grid>
           )}

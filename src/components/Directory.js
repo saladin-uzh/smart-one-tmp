@@ -1,19 +1,28 @@
 import _ from "lodash"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Fragment } from "react"
 import moment from "moment"
 
 import {
+  Grid,
+  Chip,
+  Dialog,
   Card,
   CardHeader,
   CardContent,
   Button,
-  IconButton,
+  Fab,
 } from "@material-ui/core"
-import { Autocomplete } from "@material-ui/lab"
-import { Grid, Chip, Dialog } from "@material-ui/core"
-import { Add as ContentAdd } from "@material-ui/icons"
+import { Autocomplete, createFilterOptions } from "@material-ui/lab"
+import { AddRounded } from "@material-ui/icons"
 
-import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from "."
+import {
+  MessageList,
+  AutoCompleteSearch,
+  EntityCrudSummaryCard,
+  SearchAutoSuggest,
+} from "."
+import { spacings, colors } from "../constants"
+import { TextFieldNoBorder, IconDirectories, IconOccupants } from "../ui"
 
 export default () => {
   const [unit, setUnit] = useState({
@@ -28,7 +37,7 @@ export default () => {
   const [units, setUnits] = useState([])
   const [showSuite, setShowSuite] = useState(false)
   const [showNewTag, setShowNewTag] = useState(false)
-  const [addressOptions, setAddressOptions] = useState({})
+  const [addressOptions, setAddressOptions] = useState([])
   const [tagList, setTagList] = useState([])
   const [openAlert, setOpenAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState("")
@@ -38,6 +47,15 @@ export default () => {
   useEffect(() => {
     getUnits(global.buildingId)
   }, [])
+
+  useEffect(() => {
+    console.group("Component did mount:")
+    console.log("Unit: ", unit)
+    console.log("Occupants: ", unit.occupants)
+    console.log("Tags: ", tagList)
+    console.log("Notifs: ", messages)
+    console.groupEnd()
+  }, [unit, tagList])
 
   const handleOpenAlert = (message) => {
     setOpenAlert(true)
@@ -53,37 +71,37 @@ export default () => {
         number,
       }))
 
+      console.warn(newUnits)
+
       setUnits(newUnits)
 
-      const options = _.fromPairs(
-        _.map(_.sortBy(newUnits, ["number"]), (unit) => {
-          return [`Suite ${unit.number}`, [unit.number]]
-        })
+      const options = _.map(_.sortBy(newUnits, ["number"]), ({ number }) =>
+        number.trim()
       )
 
-      console.log("options", options)
+      console.log("options: ", options)
 
       setAddressOptions(options)
     })
   }
 
   const getunitId = (number) => {
-    let o = _.filter(units, (o) => o.number === number)
+    const index = units.findIndex((val) => parseInt(val.number, 10) === number)
 
-    return o.length > 0 ? o[0].id : null
+    return units[index >= 0 ? index : 0].id
   }
 
   const getunitNumber = (id) => {
-    let o = _.filter(units, (o) => o.id === id)
+    const index = units.findIndex((val) => val.id === id)
 
-    return o.length > 0 ? o[0].number : null
+    return index >= 0 ? units[index].number : 0
   }
 
   const getUnitByNumber = (number) => getUnitById(getunitId(number))
 
   const getUnitById = (unitId) => {
     const number = getunitNumber(unitId)
-    let unit = {}
+    let newUnit = {}
     const newDirectoryEntries = []
 
     global.internalApi
@@ -101,7 +119,7 @@ export default () => {
           })
         )
 
-        unit = {
+        newUnit = {
           id,
           number,
           tags: tags,
@@ -124,9 +142,9 @@ export default () => {
               })
             })
 
-            unit.directoryEntries = newDirectoryEntries
+            newUnit.directoryEntries = newDirectoryEntries
 
-            setUnit(unit)
+            setUnit(newUnit)
 
             setEmptyOccupant({
               id: 0,
@@ -134,7 +152,7 @@ export default () => {
               lastName: "",
               email: "",
               phone: "",
-              unitId: unit.id,
+              unitId: newUnit.id,
             })
 
             setEmptyDirectory({
@@ -153,6 +171,7 @@ export default () => {
     global.externalApi
       .getBuildingNotifications(global.buildingNum)
       .then((data) => {
+        console.log(data)
         const notifications = _.map(
           data,
           ({
@@ -200,8 +219,10 @@ export default () => {
           }
         )
 
+        console.log(notifications)
+
         const unitNotifications = _.filter(notifications, (msg) =>
-          msg.allSentTo.includes(unitNum)
+          msg.allSentTo.includes(unitNum.toString())
         )
 
         setMessages(unitNotifications)
@@ -231,19 +252,23 @@ export default () => {
         )
       })
 
-      setUnit((unit) => ({ ...unit, newDirectoryEntries }))
+      setUnit((unit) => ({ ...unit, directoryEntries: newDirectoryEntries }))
     })
   }
 
-  const handleSearchChange = (unit) => {
-    console.log(`loading unit ${unit}`)
+  const handleSearchChange = (selection) => {
+    if (Boolean(selection)) {
+      const num =
+        typeof selection === "number" ? selection : parseInt(selection, 10)
 
-    getUnitByNumber(unit)
-    getNotifications(unit[0])
-    setShowSuite(true)
+      getUnitByNumber(num) // unit, emptyOccupant, emptyDirecyory
+      getNotifications(num) // messages
+
+      setShowSuite(true)
+    } else setShowSuite(false)
   }
 
-  const handleOccupantSave = (entity) => {
+  const handleOccupantAdd = (entity) => {
     if (entity.id > 0) global.internalApi.updateOccupant(entity)
     else
       global.internalApi
@@ -291,32 +316,33 @@ export default () => {
     return { valid: true, error: "" }
   }
 
-  const handleDirectorySave = ({ buildingId, unitId, name, id: hu_no }) => {
-    const username = formateName(name)
+  // const handleDirectorySave = ({ buildingId, unitId, name, id: hu_no }) => {
+  //   const username = formateName(name)
 
-    let result = isValueName(name)
+  //   let result = isValueName(name)
 
-    if (result.valid) {
-      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
+  //   if (result.valid) {
+  //     const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
 
-      global.externalApi
-        .setDirectoryEntry(buildingId, unitId, dirName)
-        .then(() => {
-          getDirectoryEntity(buildingId, unitId)
-        })
-    } else getDirectoryEntity(buildingId, unitId)
+  //     global.externalApi
+  //       .setDirectoryEntry(buildingId, unitId, dirName)
+  //       .then(() => {
+  //         getDirectoryEntity(buildingId, unitId)
+  //       })
+  //   } else getDirectoryEntity(buildingId, unitId)
 
-    return result.error
-  }
+  //   return result.error
+  // }
 
   const handleDirectoryAdd = ({ buildingId, unitId, name, id: hu_no }) => {
     const username = formateName(name)
 
-    let result = isValueName(name)
+    const result = isValueName(username)
 
     if (result.valid) {
-      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
+      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, '"')
 
+      console.log(dirName)
       global.externalApi
         .addDirectoryEntry(buildingId, unitId, dirName)
         .then(() => {
@@ -324,7 +350,7 @@ export default () => {
         })
     } else getDirectoryEntity(buildingId, unitId)
 
-    return result.error
+    // return result.error
   }
 
   const handleDirectoryDelete = (entities) => {
@@ -354,20 +380,22 @@ export default () => {
     global.internalApi.getExistBuildingTags(global.buildingId).then((data) => {
       let tags = data
 
-      if (unit) {
-        tags = data.filter((tag) => !unit.tags.some((val) => val.tag === tag))
-      }
+      console.log(data)
+      tags = data.filter((tag) => !unit.tags.some((val) => val.tag === tag))
+
+      console.log(tags)
 
       setShowNewTag((showNewTag) => !showNewTag)
       setNewTagValue("")
       setTagList(tags)
     })
 
-  const handleNewTagValueChange = (value) => setNewTagValue(_.capitalize(value))
+  const handleNewTagValueChange = (event, value) =>
+    setNewTagValue(_.capitalize(value))
 
-  const handleFilterTag = (searchText, key) =>
-    searchText !== "" &&
-    key.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+  const handleFilterTag = createFilterOptions({
+    stringify: (tag) => tag.toLowerCase(),
+  })
 
   const handleTagSave = () => {
     let exist = unit.tags.some((val) => val.tag === newTagValue)
@@ -394,6 +422,7 @@ export default () => {
           tags: unit.tags.concat(addedTag),
         })
       )
+
       setShowNewTag(false)
     })
   }
@@ -405,6 +434,7 @@ export default () => {
           tags: _.without(unit.tags, tag),
         })
       )
+
       setShowNewTag(false)
     })
 
@@ -418,100 +448,161 @@ export default () => {
   ]
 
   return (
-    <div>
-      <AutoCompleteSearch
-        addressOptions={addressOptions}
-        handleAddressUpdate={handleSearchChange}
-        hintText="Suite number"
-      />
-      <div style={{ display: showSuite ? "none" : "block" }}>
-        <span
-          style={{
-            fontSize: "24px",
-            color: "rgba(0,0,0,0.87)",
-            lineHeight: "48px",
-          }}
+    <Grid
+      container
+      style={{
+        width: "auto",
+        minHeight: "100%",
+        minWidth: 1070,
+        flexGrow: 1,
+        margin: 0,
+        padding: spacings.large,
+        textAlign: "left",
+      }}
+      alignItems="flex-start"
+      alignContent="flex-start"
+      justify="flex-start"
+      spacing={5}
+    >
+      <Grid item container xs={showSuite ? 7 : 12}>
+        <Grid
+          item
+          container
+          xs={12}
+          justify={showSuite ? "space-between" : "flex-end"}
+          alignItems="flex-start"
+          style={{ paddingBottom: spacings.xSmall }}
         >
-          Please select a suite using the search above
-        </span>
-      </div>
-      <div
-        style={{
-          display: showSuite ? "block" : "none",
-          height: "730px",
-          overflowY: "scroll",
-          marginTop: "10px",
-        }}
-      >
-        <div style={{ marginLeft: "15px", height: "48px" }}>
-          <div
-            style={{ marginLeft: "15px", display: "flex", flexWrap: "wrap" }}
-          >
-            {_.map(unit.tags, (tag) => (
-              <Chip
-                onRequestDelete={() => {
-                  handleRemoveTag(tag)
-                }}
-                style={{ margin: 4 }}
+          {showSuite && (
+            <Grid item xs={8}>
+              <h1
+                style={{ margin: 0, display: "flex", alignItems: "flex-end" }}
               >
-                {" "}
-                {tag.tag}{" "}
-              </Chip>
-            ))}
-            <IconButton
-              iconStyle={{ width: 24, height: 24 }}
-              style={{
-                width: 36,
-                height: 36,
-                position: "relative",
-                top: "-5px",
-              }}
-              onClick={handleAddTag}
-            >
-              <ContentAdd />
-            </IconButton>
-            <div style={{ display: showNewTag ? "block" : "none" }}>
-              <Autocomplete
-                style={{ height: "36px", marginLeft: "10px" }}
-                listStyle={{ maxHeight: 200, overflow: "auto" }}
-                hintText="Tag"
-                searchText={newTagValue}
-                dataSource={tagList}
-                onUpdateInput={(searchText /**, dataSource, params*/) => {
-                  handleNewTagValueChange(searchText)
-                }}
-                filter={handleFilterTag}
-              />
+                Suite {unit.number}
+              </h1>
+            </Grid>
+          )}
 
-              <Button
-                label="Save"
-                primary={true}
-                style={{ marginLeft: "10px" }}
-                onClick={() => {
-                  handleTagSave()
-                }}
-              ></Button>
-            </div>
-          </div>
-          <span
-            style={{
-              fontSize: "36px",
-              color: "rgba(0,0,0,0.87)",
-              lineHeight: "48px",
-              position: "relative",
-              top: "-48px",
-            }}
+          <Grid
+            item
+            xs={4}
+            style={{ minWidth: 150, marginBottom: spacings.xxLarge }}
           >
-            Suite {unit.number}{" "}
-          </span>
-        </div>
+            <AutoCompleteSearch
+              addressOptions={addressOptions}
+              handleAddressUpdate={handleSearchChange}
+              hintText="Suite number"
+            />
+          </Grid>
 
-        <Grid container>
-          <Grid container xs={5}>
+          {!showSuite && (
             <Grid item xs={12}>
+              <span style={{ fontSize: "1.3rem" }}>
+                Please select <strong>a suite</strong>
+              </span>
+            </Grid>
+          )}
+
+          {showSuite && (
+            <Grid item xs={12} container alignItems="center">
+              <Grid item>
+                <Fab
+                  onClick={handleAddTag}
+                  style={{
+                    marginRight: spacings.xSmall,
+                  }}
+                >
+                  <AddRounded
+                    style={{
+                      transition: "transform .1s linear",
+                      transitionDelay: "0",
+                      transform: `rotate(${showNewTag ? "45deg" : 0})`,
+                    }}
+                  />
+                </Fab>
+              </Grid>
+
+              {_.map(unit.tags, (tag) => (
+                <Grid item key={`pnbsYhTAm${tag.id}`}>
+                  <Chip
+                    key={tag}
+                    label={tag.tag}
+                    style={{
+                      marginRight: spacings.xxSmall,
+                      padding: ".3em",
+                    }}
+                    onDelete={() => {
+                      handleRemoveTag(tag)
+                    }}
+                  />
+                </Grid>
+              ))}
+
+              {showNewTag && (
+                <Grid item container style={{ width: "auto" }}>
+                  <Autocomplete
+                    ListboxProps={{
+                      style: { maxHeight: 200, overflow: "auto" },
+                    }}
+                    inputValue={newTagValue}
+                    onInputChange={handleNewTagValueChange}
+                    options={tagList}
+                    filterOptions={handleFilterTag}
+                    freeSolo
+                    renderInput={(params) => (
+                      <TextFieldNoBorder isTiny {...params} autoFocus />
+                    )}
+                  />
+
+                  <Button
+                    size="small"
+                    style={{ marginLeft: spacings.xxSmall }}
+                    onClick={handleTagSave}
+                  >
+                    Save
+                  </Button>
+                </Grid>
+              )}
+            </Grid>
+          )}
+        </Grid>
+
+        {!showSuite && (
+          <Grid
+            item
+            xs={12}
+            container
+            spacing={4}
+            alignItems="flex-start"
+            alignContent="flex-start"
+          >
+            {addressOptions.map((option) => (
+              <Grid item key={`lZUNLCNrM${option}`}>
+                <Button
+                  style={{
+                    padding: spacings.medium,
+                    cursor: "pointer",
+                  }}
+                  key={`${option}KMvSIrXV7`}
+                  label={option}
+                  color="secondary"
+                  onClick={() => handleSearchChange(option)}
+                >
+                  {option}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+
+        {showSuite && (
+          <Fragment>
+            <Grid item xs={12} style={{ marginBottom: spacings.xLarge }}>
               <EntityCrudSummaryCard
                 searchHintText="First / last name"
                 entityName="Occupants"
+                NewEntityLable="New Occupants"
+                icon={IconOccupants}
                 entityProperties={[
                   { label: "first name", name: "firstName" },
                   { label: "last name", name: "lastName" },
@@ -525,20 +616,22 @@ export default () => {
                 ]}
                 entities={unit.occupants}
                 emptyEntity={emptyOccupant}
-                onEntitySave={handleOccupantSave}
-                onEntityAdd={handleOccupantSave}
+                // onEntitySave={handleOccupantAdd}
+                onEntityAdd={handleOccupantAdd}
                 onEntitiesDelete={handleOccupantDelete}
               />
             </Grid>
+
             <Grid item xs={12}>
               <EntityCrudSummaryCard
                 searchHintText="Name"
                 entityName="Directory Entries"
+                icon={IconDirectories}
                 entityProperties={[{ label: "name", name: "name" }]}
                 entitySchema={[{ label: "name", name: "name", type: "text" }]}
                 entities={unit.directoryEntries}
                 emptyEntity={emptyDirectory}
-                onEntitySave={handleDirectorySave}
+                // onEntitySave={handleDirectorySave}
                 onEntityAdd={handleDirectoryAdd}
                 onEntitiesDelete={handleDirectoryDelete}
                 disableAdd={
@@ -546,32 +639,30 @@ export default () => {
                 }
               />
             </Grid>
+
+            <Dialog
+              actions={actions}
+              modal={true}
+              open={openAlert}
+              onRequestClose={handleCloseAlert}
+            >
+              {alertMessage}
+            </Dialog>
+          </Fragment>
+        )}
+      </Grid>
+
+      {showSuite && (
+        <Grid item container xs={5}>
+          <Grid item xs={12}>
+            <MessageList
+              onDelete={handleMessageDelete}
+              unitId={unit.id}
+              messages={messages}
+            />
           </Grid>
-          <Grid container xs={7}>
-            <Grid item xs={12}>
-              <Card style={{ textAlign: "left", margin: "20px" }}>
-                <CardHeader title="Notifications" />
-                <CardContent>
-                  <MessageList
-                    onDelete={handleMessageDelete}
-                    unitId={unit.id}
-                    messages={messages}
-                    style={{ height: "400px" }}
-                  />
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-          <Dialog
-            actions={actions}
-            modal={true}
-            open={openAlert}
-            onRequestClose={handleCloseAlert}
-          >
-            {alertMessage}
-          </Dialog>
         </Grid>
-      </div>
-    </div>
+      )}
+    </Grid>
   )
 }

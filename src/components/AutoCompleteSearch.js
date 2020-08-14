@@ -1,52 +1,57 @@
-import _ from "lodash"
 import React, { useState } from "react"
 
-import { Search } from "@material-ui/icons"
-import { Autocomplete } from "@material-ui/lab"
+import { SearchRounded } from "@material-ui/icons"
+import { Autocomplete, createFilterOptions } from "@material-ui/lab"
+import { InputAdornment } from "@material-ui/core"
+
+import { colors } from "../constants"
+import { TextFieldNoBorder } from "../ui"
 
 export default ({ handleAddressUpdate, addressOptions, hintText }) => {
-  // const [selected, setSelected] = useState([])
-  const [searchText, setSearchText] = useState([])
+  const [selected, setSelected] = useState(null)
 
-  const filterOptions = (searchText, key) => {
-    if (_.isEmpty(searchText) || _.isEmpty(key)) {
-      return false
-    }
+  const filterOptions = createFilterOptions({
+    stringify: (option) => `Suite ${option}`,
+  })
 
-    let searchTextWords = searchText.toLowerCase().split(" ")
-    let lowerKey = key.toLowerCase()
-    return _.reduce(
-      searchTextWords,
-      (found, word) => {
-        return found || lowerKey.indexOf(word) !== -1
-      },
-      false
-    )
-  }
+  const handleSelection = (event, newSelected) => {
+    const selection = Boolean(newSelected)
+      ? newSelected.replace("Suite ", "")
+      : null
 
-  const handleUpdateInput = (searchText) => setSearchText(searchText)
+    setSelected(selection)
 
-  const handleSelection = (chosen, index) => {
-    if (index !== -1) {
-      // setSelected(chosen)
-      setSearchText("")
+    console.log("selected:", selection)
 
-      console.log("selected:", chosen)
-      handleAddressUpdate(addressOptions[chosen])
-    }
+    handleAddressUpdate(selection)
   }
 
   return (
-    <div>
-      <Search style={{ marginRight: 24 }} />
-      <Autocomplete
-        dataSource={_.keys(addressOptions)}
-        value={searchText}
-        hintText={hintText}
-        filterOptions={filterOptions}
-        onNewRequest={handleSelection}
-        onUpdateInput={handleUpdateInput}
-      />
-    </div>
+    <Autocomplete
+      value={selected}
+      onChange={handleSelection}
+      options={addressOptions}
+      getOptionLabel={(o) => `Suite ${o}`}
+      filterOptions={filterOptions}
+      renderInput={(params) => (
+        <TextFieldNoBorder
+          {...params}
+          InputProps={{
+            ...params.InputProps,
+            placeholder: hintText,
+            startAdornment: (
+              <InputAdornment position="start" style={{ top: "0.25em" }}>
+                <SearchRounded />
+              </InputAdornment>
+            ),
+          }}
+        />
+      )}
+      ListboxProps={{
+        style: {
+          background: colors.white,
+        },
+      }}
+    />
   )
 }

@@ -1,7 +1,7 @@
 import React from "react"
-import { spacings } from "../constants"
+import { withStyles, Button } from "@material-ui/core"
 
-const { withStyles, Button } = require("@material-ui/core")
+import { spacings } from "../constants"
 
 const StyledButton = withStyles({
   root: {

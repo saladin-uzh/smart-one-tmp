@@ -1,15 +1,71 @@
-import React from "react"
+import React, { useState } from "react"
+import moment from "moment"
 
-import { Search } from "@material-ui/icons"
-import { TextField } from "@material-ui/core"
+import { SearchRounded } from "@material-ui/icons"
+import { InputAdornment } from "@material-ui/core"
+import { colors, spacings } from "../constants"
+import { Autocomplete, createFilterOptions } from "@material-ui/lab"
+import { TextFieldNoBorder } from "../ui"
 
-export default ({ style, hintText, onSearchChange }) => {
-  const handleChange = (e) => onSearchChange(e.target.value)
+export default ({ type, options, label, onSearchChange }) => {
+  const [selected, setSelected] = useState(null)
+
+  const filterOptions = {
+    summary: createFilterOptions({
+      stringify: (option) =>
+        `${option.firstName} ${option.lastName} ${option.email} ${option.phone}`,
+    }),
+    messages: createFilterOptions({
+      stringify: (option) => option.message.toLowerCase(),
+    }),
+  }
+
+  const getOptionLabel = (option) => {
+    switch (type) {
+      case "summary":
+        return `${option.firstName} ${option.lastName}`
+      case "messages":
+        return `From ${option.subject} on ${moment
+          .unix(option.sendDate)
+          .format("l")}`
+    }
+  }
+
+  const handleSelection = (event, newSelected) => {
+    setSelected(newSelected)
+
+    onSearchChange(newSelected ? newSelected.id : null)
+  }
 
   return (
-    <div style={style}>
-      <Search style={{ marginRight: 24 }} />
-      <TextField onChange={handleChange} hintText={hintText} />
-    </div>
+    <Autocomplete
+      value={selected}
+      onChange={handleSelection}
+      freeSolo
+      options={options}
+      getOptionLabel={getOptionLabel}
+      filterOptions={filterOptions[type]}
+      style={{ minWidth: `calc(${spacings.xxLarge} * 5)` }}
+      renderInput={(params) => (
+        <TextFieldNoBorder
+          {...params}
+          bg={colors.whiteBg}
+          InputProps={{
+            ...params.InputProps,
+            placeholder: label,
+            startAdornment: (
+              <InputAdornment position="start" style={{ top: "0.25em" }}>
+                <SearchRounded />
+              </InputAdornment>
+            ),
+          }}
+        />
+      )}
+      ListboxProps={{
+        style: {
+          background: colors.white,
+        },
+      }}
+    />
   )
 }

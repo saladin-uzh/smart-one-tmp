@@ -1,9 +1,16 @@
 import _, { property } from "lodash"
 import React, { useState } from "react"
 
-import { Dialog, Button } from "@material-ui/core"
+import {
+  Dialog,
+  Button,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+} from "@material-ui/core"
 
 import { EntityCrudSelectField, EntityCrudTextField } from "."
+import { colors, radii } from "../constants"
 
 export default ({
   entity: initialEntity,
@@ -16,64 +23,55 @@ export default ({
   entitySchema,
 }) => {
   const [entity, setEntity] = useState(initialEntity)
-  const [openAlert, setOpenAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState("")
+  // const [openAlert, setOpenAlert] = useState(false)
+  // const [alertMessage, setAlertMessage] = useState("")
 
-  const handleOpenAlert = (message) => {
-    setOpenAlert(true)
-    setAlertMessage(message)
-  }
+  // const handleOpenAlert = (message) => {
+  //   setOpenAlert(true)
+  //   setAlertMessage(message)
+  // }
 
-  const handleCloseAlert = () => setOpenAlert(false)
+  // const handleCloseAlert = () => setOpenAlert(false)
 
   const handleSave = () => {
-    const value = onEntitySave(entity)
+    onEntitySave(entity)
+    handleClose()
+  }
+  // const handleSave = () => {
+  // const value = onEntitySave(entity)
 
-    if (!String.isNullOrEmpty(value)) {
-      handleOpenAlert(value)
-    }
+  // if (!String.isNullOrEmpty(value)) {
+  // handleOpenAlert(value)
+  // }
+  // }
+
+  const handleChange = (value, propertyName) => {
+    console.log(value, propertyName)
+    setEntity((entity) => ({ ...entity, [propertyName]: value }))
   }
 
-  const handleChange = (value) =>
-    setEntity(_.assign(entity, { [property.name]: value }))
-
-  const actions = [
-    <Button key="cancel" label="Cancel" primary={true} onClick={handleClose} />,
-    <Button
-      key="save"
-      label="Save"
-      primary={true}
-      keyboardFocused={true}
-      onClick={handleSave}
-    />,
-  ]
-
-  const alertActions = [
-    <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
-  ]
+  // const alertActions = [
+  //   <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
+  // ]
 
   return (
-    <div>
-      <Dialog
-        title={title ? title : `${action} ${entityName}`}
-        actions={actions}
-        modal={false}
-        open={open}
-        onRequestClose={handleClose}
-        autoScrollBodyContent={true}
-      >
+    <Dialog open={open} onClose={handleClose}>
+      <DialogTitle>{title ? title : `${action} ${entityName}`}</DialogTitle>
+      <DialogContent>
         {_.map(entitySchema, (property) => {
           if (property.type === "text") {
             return (
               <EntityCrudTextField
+                key={`00Nbkzvrt${property.label}`}
                 label={_.capitalize(property.label)}
                 value={entity[property.name]}
-                handleChange={handleChange}
+                handleChange={(v) => handleChange(v, property.name)}
               />
             )
           } else if (property.type === "options") {
             return (
               <EntityCrudSelectField
+                key={`Q4HyXnird${property.label}`}
                 label={_.capitalize(property.label)}
                 value={entity[property.name]}
                 optionValues={property.optionValues}
@@ -82,15 +80,24 @@ export default ({
             )
           }
         })}
-        <Dialog
-          actions={alertActions}
-          modal={true}
-          open={openAlert}
-          onRequestClose={handleCloseAlert}
+      </DialogContent>
+      <DialogActions>
+        <Button
+          label="Cancel"
+          color="default"
+          onClick={handleClose}
+          style={{ color: colors.text, borderRadius: radii.borderSharp }}
         >
-          {alertMessage}
-        </Dialog>
-      </Dialog>
-    </div>
+          Cancel
+        </Button>
+        <Button
+          label="Add"
+          onClick={handleSave}
+          style={{ borderRadius: radii.borderSharp }}
+        >
+          Add
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }

@@ -1,9 +1,13 @@
 import React from "react"
 import { connect } from "react-redux"
-import { BrowserRouter as Router, Route } from "react-router-dom"
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from "react-router-dom"
 import { CognitoState, NewPasswordRequired } from "react-cognito"
 
-import { ThemeProvider as MuiThemeProvider } from "@material-ui/styles"
 import {
   CommunityConfiguration,
   Ownership,
@@ -14,8 +18,6 @@ import {
   NewPasswordForm,
   LoginAndReset,
 } from "./components"
-
-import headerImage from "./assets/1920-header.png"
 
 import { rememberMeAction } from "./store/login"
 
@@ -37,130 +39,53 @@ const changePasswordPage = (props) => <ChangePasswordForm {...props} />
 
 const mainPage = ({ dispatch }) => (
   <Router>
-    <MuiThemeProvider theme={{}}>
-      <div
-        style={{
-          textAlign: "center",
-          display: "flex",
-          height: "100%",
-        }}
-      >
-        <SidebarNav dispatch={dispatch}></SidebarNav>
-        <div>
-          <header className="App-header">
-            <div
-              style={{ width: "1900px", height: "120px", overflow: "hidden" }}
-            >
-              <img src={headerImage} alt="logo" style={{ opacity: "0.33" }} />
-            </div>
+    <div style={{ display: "flex", width: "100%", height: "100%" }}>
+      <SidebarNav dispatch={dispatch} />
+      <Switch>
+        <Redirect exact from="/" to="/directory" key="zCgA74SIB" />
 
-            <div
-              style={{
-                position: "absolute",
-                top: "3%",
-                width: "100%",
-                textAlign: "center",
-                color: "rgba(36, 52, 58, 0.95)",
-                fontSize: "4em",
-              }}
-            >
-              <Route
-                key={0}
-                path={"/"}
-                exact={true}
-                component={() => <span>Home</span>}
-              />
-              <Route
-                key={1}
-                path={"/notifications"}
-                exact={true}
-                component={() => <span>Notifications</span>}
-              />
-              <Route
-                key={2}
-                path={"/directory"}
-                exact={true}
-                component={() => <span>Suite Information</span>}
-              />
-              <Route
-                key={3}
-                path={"/community"}
-                exact={true}
-                component={() => <span>Building Configuration</span>}
-              />
-              <Route
-                key={4}
-                path={"/ownership"}
-                exact={true}
-                component={() => <span>Ownership</span>}
-              />
-            </div>
-          </header>
-          <div style={{ height: "700px" }}>
-            <Route
-              key={0}
-              path={"/"}
-              exact={true}
-              component={Directory}
-            ></Route>
+        <Route
+          path="/notifications"
+          component={Notifications}
+          key="2oL0oXDHj"
+        />
 
-            <Route
-              key={1}
-              path={"/notifications"}
-              exact={true}
-              component={Notifications}
-            ></Route>
+        <Route path="/directory" component={Directory} key="RzolOPipG" />
 
-            <Route
-              key={2}
-              path={"/directory"}
-              exact={true}
-              component={Directory}
-            ></Route>
-            <Route
-              key={3}
-              path={"/community"}
-              exact={true}
-              component={CommunityConfiguration}
-            ></Route>
+        <Route
+          path="/community"
+          component={CommunityConfiguration}
+          key="NVbTlV54J"
+        />
 
-            <Route
-              key={4}
-              path={"/ownership"}
-              exact={true}
-              component={Ownership}
-            ></Route>
-          </div>
-        </div>
-      </div>
-    </MuiThemeProvider>
+        <Route path="/ownership" component={Ownership} key="PEKIP7dfZ" />
+      </Switch>
+    </div>
   </Router>
 )
 
 const App = (props) => {
   const getPage = () => {
-    const { state, userLogin, rememberMe, changePass } = props
+    // const { state, userLogin, rememberMe, changePass } = props
 
-    switch (state) {
-      case CognitoState.AUTHENTICATED:
-      case CognitoState.LOGGING_IN:
-      case CognitoState.LOGGED_IN:
-        if (userLogin || rememberMe) {
-          if (changePass) return changePasswordPage(props)
-          else return mainPage(props)
-        } else return loginPage(props)
-      case CognitoState.NEW_PASSWORD_REQUIRED:
-        return newPasswordPage()
-      default:
-        return loginPage(props)
-    }
+    return mainPage(props)
+
+    // switch (state) {
+    //   case CognitoState.AUTHENTICATED:
+    //   case CognitoState.LOGGING_IN:
+    //   case CognitoState.LOGGED_IN:
+    //     if (userLogin || rememberMe) {
+    //       if (changePass) return changePasswordPage(props)
+    //       else return mainPage(props)
+    //     } else return loginPage(props)
+    //   case CognitoState.NEW_PASSWORD_REQUIRED:
+    //     return newPasswordPage()
+    //   default:
+    //     return loginPage(props)
+    // }
   }
 
-  return (
-    <GlobalStylesProvider>
-      <div className="App">{getPage()}</div>
-    </GlobalStylesProvider>
-  )
+  return <GlobalStylesProvider>{getPage()}</GlobalStylesProvider>
 }
 
 const mapStateToProps = ({ cognito, login }) => ({

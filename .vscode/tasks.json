@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "start",
+      "problemMatcher": [],
+      "label": "npm: start",
+      "detail": "react-scripts start",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "options": {
+        "env": {
+          "BROWSER": "none"
+        }
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "reevaluateOnRerun": false
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "revealProblems": "onProblem",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    }
+  ]
+}

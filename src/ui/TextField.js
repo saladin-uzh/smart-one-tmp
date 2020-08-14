@@ -6,6 +6,7 @@ import { colors, spacings, radii } from "../constants"
 
 const StyledTextField = withStyles({
   root: {
+    maxWidth: 300,
     "& .MuiOutlinedInput-root": {
       borderRadius: radii.border,
       "& fieldset": {
@@ -29,5 +30,11 @@ const StyledTextField = withStyles({
 })(TextField)
 
 export default (props) => (
-  <StyledTextField variant="outlined" size="small" color="primary" {...props} />
+  <StyledTextField
+    variant="outlined"
+    size="small"
+    color="primary"
+    fullWidth
+    {...props}
+  />
 )

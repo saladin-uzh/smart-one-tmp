@@ -3,19 +3,7 @@ import React from "react"
 import { TextField } from "@material-ui/core"
 
 export default ({ label, value, handleChange }) => {
-  const onChange = (event, value) => {
-    handleChange(value)
-  }
+  const onChange = (event) => handleChange(event.target.value)
 
-  return (
-    <TextField
-      floatingLabelText={label}
-      floatingLabelFixed={true}
-      multiLine={true}
-      rows={1}
-      fullWidth={true}
-      value={value}
-      onChange={onChange}
-    />
-  )
+  return <TextField label={label} value={value} onChange={onChange} fullWidth />
 }

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react"
 
-import { Grid } from "@material-ui/core"
+import { Grid, Button } from "@material-ui/core"
 
 import { rememberMeAction } from "../store/login"
 
-import { ButtonUI, TextFieldUI, TitleUI, LinkUI } from "../ui"
+import { TextFieldUI, TitleUI, LinkUI } from "../ui"
 
 export default ({
   // email,
@@ -45,11 +45,11 @@ export default ({
 
   return (
     <form onSubmit={onFormSubmit}>
-      <Grid container direction="column" spacing={5}>
+      <Grid container spacing={5}>
         <Grid item xs={12}>
           <TitleUI>SmartONE Grandview</TitleUI>
         </Grid>
-        <Grid container item direction="column" spacing={4}>
+        <Grid container item spacing={4}>
           <Grid item xs={12}>
             <TextFieldUI
               value={usernameInput}
@@ -73,7 +73,7 @@ export default ({
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <ButtonUI type="submit">Log in</ButtonUI>
+          <Button type="submit">Log in</Button>
         </Grid>
         <Grid item xs={12}>
           <LinkUI onClick={onShowReset}>Forgot your password?</LinkUI>

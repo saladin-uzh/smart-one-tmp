@@ -1,5 +1,5 @@
 import _ from "lodash"
-import React, { memo, useState, useEffect } from "react"
+import React, { useState, useEffect, Fragment } from "react"
 
 import {
   Card,
@@ -11,190 +11,199 @@ import {
   TableHead,
   TableRow,
   TableCell,
+  Grid,
+  CardHeader,
+  TableContainer,
+  Checkbox,
 } from "@material-ui/core"
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from "."
+import { colors, spacings, radii } from "../constants"
 
-export default memo(
-  ({
-    entities,
-    emptyEntity,
-    onEntitySave,
-    onEntityAdd,
-    onEntitiesDelete,
-    entityName,
-    searchHintText,
-    entityProperties,
-    disableAdd,
-    disableDelete,
-    disableEdit,
-    EditEntityLable,
-    entitySchema,
-    NewEntityLable,
-  }) => {
-    const [filteredEntities, setFilteredEntities] = useState(entities)
-    const [clickedEntity, setClickedEntity] = useState({})
-    const [selectedEntities, setSelectedEntities] = useState({})
-    const [showEditDialog, setShowEditDialog] = useState(false)
-    const [showAddDialog, setShowAddDialog] = useState(false)
+export default ({
+  entities,
+  emptyEntity,
+  onEntitySave,
+  onEntityAdd,
+  onEntitiesDelete,
+  entityName,
+  searchHintText,
+  entityProperties,
+  disableAdd,
+  disableDelete,
+  // disableEdit,
+  // EditEntityLable,
+  entitySchema,
+  NewEntityLable,
+  icon: Icon,
+}) => {
+  const [filteredEntities, setFilteredEntities] = useState([])
+  const [clickedEntity, setClickedEntity] = useState({})
+  const [selectedEntities, setSelectedEntities] = useState([])
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const [isAllSelected, setIsAllSelected] = useState(false)
+  const [isSomeSelected, setIsSomeSelected] = useState(false)
 
-    useEffect(() => {
-      setFilteredEntities(entities)
-    }, [entities])
+  useEffect(() => {
+    setFilteredEntities(entities)
+  }, [entities])
 
-    const handleEntitySave = (entity) => {
-      var value = onEntitySave(entity)
+  useEffect(() => {
+    const numSelected = selectedEntities.length
 
-      if (!String.isNullOrEmpty(value)) return value
-
-      setShowEditDialog(false)
-      return ""
-    }
-
-    const handleEntityAdd = (entity) => {
-      var value = onEntityAdd(entity)
-
-      if (!String.isNullOrEmpty(value)) return value
-
-      setShowAddDialog(false)
-      return ""
-    }
-
-    const handleEntitiesDelete = () => onEntitiesDelete(selectedEntities)
-
-    const handleSearchChange = (searchText) => {
-      if (_.isEmpty(searchText)) setFilteredEntities(entities)
-      else {
-        const foundEntities = _.filter(
-          entities,
-          (ent) =>
-            !_.isUndefined(
-              _.find(ent, (value) =>
-                value
-                  .toString()
-                  .toLowerCase()
-                  .includes(searchText.toLowerCase())
-              )
-            )
-        )
-
-        setFilteredEntities(foundEntities)
+    if (numSelected) {
+      if (numSelected === entities.length) {
+        setIsAllSelected(true)
+        setIsSomeSelected(false)
+      } else {
+        setIsSomeSelected(true)
+        setIsAllSelected(false)
       }
+    } else {
+      setIsSomeSelected(false)
+      setIsAllSelected(false)
     }
+  }, [selectedEntities])
 
-    const handleEntitySelection = (selectedIndices) => {
-      const newSelectedEntities = _.map(
-        selectedIndices,
-        (i) => filteredEntities[i]
-      )
+  // const handleEntitySave = (entity) => {
+  //   var value = onEntitySave(entity)
 
-      setSelectedEntities(newSelectedEntities)
-    }
+  //   if (!String.isNullOrEmpty(value)) return value
 
-    const handleCellCLick = (row, column) => {
-      console.log(`clicked row ${row}, column ${column}`)
+  //   setShowEditDialog(false)
+  //   return ""
+  // }
 
-      if (column >= 0) {
-        setClickedEntity(filteredEntities[row])
-        setShowEditDialog(true)
-        setShowAddDialog(false)
-      }
-    }
+  const handleEntityAdd = (entity) => onEntityAdd(entity)
 
-    const handleRowClick = (selected) => {
-      console.log("selected rows", selected)
+  // if (!String.isNullOrEmpty(value)) return value
 
-      let selectedIndices = []
+  // setShowAddDialog(false)
+  // return ""
+  // }
 
-      if (Array.isArray(selected)) selectedIndices = selected
-      else {
-        if (selected === "all") {
-          selectedIndices = _.range(filteredEntities.length)
-        }
-        if (selected === "none") {
-          selectedIndices = []
-        }
-      }
+  const handleEntitiesDelete = () => onEntitiesDelete(selectedEntities)
 
-      handleEntitySelection(selectedIndices)
-    }
+  const handleSearchChange = (selectedId) => {
+    if (selectedId)
+      setFilteredEntities(entities.filter((ent) => ent.id === selectedId))
+    else setFilteredEntities(entities)
+  }
 
-    const handleAddClick = () => {
-      setShowEditDialog(false)
-      setShowAddDialog(true)
-    }
+  const handleRowClick = (event, entityId) => {
+    if (selectedEntities.includes(entityId))
+      setSelectedEntities(_.without(selectedEntities, entityId))
+    else setSelectedEntities([...selectedEntities, entityId])
+  }
 
-    const onEditDialogClose = () => setShowEditDialog(false)
+  const handleSelectAll = (event) => {
+    if (!event.target.checked) setSelectedEntities([])
+    else setSelectedEntities(filteredEntities.map((e) => e.id))
+  }
 
-    const onAddDialogClose = () => setShowAddDialog(false)
+  const isSelected = (id) => selectedEntities.includes(id)
 
-    return (
-      <div>
-        <Card style={{ textAlign: "left", margin: "20px" }}>
-          <CardContent style={{ padding: "0 16px 0 16px" }}>
-            <span
-              style={{
-                fontSize: "24px",
-                color: "rgba(0,0,0,0.87)",
-                lineHeight: "36px",
-              }}
-            >
+  const handleNewButtonClick = () => setShowAddDialog(true)
+
+  // const onEditDialogClose = () => setShowEditDialog(false)
+
+  const onAddDialogClose = () => setShowAddDialog(false)
+
+  return (
+    <Fragment>
+      <Card>
+        <CardHeader
+          title={
+            <h3 style={{ margin: 0 }}>
+              <Icon style={{ marginRight: spacings.xSmall }} />
               {entityName}
-            </span>
+            </h3>
+          }
+          action={
             <SearchAutoSuggest
+              type="summary"
               onSearchChange={handleSearchChange}
-              hintText={searchHintText}
-              style={{
-                display: "inline-block",
-                height: "36px",
-                marginLeft: "50px",
-              }}
+              options={entities}
+              label={searchHintText}
             />
-            <div>
-              <Table
-                height={"150px"}
-                selectable={true}
-                multiSelectable={true}
-                onCellClick={handleCellCLick}
-                onRowSelection={handleRowClick}
-              >
-                <TableHead>
-                  <TableRow>
-                    {_.map(entityProperties, ({ label }) => (
-                      <TableCell>{_.capitalize(label)}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody
-                  displayRowCheckbox={true}
-                  showRowHover={true}
-                  deselectOnClickaway={false}
-                >
-                  {_.map(filteredEntities, (entity) => (
-                    <TableRow>
+          }
+        />
+
+        <CardContent style={{ padding: `0 ${spacings.small}` }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={isSomeSelected}
+                      checked={isAllSelected}
+                      onChange={handleSelectAll}
+                      color="primary"
+                    />
+                  </TableCell>
+                  {_.map(entityProperties, ({ label }) => (
+                    <TableCell key={`OhxmXUPOT${label}`} align="center">
+                      {_.capitalize(label)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {_.map(filteredEntities, (entity) => {
+                  const isItemSelected = isSelected(entity.id)
+
+                  return (
+                    <TableRow
+                      key={`lWAstsZ-E${entity.id}`}
+                      onClick={(e) => handleRowClick(e, entity.id)}
+                      role="checkbox"
+                      selected={isItemSelected}
+                      tabIndex={-1}
+                    >
+                      <TableCell
+                        key={`c5hoXOC_X${entity.id}`}
+                        padding="checkbox"
+                      >
+                        <Checkbox checked={isItemSelected} />
+                      </TableCell>
                       {_.map(entityProperties, ({ name }) => (
-                        <TableCell>{entity[name]}</TableCell>
+                        <TableCell align="center" key={`${name}n2JSnVN5t`}>
+                          {entity[name]}
+                        </TableCell>
                       ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-          <CardActions>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+
+        <CardActions style={{ justifyContent: "flex-end" }}>
+          {!disableDelete && (
             <Button
-              variant="contained"
-              label="New"
-              primary={false}
-              style={{ marginRight: "2em" }}
-              disabled={disableAdd}
-              onClick={handleAddClick}
-            />
-            {!disableDelete && (
-              <Button label="Delete" onClick={handleEntitiesDelete} />
-            )}
-          </CardActions>
-        </Card>
+              label="Delete"
+              color="default"
+              onClick={handleEntitiesDelete}
+              style={{ color: colors.text, borderRadius: radii.borderSharp }}
+            >
+              Delete
+            </Button>
+          )}
+          <Button
+            label="New"
+            disabled={disableAdd}
+            onClick={handleNewButtonClick}
+            style={{ borderRadius: radii.borderSharp }}
+          >
+            New
+          </Button>
+        </CardActions>
+      </Card>
+
+      {/* <Grid item>
         {showEditDialog && !disableEdit && (
           <EntityCrudEditDialog
             entityName={entityName}
@@ -207,6 +216,8 @@ export default memo(
             handleClose={onEditDialogClose}
           />
         )}
+      </Grid> */}
+      <Grid item>
         {showAddDialog && !disableAdd && (
           <EntityCrudEditDialog
             entityName={entityName}
@@ -219,11 +230,7 @@ export default memo(
             handleClose={onAddDialogClose}
           />
         )}
-      </div>
-    )
-  },
-  (prev, next) =>
-    next.filteredEntities === prev.filteredEntities &&
-    next.showEditDialog === prev.showEditDialog &&
-    next.showAddDialog === prev.showAddDialog
-)
+      </Grid>
+    </Fragment>
+  )
+}

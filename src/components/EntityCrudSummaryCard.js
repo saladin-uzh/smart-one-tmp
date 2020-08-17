@@ -23,7 +23,7 @@ import { colors, spacings, radii } from "../constants"
 export default ({
   entities,
   emptyEntity,
-  onEntitySave,
+  // onEntitySave,
   onEntityAdd,
   onEntitiesDelete,
   entityName,
@@ -38,9 +38,9 @@ export default ({
   icon: Icon,
 }) => {
   const [filteredEntities, setFilteredEntities] = useState([])
-  const [clickedEntity, setClickedEntity] = useState({})
+  // const [clickedEntity, setClickedEntity] = useState({})
   const [selectedEntities, setSelectedEntities] = useState([])
-  const [showEditDialog, setShowEditDialog] = useState(false)
+  // const [showEditDialog, setShowEditDialog] = useState(false)
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [isAllSelected, setIsAllSelected] = useState(false)
   const [isSomeSelected, setIsSomeSelected] = useState(false)
@@ -158,7 +158,7 @@ export default ({
                     <TableRow
                       key={`lWAstsZ-E${entity.id}`}
                       onClick={(e) => handleRowClick(e, entity.id)}
-                      role="checkbox"
+                      // role="checkbox"
                       selected={isItemSelected}
                       tabIndex={-1}
                     >

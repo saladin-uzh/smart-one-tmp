@@ -28,6 +28,8 @@ export default ({ type, options, label, onSearchChange }) => {
         return `From ${option.subject} on ${moment
           .unix(option.sendDate)
           .format("l")}`
+      default:
+        return option
     }
   }
 

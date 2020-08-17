@@ -1,6 +1,6 @@
 import React from "react"
 import { createMuiTheme, ThemeProvider } from "@material-ui/core/styles"
-import { CssBaseline, fade } from "@material-ui/core"
+import { CssBaseline } from "@material-ui/core"
 
 import { colors, spacings, radii } from "./constants"
 
@@ -40,7 +40,7 @@ const SmartOneTheme = createMuiTheme({
         paddingTop: 0,
         paddingBottom: 0,
         textTransform: "none",
-        fontSize: "1em",
+        fontSize: 16,
         fontWeight: "bold",
       },
       label: {
@@ -81,7 +81,7 @@ const SmartOneTheme = createMuiTheme({
         height: "auto",
         "&:hover": {
           color: colors.white,
-          backgroundColor: colors.main,
+          backgroundColor: `${colors.main} !important`,
           "& .MuiChip-deleteIcon": {
             color: colors.white,
           },

@@ -1,4 +1,4 @@
-import _, { property } from "lodash"
+import _ from "lodash"
 import React, { useState } from "react"
 
 import {

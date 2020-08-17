@@ -9,7 +9,6 @@ const useStyles = makeStyles({
   root: {
     display: "flex",
     height: "100%",
-    width: "85%",
     alignItems: "center",
     justifyContent: "flex-start",
     padding: `${spacings.small} ${spacings.xSmall} ${spacings.small} ${spacings.xxLarge}`,
@@ -37,6 +36,7 @@ export default ({ children, ...other }) => {
       activeStyle={{
         background: colors.main,
         color: colors.white,
+        fontSize: 16,
       }}
     >
       {children}

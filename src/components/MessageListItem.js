@@ -1,36 +1,35 @@
-import _ from "lodash"
-import React, { useState } from "react"
+import React from "react"
 
 import {
-  IconButton,
+  // IconButton,
   ListItem,
-  MenuItem,
+  // MenuItem,
   ListItemText,
-  ListItemSecondaryAction,
+  // ListItemSecondaryAction,
   Grid,
 } from "@material-ui/core"
-import { MoreVert as MoreVertIcon } from "@material-ui/icons"
+// import { MoreVert as MoreVertIcon } from "@material-ui/icons"
 import { colors, radii, spacings } from "../constants"
 
-export default ({ onDelete, message }) => {
-  const [showDetail, setShowDetail] = useState(false)
+export default ({ /**onDelete,*/ message }) => {
+  // const [showDetail, setShowDetail] = useState(false)
 
-  const handleDelete = () => {
-    setShowDetail(false)
-    onDelete(message)
-  }
+  // const handleDelete = () => {
+  //   // setShowDetail(false)
+  //   onDelete(message)
+  // }
 
-  const toggleDetailShow = () => setShowDetail((showDetail) => !showDetail)
+  // const toggleDetailShow = () => setShowDetail((showDetail) => !showDetail)
 
-  const iconButtonElement = (
-    <IconButton touch={true} tooltip="more" tooltipPosition="bottom-left">
-      <MoreVertIcon color={colors.grey} />
-    </IconButton>
-  )
+  // const iconButtonElement = (
+  //   <IconButton touch={true} tooltip="more" tooltipPosition="bottom-left">
+  //     <MoreVertIcon color={colors.grey} />
+  //   </IconButton>
+  // )
 
   return (
     <ListItem
-      onClick={toggleDetailShow}
+      // onClick={toggleDetailShow}
       style={{
         backgroundColor: colors.white,
         borderRadius: radii.border,
@@ -53,13 +52,12 @@ export default ({ onDelete, message }) => {
           </Grid>
         }
         secondary={message.message}
-      >
-        <ListItemSecondaryAction>
+      />
+      {/* <ListItemSecondaryAction>
           <IconButton iconButtonElement={iconButtonElement}>
             <MenuItem onClick={handleDelete}>Delete</MenuItem>
           </IconButton>
-        </ListItemSecondaryAction>
-      </ListItemText>
+        </ListItemSecondaryAction> */}
     </ListItem>
   )
 }

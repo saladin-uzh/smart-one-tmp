@@ -2,26 +2,12 @@ import _ from "lodash"
 import React, { useState, useEffect, Fragment } from "react"
 import moment from "moment"
 
-import {
-  Grid,
-  Chip,
-  Dialog,
-  Card,
-  CardHeader,
-  CardContent,
-  Button,
-  Fab,
-} from "@material-ui/core"
+import { Grid, Chip, Dialog, Button, Fab } from "@material-ui/core"
 import { Autocomplete, createFilterOptions } from "@material-ui/lab"
 import { AddRounded } from "@material-ui/icons"
 
-import {
-  MessageList,
-  AutoCompleteSearch,
-  EntityCrudSummaryCard,
-  SearchAutoSuggest,
-} from "."
-import { spacings, colors } from "../constants"
+import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from "."
+import { spacings } from "../constants"
 import { TextFieldNoBorder, IconDirectories, IconOccupants } from "../ui"
 
 export default () => {

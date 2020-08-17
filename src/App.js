@@ -6,7 +6,7 @@ import {
   Redirect,
   Switch,
 } from "react-router-dom"
-import { CognitoState, NewPasswordRequired } from "react-cognito"
+import { CognitoState, NewPasswordRequired, PasswordReset } from "react-cognito"
 
 import {
   CommunityConfiguration,
@@ -35,11 +35,15 @@ const newPasswordPage = () => (
   </NewPasswordRequired>
 )
 
-const changePasswordPage = (props) => <ChangePasswordForm {...props} />
+const changePasswordPage = (props) => (
+  <PasswordReset>
+    <ChangePasswordForm {...props} />
+  </PasswordReset>
+)
 
 const mainPage = ({ dispatch }) => (
   <Router>
-    <div style={{ display: "flex", width: "100%", height: "100%" }}>
+    <div style={{ display: "flex", width: "100%", minHeight: "100%" }}>
       <SidebarNav dispatch={dispatch} />
       <Switch>
         <Redirect exact from="/" to="/directory" key="zCgA74SIB" />
@@ -59,6 +63,12 @@ const mainPage = ({ dispatch }) => (
         />
 
         <Route path="/ownership" component={Ownership} key="PEKIP7dfZ" />
+
+        <Route
+          path="/change-password"
+          component={ChangePasswordForm}
+          key="oyQyDOVSA"
+        />
       </Switch>
     </div>
   </Router>
@@ -76,8 +86,9 @@ const App = (props) => {
     //   case CognitoState.LOGGED_IN:
     //     if (userLogin || rememberMe) {
     //       if (changePass) return changePasswordPage(props)
-    //       else return mainPage(props)
-    //     } else return loginPage(props)
+    //       return mainPage(props)
+    //     }
+    //     return loginPage(props)
     //   case CognitoState.NEW_PASSWORD_REQUIRED:
     //     return newPasswordPage()
     //   default:

@@ -20,7 +20,7 @@ const StyledTextField = withStyles({
       },
     },
     "& .MuiInputLabel-outlined": {
-      transform: `translate(${spacings.xxSmall}, -${spacings.small}) scale(.9)`,
+      transform: `translate(${spacings.xxSmall}, -${spacings.medium}) scale(.9)`,
       fontWeight: "bold",
       "&.MuiInputLabel-shrink": {
         transform: `translate(${spacings.small}, -${spacings.xxSmall}) scale(.725)`,

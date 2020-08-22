@@ -115,7 +115,7 @@ export default ({
       <Card>
         <CardHeader
           title={
-            <h3 style={{ margin: 0 }}>
+            <h3 style={{ margin: 0, fontSize: 24 }}>
               <Icon style={{ marginRight: spacings.xSmall }} />
               {entityName}
             </h3>
@@ -144,7 +144,11 @@ export default ({
                     />
                   </TableCell>
                   {_.map(entityProperties, ({ label }) => (
-                    <TableCell key={`OhxmXUPOT${label}`} align="center">
+                    <TableCell
+                      key={`OhxmXUPOT${label}`}
+                      align="center"
+                      style={{ fontSize: 16 }}
+                    >
                       {_.capitalize(label)}
                     </TableCell>
                   ))}

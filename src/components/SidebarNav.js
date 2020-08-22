@@ -33,7 +33,7 @@ export default ({ dispatch }) => {
       style={{
         width: 250,
         minWidth: 250,
-        height: "100%",
+        minHeight: "100%",
         margin: 0,
         backgroundColor: colors.white,
       }}

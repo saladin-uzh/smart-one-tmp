@@ -5,6 +5,7 @@ import { List, Card, CardContent, CardHeader } from "@material-ui/core"
 
 import { SearchAutoSuggest, MessageListItem } from "."
 import { spacings, colors } from "../constants"
+import { NotificationsRounded } from "@material-ui/icons"
 
 export default ({ messages: initialMessages, onDelete }) => {
   const [messages, setMessages] = useState(initialMessages)
@@ -36,7 +37,12 @@ export default ({ messages: initialMessages, onDelete }) => {
   return (
     <Card>
       <CardHeader
-        title="Notifications"
+        title={
+          <h3 style={{ margin: 0, fontSize: 24, textAlign: "left" }}>
+            <NotificationsRounded style={{ marginRight: spacings.xSmall }} />
+            Notifications
+          </h3>
+        }
         action={
           <SearchAutoSuggest
             type="messages"

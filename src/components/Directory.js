@@ -61,8 +61,9 @@ export default () => {
 
       setUnits(newUnits)
 
-      const options = _.map(_.sortBy(newUnits, ["number"]), ({ number }) =>
-        number.trim()
+      const options = _.map(
+        _.sortBy(newUnits, ["number"]),
+        ({ number }) => number
       )
 
       console.log("options: ", options)
@@ -72,7 +73,7 @@ export default () => {
   }
 
   const getunitId = (number) => {
-    const index = units.findIndex((val) => parseInt(val.number, 10) === number)
+    const index = units.findIndex((val) => val.number === number)
 
     return units[index >= 0 ? index : 0].id
   }
@@ -178,11 +179,7 @@ export default () => {
                 ? `${allAddressees[0]}, ${allAddressees[1]}, ${
                     allAddressees[2]
                   } and ${allAddressees.length - 3} others`
-                : _.sum(
-                    _.map(allAddressees, (a) => {
-                      return a + " "
-                    })
-                  )
+                : _.sum(allAddressees.join(", "))
 
             const parser = new DOMParser()
 
@@ -208,7 +205,7 @@ export default () => {
         console.log(notifications)
 
         const unitNotifications = _.filter(notifications, (msg) =>
-          msg.allSentTo.includes(unitNum.toString())
+          msg.allSentTo.includes(unitNum.replace("\r", ""))
         )
 
         setMessages(unitNotifications)
@@ -244,11 +241,8 @@ export default () => {
 
   const handleSearchChange = (selection) => {
     if (Boolean(selection)) {
-      const num =
-        typeof selection === "number" ? selection : parseInt(selection, 10)
-
-      getUnitByNumber(num) // unit, emptyOccupant, emptyDirecyory
-      getNotifications(num) // messages
+      getUnitByNumber(selection) // unit, emptyOccupant, emptyDirecyory
+      getNotifications(selection) // messages
 
       setShowSuite(true)
     } else setShowSuite(false)
@@ -462,7 +456,12 @@ export default () => {
           {showSuite && (
             <Grid item xs={8}>
               <h1
-                style={{ margin: 0, display: "flex", alignItems: "flex-end" }}
+                style={{
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "flex-end",
+                  fontSize: 36,
+                }}
               >
                 Suite {unit.number}
               </h1>
@@ -641,11 +640,7 @@ export default () => {
       {showSuite && (
         <Grid item container xs={5}>
           <Grid item xs={12}>
-            <MessageList
-              onDelete={handleMessageDelete}
-              unitId={unit.id}
-              messages={messages}
-            />
+            <MessageList onDelete={handleMessageDelete} messages={messages} />
           </Grid>
         </Grid>
       )}

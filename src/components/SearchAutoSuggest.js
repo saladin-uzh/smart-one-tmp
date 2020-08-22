@@ -25,7 +25,7 @@ export default ({ type, options, label, onSearchChange }) => {
       case "summary":
         return `${option.firstName} ${option.lastName}`
       case "messages":
-        return `From ${option.subject} on ${moment
+        return `"${option.subject}" on ${moment
           .unix(option.sendDate)
           .format("l")}`
       default:

@@ -2,9 +2,10 @@ import _ from "lodash"
 import React, { useState, useEffect } from "react"
 import moment from "moment"
 
-import { Grid, Card, CardHeader, CardContent } from "@material-ui/core"
+import { Grid, Card } from "@material-ui/core"
 
 import { MessageList, ComposeMessageDialog } from "."
+import { spacings } from "../constants"
 
 export default () => {
   const [messages, setMessages] = useState([])
@@ -17,28 +18,34 @@ export default () => {
 
   const getUnits = () => {
     global.internalApi.getBuildingUnits(global.buildingId).then((data) => {
-      const units = data
-      let options = { "All suites": _.map(units, "suite") }
+      const units = _.map(data, ({ id, commaxId: number }) => ({
+        id,
+        number,
+      }))
 
-      const suiteOptions = _.fromPairs(
-        _.map(_.sortBy(units, ["suite"]), ({ suite }) => [
-          `Suite ${suite}`,
-          [suite],
-        ])
+      const options = _.map(_.sortBy(units, ["number"]), ({ number }) =>
+        number.trim()
       )
 
-      const tags = _.reduce(
-        _.flatMap(units, ({ tags, suite: unit }) =>
-          _.map(tags, ({ tag }) => ({ tag, unit }))
-        ),
-        (result, { tag, unit }) => {
-          if (result[tag] || (result[tag] = [])) result[tag].push(unit)
-          return result
-        },
-        {}
-      )
+      // const suiteOptions = _.fromPairs(
+      //   _.map(_.sortBy(units, ["suite"]), ({ suite }) => [
+      //     `Suite ${suite}`,
+      //     [suite],
+      //   ])
+      // )
 
-      options = _.merge(options, suiteOptions, tags)
+      // const tags = _.reduce(
+      //   _.flatMap(units, ({ tags, suite: unit }) =>
+      //     _.map(tags, ({ tag }) => ({ tag, unit }))
+      //   ),
+      //   (result, { tag, unit }) => {
+      //     if (result[tag] || (result[tag] = [])) result[tag].push(unit)
+      //     return result
+      //   },
+      //   {}
+      // )
+
+      // options = _.merge(options, suiteOptions, tags)
 
       console.log("options", options)
 
@@ -70,7 +77,7 @@ export default () => {
                 ? `${allAddressees[0]}, ${allAddressees[1]}, ${
                     allAddressees[2]
                   } and ${allAddressees.length - 3} others`
-                : _.sum(_.map(allAddressees, (a) => a + " "))
+                : _.sum(allAddressees.join(", "))
 
             const parser = new DOMParser()
 
@@ -93,6 +100,8 @@ export default () => {
           }
         )
 
+        console.log("notifs: ", notifications)
+
         setMessages(notifications)
       })
   }
@@ -114,25 +123,19 @@ export default () => {
   }
 
   return (
-    <div>
-      <Grid container spacing={16}>
+    <Grid container spacing={5} style={{ padding: spacings.large, margin: 0 }}>
+      <Grid item container xs={6}>
         <Grid item xs={12}>
-          <Card style={{ margin: "20px" }}>
-            <CardHeader></CardHeader>
-            <CardContent>
-              <MessageList
-                messages={messages}
-                onDelete={handleMessageDelete}
-              ></MessageList>
-            </CardContent>
-          </Card>
+          <MessageList onDelete={handleMessageDelete} messages={messages} />
         </Grid>
       </Grid>
-      <ComposeMessageDialog
-        buildingId={global.buildingNum}
-        onSend={handleMessageSend}
-        addressOptions={addressOptions}
-      />
-    </div>
+      <Grid item xs={6}>
+        <ComposeMessageDialog
+          buildingId={global.buildingNum}
+          onSend={handleMessageSend}
+          addressOptions={addressOptions}
+        />
+      </Grid>
+    </Grid>
   )
 }

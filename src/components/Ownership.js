@@ -1,5 +1,7 @@
 import _ from "lodash"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, Fragment } from "react"
+import MomentUtils from "@date-io/moment"
+import moment from "moment"
 
 import {
   Grid,
@@ -11,20 +13,28 @@ import {
   CardHeader,
   CardContent,
 } from "@material-ui/core"
-import { DatePicker } from "@material-ui/pickers"
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers"
 
 import {
   AutoCompleteSearch,
   EntityCrudSummaryCard,
   EntityCrudSelectField,
 } from "."
+import { HouseRounded, PeopleRounded } from "@material-ui/icons"
+import { spacings, radii, colors } from "../constants"
+import { TextFieldUI, CardTilte, TabLink } from "../ui"
+import { useRouteMatch } from "react-router-dom/cjs/react-router-dom.min"
+import { NavLink } from "react-router-dom"
 
 export default () => {
   const [ownership, setOwnership] = useState({
     id: 1,
     activateDate: new Date(),
     inactivateDate: new Date(),
-    typeId: 0,
+    typeId: "",
     notes: "",
     avtive: true,
     people: [],
@@ -32,7 +42,7 @@ export default () => {
   })
   const [unitNumber, setUnitNumber] = useState("")
   const [unitId, setUnitId] = useState("")
-  const [buildingId, setBuildingId] = useState("")
+  const [buildingId, setBuildingId] = useState(global.buildingId)
   const [emptyPeople, setEmptyPeople] = useState({})
   const [emptyProperty, setEmptyProperty] = useState({})
   const [units, setUnits] = useState([])
@@ -40,14 +50,27 @@ export default () => {
   const [ownershipPersonTypes, setOwnershipPersonTypes] = useState([])
   const [ownershipProperties, setOwnershipProperties] = useState([])
   const [showSuite, setShowSuite] = useState(false)
-  const [addressOptions, setAddressOptions] = useState({})
+  const [addressOptions, setAddressOptions] = useState([])
   const [open, setOpen] = useState(false)
+  const {
+    params: { tab: currentTab },
+  } = useRouteMatch()
 
   useEffect(() => {
     getOwnershipTypes()
     getOwnershipPersonTypes()
-    getUnits(global.buildingId)
+    getUnits()
   }, [])
+
+  useEffect(() => {
+    console.group("Component did mount:")
+    console.log("Units: ", units)
+    console.log("Ownership: ", ownership)
+    console.log("Ownership types: ", ownershipTypes)
+    console.log("Ownership person types: ", ownershipPersonTypes)
+    console.log("Ownership props: ", ownershipProperties)
+    console.groupEnd()
+  }, [units, ownershipTypes, ownershipPersonTypes, ownershipProperties])
 
   const handleOpen = () => setOpen(true)
 
@@ -73,33 +96,43 @@ export default () => {
       setOwnershipPersonTypes(types)
     })
 
-  const getUnits = (newBuildingId) =>
+  const getUnits = (newBuildingId = global.buildingId) => {
+    if (buildingId !== newBuildingId) {
+      setBuildingId(newBuildingId)
+    }
+
     global.internalApi.getBuildingUnits(newBuildingId).then((data) => {
       const newUnits = _.map(data, ({ id, commaxId: number }) => ({
         id,
         number,
       }))
 
-      setUnits(newUnits)
-      setBuildingId(newBuildingId)
+      console.warn(newUnits)
 
-      const options = _.fromPairs(
-        _.map(_.sortBy(units, ["number"]), ({ number }) => [
-          `Suite ${number}`,
-          [number],
-        ])
+      setUnits(newUnits)
+
+      const options = _.map(
+        _.sortBy(newUnits, ["number"]),
+        ({ number }) => number
       )
 
-      console.log("options", options)
+      console.log("options: ", options)
 
       setAddressOptions(options)
     })
-
-  const getunitId = (unitNumber) => {
-    const o = _.filter(units, ({ number }) => number === unitNumber)
-
-    return o.length > 0 ? o[0].id : null
   }
+
+  const getunitId = (number) => {
+    const index = units.findIndex((val) => val.number === number)
+
+    return units[index >= 0 ? index : 0].id
+  }
+
+  // const getunitNumber = (id) => {
+  //   const index = units.findIndex((val) => val.id === id)
+
+  //   return index >= 0 ? units[index].number : 0
+  // }
 
   const getOwnershipByNumber = (number) => {
     const newUnitId = getunitId(number)
@@ -160,19 +193,17 @@ export default () => {
           }
         })
 
-        const properties = _.map(data.properties, (o) => {
-          return {
-            id: o.id,
-            ownershipId: data.id,
-            legalLevel: o.legalLevel,
-            legalUnit: o.legalUnit,
-            suite: o.suite,
-            design: o.design,
-            size: o.size,
-            typeId: o.typeId,
-            type: o.type.description,
-          }
-        })
+        const properties = _.map(data.properties, (o) => ({
+          id: o.id,
+          ownershipId: data.id,
+          legalLevel: o.legalLevel,
+          legalUnit: o.legalUnit,
+          suite: o.suite,
+          design: o.design,
+          size: o.size,
+          typeId: o.typeId,
+          type: o.type.description,
+        }))
 
         const activateDate = new Date(data.activateDate)
         const inactivateDate = new Date(data.inActivateDate)
@@ -185,8 +216,8 @@ export default () => {
           notes: data.notes ? data.notes : "",
           active: data.active,
           typeId: data.typeId,
-          people: people,
-          properties: properties,
+          people,
+          properties,
         }
 
         const newEmptyPeople = {
@@ -227,7 +258,7 @@ export default () => {
               data,
               ({ id: value, suite, type: { description } }) => ({
                 value,
-                display: `${suite} -  ${description}`,
+                display: `${suite} - ${description}`,
               })
             )
 
@@ -299,35 +330,26 @@ export default () => {
       })
   }
 
-  const handleDatePickerChange_active = (event, value) =>
-    setOwnership((ownership) =>
-      _.assign(ownership, {
-        activateDate: value,
-      })
-    )
+  const handleDatePickerChange_active = (value) =>
+    setOwnership((ownership) => ({
+      ...ownership,
+      activateDate: moment(value).toDate(),
+    }))
 
-  const handleDatePickerChange_inactive = (event, value) =>
-    setOwnership((ownership) =>
-      _.assign(ownership, {
-        inactivateDate: value,
-      })
-    )
+  const handleDatePickerChange_inactive = (value) =>
+    setOwnership((ownership) => ({
+      ...ownership,
+      inactivateDate: moment(value).toDate(),
+    }))
 
   const handleSelectChange = (value) =>
-    setOwnership((owneship) => _.assign(ownership, { typeId: value }))
+    setOwnership((ownership) => ({ ...ownership, typeId: value }))
 
-  const handleNotesChange = (event, value) =>
-    setOwnership((ownership) =>
-      _.assign(ownership, {
-        notes: value,
-      })
-    )
-
-  const formatDate = new global.Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format
+  const handleNotesChange = (newNotes) =>
+    setOwnership((ownership) => ({
+      ...ownership,
+      notes: newNotes,
+    }))
 
   const transferActions = [
     <Button key="cancel" label="Cancel" primary={true} onClick={handleClose} />,
@@ -340,194 +362,311 @@ export default () => {
     />,
   ]
 
+  const tabContent = {
+    prop: (
+      <Fragment>
+        <Grid item xs={12}>
+          <EntityCrudSummaryCard
+            searchHintText="Suite number"
+            searchType="ownership"
+            entityName="Property"
+            NewEntityLable="Parking\Locker"
+            icon={HouseRounded}
+            entityProperties={[
+              { label: "suite", name: "suite" },
+              { label: "type", name: "type" },
+              { label: "legal Level", name: "legalLevel" },
+              { label: "legal Unit", name: "legalUnit" },
+            ]}
+            entitySchema={[
+              {
+                label: "Property",
+                name: "id",
+                type: "options",
+                optionValues: ownershipProperties,
+              },
+            ]}
+            entities={ownership.properties}
+            emptyEntity={emptyProperty}
+            // disableEdit={true}
+            onEntityAdd={handleOwnershipUnitSave}
+            onEntitiesDelete={handleOwnershipUnitDelete}
+          />
+        </Grid>
+        <Grid item xs={7}>
+          <Card>
+            <CardHeader
+              title={<CardTilte text="Ownership detail" icon={PeopleRounded} />}
+            />
+            <CardContent>
+              <Grid container spacing={6}>
+                <Grid item container xs={5}>
+                  <MuiPickersUtilsProvider utils={MomentUtils}>
+                    <Grid
+                      item
+                      xs={12}
+                      style={{ marginBottom: spacings.xxLarge }}
+                    >
+                      <KeyboardDatePicker
+                        autoOk
+                        variant="inline"
+                        inputVariant="outlined"
+                        value={ownership.activateDate}
+                        onChange={handleDatePickerChange_active}
+                        label="Activate Date"
+                        placeholder="dd/MM/yyyy"
+                        format="DD/MM/yyyy"
+                        InputAdornmentProps={{ position: "start" }}
+                        TextFieldComponent={TextFieldUI}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      style={{ marginBottom: spacings.xxLarge }}
+                    >
+                      <KeyboardDatePicker
+                        autoOk
+                        variant="inline"
+                        inputVariant="outlined"
+                        value={ownership.inactivateDate}
+                        onChange={handleDatePickerChange_inactive}
+                        label="Inactivate Date"
+                        placeholder="dd/MM/yyyy"
+                        format="DD/MM/yyyy"
+                        InputAdornmentProps={{ position: "start" }}
+                        TextFieldComponent={TextFieldUI}
+                      />
+                    </Grid>
+                  </MuiPickersUtilsProvider>
+                  <Grid item xs={12}>
+                    <EntityCrudSelectField
+                      label="Type"
+                      value={ownership.typeId}
+                      optionValues={ownershipTypes}
+                      handleChange={handleSelectChange}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item xs={7}>
+                  <TextFieldUI
+                    multiline
+                    rows={5}
+                    label="Notes"
+                    value={ownership.notes}
+                    onChange={handleNotesChange}
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+            <CardActions>
+              <Button label="Transfer" color="default" onClick={handleOpen}>
+                Transfer
+              </Button>
+              <Button label="Save" onClick={handleOwnershipSave}>
+                Save
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Fragment>
+    ),
+    dir: (
+      <Grid item xs={12}>
+        <EntityCrudSummaryCard
+          searchHintText="First / last name"
+          searchType="people"
+          entityName="People"
+          NewEntityLable="Person"
+          icon={PeopleRounded}
+          entityProperties={[
+            { label: "Type", name: "type" },
+            { label: "first name", name: "firstName" },
+            { label: "last name", name: "lastName" },
+            { label: "Address", name: "fullAddress" },
+            { label: "Email", name: "email" },
+            { label: "home Phone", name: "homePhone" },
+            { label: "business Phone", name: "workPhone" },
+            { label: "Mobile", name: "cellPhone" },
+          ]}
+          entitySchema={[
+            {
+              label: "type",
+              name: "typeId",
+              type: "options",
+              optionValues: ownershipPersonTypes,
+            },
+            {
+              label: "salutation",
+              name: "salutation",
+              type: "text",
+            },
+            {
+              label: "first name",
+              name: "firstName",
+              type: "text",
+            },
+            {
+              label: "middle name",
+              name: "middleName",
+              type: "text",
+            },
+            { label: "last name", name: "lastName", type: "text" },
+            { label: "address", name: "address", type: "text" },
+            { label: "suite", name: "suite", type: "text" },
+            { label: "city", name: "city", type: "text" },
+            { label: "province", name: "province", type: "text" },
+            {
+              label: "PostalCode/Zip",
+              name: "postalcodeZip",
+              type: "text",
+            },
+            { label: "country", name: "country", type: "text" },
+            { label: "email", name: "email", type: "text" },
+            {
+              label: "home Phone",
+              name: "homePhone",
+              type: "text",
+            },
+            {
+              label: "business Phone",
+              name: "workPhone",
+              type: "text",
+            },
+            { label: "Mobile", name: "cellPhone", type: "text" },
+          ]}
+          entities={ownership.people}
+          emptyEntity={emptyPeople}
+          // onEntitySave={handlePersonSave}
+          onEntityAdd={handlePersonSave}
+          onEntitiesDelete={handlePersonDelete}
+        />
+      </Grid>
+    ),
+  }
+
   return (
-    <div>
-      <AutoCompleteSearch
-        addressOptions={addressOptions}
-        handleAddressUpdate={handleSearchChange}
-        hintText="Suite number"
-      />
-      <div style={{ display: showSuite ? "none" : "block" }}>
-        <span
-          style={{
-            fontSize: "24px",
-            color: "rgba(0,0,0,0.87)",
-            lineHeight: "48px",
-          }}
-        >
-          Please select a suite using the search above
-        </span>
-      </div>
-      <div
+    <Grid
+      container
+      style={{
+        width: "auto",
+        minHeight: "100%",
+        minWidth: 1070,
+        flexGrow: 1,
+        margin: 0,
+        padding: spacings.large,
+        textAlign: "left",
+      }}
+      alignItems="flex-start"
+      alignContent="flex-start"
+      justify="flex-start"
+      spacing={5}
+    >
+      <Grid
+        item
+        container
+        xs={12}
+        justify={showSuite ? "space-between" : "flex-end"}
+        alignItems={showSuite ? "center" : "flex-start"}
         style={{
-          display: showSuite ? "block" : "none",
-          height: "730px",
-          overflowY: "scroll",
-          marginTop: "10px",
+          margin: spacings.small,
+          ...(showSuite
+            ? { backgroundColor: colors.white, borderRadius: radii.border }
+            : {}),
         }}
       >
-        <Dialog
-          title="Transfer Ownership"
-          actions={transferActions}
-          modal={true}
-          open={open}
+        {showSuite && (
+          <Grid item xs={3}>
+            <h1
+              style={{
+                margin: 0,
+                paddingLeft: spacings.xLarge,
+                display: "flex",
+                alignItems: "flex-end",
+                fontSize: 36,
+              }}
+            >
+              Suite {unitNumber}
+            </h1>
+          </Grid>
+        )}
+
+        <Grid
+          item
+          xs={3}
+          style={{
+            minWidth: 150,
+            marginBottom: showSuite ? 0 : spacings.xxLarge,
+          }}
         >
-          This will transfer the current ownership. Continue?
-        </Dialog>
-        <Grid container>
-          <Grid container xs={12}>
-            <Grid item xs={5}>
-              <Card style={{ textAlign: "left", margin: "20px" }}>
-                <CardHeader
-                  title={"Suite " + unitNumber}
-                  subtitle="Ownership detail"
-                />
-                <CardContent>
-                  <Grid container>
-                    <Grid container xs={12}>
-                      <Grid item xs={6}>
-                        <div>
-                          <DatePicker
-                            floatingLabelText="Activate Date"
-                            floatingLabelFixed={true}
-                            autoOk={true}
-                            firstDayOfWeek={0}
-                            formatDate={formatDate}
-                            value={ownership.activateDate}
-                            onChange={handleDatePickerChange_active}
-                          />
-                          <DatePicker
-                            floatingLabelText="Inactivate Date"
-                            floatingLabelFixed={true}
-                            autoOk={true}
-                            firstDayOfWeek={0}
-                            formatDate={formatDate}
-                            value={ownership.inactivateDate}
-                            onChange={handleDatePickerChange_inactive}
-                          />
-                          <EntityCrudSelectField
-                            label="Type"
-                            value={ownership.typeId}
-                            optionValues={ownershipTypes}
-                            handleChange={handleSelectChange}
-                          />
-                        </div>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <div>
-                          <TextField
-                            floatingLabelText="Notes"
-                            floatingLabelFixed={true}
-                            fullWidth={true}
-                            multiLine={true}
-                            rows={1}
-                            rowsMax={5}
-                            value={ownership.notes}
-                            onChange={handleNotesChange}
-                          />
-                        </div>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    variant="contained"
-                    label="Save"
-                    primary={true}
-                    style={{ marginRight: "2em" }}
-                    onClick={handleOwnershipSave}
-                  />
-                  <Button
-                    variant="contained"
-                    label="Transfer"
-                    primary={false}
-                    style={{ marginRight: "2em" }}
-                    onClick={handleOpen}
-                  />
-                </CardActions>
-              </Card>
+          <AutoCompleteSearch
+            fainted={showSuite}
+            addressOptions={addressOptions}
+            handleAddressUpdate={handleSearchChange}
+            hintText="Suite number"
+          />
+        </Grid>
+
+        {showSuite && (
+          <Grid item xs={6} container justify="center" alignItems="center">
+            <Grid item style={{ marginRight: spacings.xSmall }}>
+              <TabLink to="/ownership/prop">
+                Ownership detail / Property
+              </TabLink>
             </Grid>
-            <Grid item xs={7}>
-              <EntityCrudSummaryCard
-                searchHintText="Suite number"
-                entityName="Property"
-                entityProperties={[
-                  { label: "suite", name: "suite" },
-                  { label: "type", name: "type" },
-                  { label: "legal Level", name: "legalLevel" },
-                  { label: "legal Unit", name: "legalUnit" },
-                ]}
-                entitySchema={[
-                  {
-                    label: "Property",
-                    name: "id",
-                    type: "options",
-                    optionValues: ownershipProperties,
-                  },
-                ]}
-                disableEdit={true}
-                NewEntityLable="Parking\Locker"
-                entities={ownership.properties}
-                emptyEntity={emptyProperty}
-                onEntityAdd={handleOwnershipUnitSave}
-                onEntitiesDelete={handleOwnershipUnitDelete}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <EntityCrudSummaryCard
-                searchHintText="First / last name"
-                entityName="People"
-                entityProperties={[
-                  { label: "Type", name: "type" },
-                  { label: "first name", name: "firstName" },
-                  { label: "last name", name: "lastName" },
-                  { label: "Address", name: "fullAddress" },
-                  { label: "Email", name: "email" },
-                  { label: "home Phone", name: "homePhone" },
-                  { label: "business Phone", name: "workPhone" },
-                  { label: "Mobile", name: "cellPhone" },
-                ]}
-                entitySchema={[
-                  {
-                    label: "type",
-                    name: "typeId",
-                    type: "options",
-                    optionValues: ownershipPersonTypes,
-                  },
-                  { label: "salutation", name: "salutation", type: "text" },
-                  { label: "first name", name: "firstName", type: "text" },
-                  { label: "middle name", name: "middleName", type: "text" },
-                  { label: "last name", name: "lastName", type: "text" },
-                  { label: "address", name: "address", type: "text" },
-                  { label: "suite", name: "suite", type: "text" },
-                  { label: "city", name: "city", type: "text" },
-                  { label: "province", name: "province", type: "text" },
-                  {
-                    label: "PostalCode/Zip",
-                    name: "postalcodeZip",
-                    type: "text",
-                  },
-                  { label: "country", name: "country", type: "text" },
-                  { label: "email", name: "email", type: "text" },
-                  { label: "home Phone", name: "homePhone", type: "text" },
-                  {
-                    label: "business Phone",
-                    name: "workPhone",
-                    type: "text",
-                  },
-                  { label: "Mobile", name: "cellPhone", type: "text" },
-                ]}
-                entities={ownership.people}
-                emptyEntity={emptyPeople}
-                onEntitySave={handlePersonSave}
-                onEntityAdd={handlePersonSave}
-                onEntitiesDelete={handlePersonDelete}
-              />
+            <Grid item>
+              <TabLink to="/ownership/dir">Directory Entries</TabLink>
             </Grid>
           </Grid>
+        )}
+
+        {!showSuite && (
+          <Grid item xs={12}>
+            <span style={{ fontSize: "1.3rem" }}>
+              Please select <strong>a suite</strong>
+            </span>
+          </Grid>
+        )}
+      </Grid>
+
+      {!showSuite && (
+        <Grid
+          item
+          xs={12}
+          container
+          spacing={4}
+          alignItems="flex-start"
+          alignContent="flex-start"
+        >
+          {addressOptions.map((option) => (
+            <Grid item key={`lZUNLCNrM${option}`}>
+              <Button
+                style={{
+                  padding: spacings.medium,
+                  cursor: "pointer",
+                }}
+                key={`${option}KMvSIrXV7`}
+                label={option}
+                color="secondary"
+                onClick={() => handleSearchChange(option)}
+              >
+                {option}
+              </Button>
+            </Grid>
+          ))}
         </Grid>
-      </div>
-    </div>
+      )}
+
+      {showSuite && tabContent[currentTab]}
+
+      <Dialog
+        title="Transfer Ownership"
+        actions={transferActions}
+        modal={true}
+        open={open}
+      >
+        This will transfer the current ownership. Continue?
+      </Dialog>
+    </Grid>
   )
 }

@@ -1,22 +1,26 @@
 import _ from "lodash"
 import React from "react"
 
-import { MenuItem, Select } from "@material-ui/core"
+import { MenuItem, TextField } from "@material-ui/core"
+import { TextFieldUI } from "../ui"
 
 export default ({ value, label, handleChange, optionValues }) => {
-  const onChange = (event, index, value) => handleChange(value)
+  const onChange = (event) => handleChange(event.target.value)
 
   return (
-    <Select
-      floatingLabelText={label}
-      floatingLabelFixed={true}
-      fullWidth={true}
+    <TextFieldUI
+      label={label}
       value={value}
       onChange={onChange}
+      select
+      fullWidth
+      style={{ maxWidth: "100%" }}
     >
-      {_.map(optionValues, ({ value, display }) => (
-        <MenuItem value={value} primaryText={display} />
+      {_.map(optionValues, ({ value: oValue, display }) => (
+        <MenuItem key={`M3vBj9Kgb${oValue}`} value={oValue}>
+          {display}
+        </MenuItem>
       ))}
-    </Select>
+    </TextFieldUI>
   )
 }

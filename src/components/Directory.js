@@ -34,14 +34,14 @@ export default () => {
     getUnits(global.buildingId)
   }, [])
 
-  useEffect(() => {
-    console.group("Component did mount:")
-    console.log("Unit: ", unit)
-    console.log("Occupants: ", unit.occupants)
-    console.log("Tags: ", tagList)
-    console.log("Notifs: ", messages)
-    console.groupEnd()
-  }, [unit, tagList])
+  // useEffect(() => {
+  //   console.group("Component did mount:")
+  //   console.log("Unit: ", unit)
+  //   console.log("Occupants: ", unit.occupants)
+  //   console.log("Tags: ", tagList)
+  //   console.log("Notifs: ", messages)
+  //   console.groupEnd()
+  // }, [unit, tagList, messages])
 
   const handleOpenAlert = (message) => {
     setOpenAlert(true)
@@ -585,6 +585,7 @@ export default () => {
             <Grid item xs={12} style={{ marginBottom: spacings.xLarge }}>
               <EntityCrudSummaryCard
                 searchHintText="First / last name"
+                searchType="occupants"
                 entityName="Occupants"
                 NewEntityLable="New Occupants"
                 icon={IconOccupants}
@@ -610,6 +611,7 @@ export default () => {
             <Grid item xs={12}>
               <EntityCrudSummaryCard
                 searchHintText="Name"
+                searchType="dir"
                 entityName="Directory Entries"
                 icon={IconDirectories}
                 entityProperties={[{ label: "name", name: "name" }]}

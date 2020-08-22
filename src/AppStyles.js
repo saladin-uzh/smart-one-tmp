@@ -91,6 +91,21 @@ const SmartOneTheme = createMuiTheme({
         color: colors.text,
       },
     },
+    MuiCard: {
+      root: {
+        textAlign: "left",
+        margin: 0,
+        padding: spacings.large,
+
+        "& .MuiCardContent-root": {
+          padding: `${spacings.xxLarge} ${spacings.small}`,
+        },
+
+        "& .MuiCardActions-root": {
+          justifyContent: "flex-end",
+        },
+      },
+    },
     MuiCardHeader: {
       root: {
         color: colors.main,
@@ -153,6 +168,24 @@ const SmartOneTheme = createMuiTheme({
       root: {
         "&:last-child": {
           marginBottom: `0 !important`,
+        },
+      },
+    },
+    MuiPopover: {
+      paper: {
+        "& .MuiPickersDatePickerRoot-toolbar": {
+          "& .MuiPickersToolbarButton-toolbarBtn": {
+            "& .MuiPickersToolbarText-toolbarTxt": {
+              color: colors.white,
+            },
+          },
+        },
+        "& .MuiPickersBasePicker-pickerView": {
+          "& .MuiPickersCalendar-week": {
+            "& .MuiPickersDay-daySelected": {
+              color: colors.white,
+            },
+          },
         },
       },
     },

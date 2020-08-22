@@ -1,11 +1,12 @@
 import React from "react"
+import clsx from "clsx"
 
 import { withStyles, TextField } from "@material-ui/core"
 
 import { colors, spacings, radii } from "../constants"
 
-const StyledTextField = withStyles({
-  root: {
+export default withStyles({
+  singleLine: {
     maxWidth: 300,
     "& .MuiOutlinedInput-root": {
       borderRadius: radii.border,
@@ -24,17 +25,24 @@ const StyledTextField = withStyles({
       fontWeight: "bold",
       "&.MuiInputLabel-shrink": {
         transform: `translate(${spacings.small}, -${spacings.xxSmall}) scale(.725)`,
+        color: colors.main,
       },
     },
   },
-})(TextField)
-
-export default (props) => (
-  <StyledTextField
+  multiLine: {
+    maxWidth: "100%",
+  },
+})(({ classes, value, onChange, ...props }) => (
+  <TextField
     variant="outlined"
     size="small"
     color="primary"
     fullWidth
+    className={clsx(classes.singleLine, {
+      [classes.multiLine]: props.multiline,
+    })}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
     {...props}
   />
-)
+))

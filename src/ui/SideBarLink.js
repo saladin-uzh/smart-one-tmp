@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     textAlign: "left",
     textDecoration: "none",
     color: colors.text,
-    fontSize: "1.3rem",
+    fontSize: 16,
     "&:hover": {
       background: colors.main,
       color: colors.white,
@@ -32,7 +32,7 @@ export default ({ children, ...other }) => {
   return (
     <NavLink
       {...other}
-      className={clsx(classes.root, ...classes)}
+      className={clsx(classes.root, classes)}
       activeStyle={{
         background: colors.main,
         color: colors.white,

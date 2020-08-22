@@ -47,6 +47,12 @@ const mainPage = ({ dispatch }) => (
       <SidebarNav dispatch={dispatch} />
       <Switch>
         <Redirect exact from="/" to="/directory" key="zCgA74SIB" />
+        <Redirect
+          exact
+          from="/ownership"
+          to="/ownership/prop"
+          key="sxipPB-_h"
+        />
 
         <Route
           path="/notifications"
@@ -62,7 +68,7 @@ const mainPage = ({ dispatch }) => (
           key="NVbTlV54J"
         />
 
-        <Route path="/ownership" component={Ownership} key="PEKIP7dfZ" />
+        <Route path="/ownership/:tab" component={Ownership} key="PEKIP7dfZ" />
 
         <Route
           path="/change-password"

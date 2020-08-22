@@ -11,7 +11,19 @@ export default ({ type, options, label, onSearchChange }) => {
   const [selected, setSelected] = useState(null)
 
   const filterOptions = {
-    summary: createFilterOptions({
+    poeople: createFilterOptions({
+      stringify: (option) =>
+        Object.keys(option)
+          .map((o) => option[o])
+          .join(" "),
+    }),
+    ownership: createFilterOptions({
+      stringify: (option) => `${option.type} ${option.suite}`,
+    }),
+    dir: createFilterOptions({
+      stringify: (option) => option.name,
+    }),
+    occupants: createFilterOptions({
       stringify: (option) =>
         `${option.firstName} ${option.lastName} ${option.email} ${option.phone}`,
     }),
@@ -22,7 +34,13 @@ export default ({ type, options, label, onSearchChange }) => {
 
   const getOptionLabel = (option) => {
     switch (type) {
-      case "summary":
+      case "people":
+        return `${option.firstName} ${option.lastName}`
+      case "ownership":
+        return `${option.type} ${option.suite}`
+      case "dir":
+        return option.name
+      case "occupants":
         return `${option.firstName} ${option.lastName}`
       case "messages":
         return `"${option.subject}" on ${moment

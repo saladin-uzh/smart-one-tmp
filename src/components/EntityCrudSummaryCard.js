@@ -19,6 +19,7 @@ import {
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from "."
 import { colors, spacings, radii } from "../constants"
+import { CardTilte, PaginatedColumn } from "../ui"
 
 export default ({
   entities,
@@ -36,6 +37,7 @@ export default ({
   entitySchema,
   NewEntityLable,
   icon: Icon,
+  searchType,
 }) => {
   const [filteredEntities, setFilteredEntities] = useState([])
   // const [clickedEntity, setClickedEntity] = useState({})
@@ -44,6 +46,9 @@ export default ({
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [isAllSelected, setIsAllSelected] = useState(false)
   const [isSomeSelected, setIsSomeSelected] = useState(false)
+  const [currentTablePage, setCurrentTablePage] = useState(
+    entityProperties[0].name
+  )
 
   useEffect(() => {
     setFilteredEntities(entities)
@@ -110,19 +115,22 @@ export default ({
 
   const onAddDialogClose = () => setShowAddDialog(false)
 
+  const handleTablePageChange = (targetTablePageLabel) => {
+    const targetPageIndex = entityProperties.findIndex(
+      ({ label }) => label === targetTablePageLabel
+    )
+    const targetTablePageName = entityProperties[targetPageIndex].name
+    setCurrentTablePage(targetTablePageName)
+  }
+
   return (
     <Fragment>
       <Card>
         <CardHeader
-          title={
-            <h3 style={{ margin: 0, fontSize: 24 }}>
-              <Icon style={{ marginRight: spacings.xSmall }} />
-              {entityName}
-            </h3>
-          }
+          title={<CardTilte icon={Icon} text={entityName} />}
           action={
             <SearchAutoSuggest
-              type="summary"
+              type={searchType}
               onSearchChange={handleSearchChange}
               options={entities}
               label={searchHintText}
@@ -130,7 +138,7 @@ export default ({
           }
         />
 
-        <CardContent style={{ padding: `0 ${spacings.small}` }}>
+        <CardContent>
           <TableContainer>
             <Table>
               <TableHead>
@@ -143,15 +151,35 @@ export default ({
                       color="primary"
                     />
                   </TableCell>
-                  {_.map(entityProperties, ({ label }) => (
-                    <TableCell
-                      key={`OhxmXUPOT${label}`}
-                      align="center"
-                      style={{ fontSize: 16 }}
-                    >
-                      {_.capitalize(label)}
-                    </TableCell>
-                  ))}
+                  {entityProperties.length <= 5 ? (
+                    _.map(entityProperties, ({ label }) => (
+                      <TableCell
+                        key={`OhxmXUPOT${label}`}
+                        align="center"
+                        style={{ fontSize: 16 }}
+                      >
+                        {_.capitalize(label)}
+                      </TableCell>
+                    ))
+                  ) : (
+                    <Fragment>
+                      {entityProperties.slice(0, 4).map(({ label }) => (
+                        <TableCell
+                          key={`nQxpFypoG${label}`}
+                          align="left"
+                          style={{ fontSize: 16 }}
+                        >
+                          {_.capitalize(label)}
+                        </TableCell>
+                      ))}
+                      <PaginatedColumn
+                        entities={entityProperties
+                          .slice(4)
+                          .map(({ label }) => label)}
+                        onChange={handleTablePageChange}
+                      />
+                    </Fragment>
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -172,11 +200,27 @@ export default ({
                       >
                         <Checkbox checked={isItemSelected} />
                       </TableCell>
-                      {_.map(entityProperties, ({ name }) => (
-                        <TableCell align="center" key={`${name}n2JSnVN5t`}>
-                          {entity[name]}
-                        </TableCell>
-                      ))}
+                      {entityProperties.length <= 5 ? (
+                        _.map(entityProperties, ({ name }) => (
+                          <TableCell align="center" key={`${name}n2JSnVN5t`}>
+                            {entity[name]}
+                          </TableCell>
+                        ))
+                      ) : (
+                        <Fragment>
+                          {entityProperties.slice(0, 4).map(({ name }) => (
+                            <TableCell key={`n2JSnVN5t${name}`} align="left">
+                              {entity[name]}
+                            </TableCell>
+                          ))}
+                          <TableCell
+                            key={`omTHBCqbW${currentTablePage}`}
+                            align="left"
+                          >
+                            {entity[currentTablePage]}
+                          </TableCell>
+                        </Fragment>
+                      )}
                     </TableRow>
                   )
                 })}
@@ -185,7 +229,7 @@ export default ({
           </TableContainer>
         </CardContent>
 
-        <CardActions style={{ justifyContent: "flex-end" }}>
+        <CardActions>
           {!disableDelete && (
             <Button
               label="Delete"

@@ -37,7 +37,14 @@ const newPasswordPage = () => (
 
 const mainPage = ({ dispatch }) => (
   <Router>
-    <div style={{ display: "flex", width: "100%", minHeight: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        overflowY: "hidden",
+        height: "100vh",
+        maxHeight: "100vh",
+      }}
+    >
       <SidebarNav />
       <Switch>
         <Redirect exact from="/" to="/directory" key="zCgA74SIB" />

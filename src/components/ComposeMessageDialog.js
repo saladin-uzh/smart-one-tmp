@@ -13,30 +13,72 @@ import { Add as ContentAdd } from "@material-ui/icons"
 
 import { AutoCompleteToAddress } from "."
 
-export default ({ open, addressOptions, onSend, buildingId }) => {
-  const [isOpen, setIsOpen] = useState(open)
+const initialErrors = {
+  to: false,
+  subject: false,
+  message: false,
+}
+
+export default ({ addressOptions, onSend, buildingId, handleError }) => {
+  const [isOpen, setIsOpen] = useState(false)
   const [to, setTo] = useState([])
   const [message, setMessage] = useState("")
   const [subject, setSubject] = useState("")
+  const [errors, setErrors] = useState(initialErrors)
 
-  const updateToAddress = (newAddress) => {
-    console.log("setting new addresses", newAddress)
-
-    setTo(newAddress)
+  const updateToAddress = (newAddresses) => {
+    setTo(newAddresses)
+    if (errors.to && to.length > 0)
+      setErrors((errors) => ({ ...errors, to: false }))
   }
 
-  const updateMessage = (event) => setMessage(event.target.value)
+  const updateMessage = (event) => {
+    setMessage(event.target.value)
+    if (errors.message) setErrors((errors) => ({ ...errors, message: false }))
+  }
 
-  const updateSubject = (event) => setSubject(event.target.value)
+  const updateSubject = (event) => {
+    setSubject(event.target.value)
+    if (errors.subject) setErrors((errors) => ({ ...errors, subject: false }))
+  }
 
   const handleOpen = () => setIsOpen(true)
 
-  const handleClose = () => setIsOpen(false)
+  const handleClose = () => {
+    setTo([])
+    setSubject("")
+    setMessage("")
+    setErrors(initialErrors)
+    setIsOpen(false)
+  }
 
   const handleSend = () => {
-    onSend(buildingId, to, subject, message)
+    if (to.length > 0 && Boolean(subject) && Boolean(message)) {
+      onSend(buildingId, to, subject, message)
+      handleClose()
+    } else {
+      let errorText = "Unable to send message\r\n"
+      const newErrors = errors
 
-    setIsOpen(false)
+      if (to.length === 0) {
+        errorText += "\r\nAddress is empty!"
+        newErrors.to = true
+      }
+
+      if (!Boolean(subject)) {
+        errorText += "\r\nSubject is empty!"
+        newErrors.subject = true
+      }
+
+      if (!Boolean(message)) {
+        errorText += "\r\nMessage is empty!"
+        newErrors.message = true
+      }
+
+      setErrors(newErrors)
+
+      handleError(errorText)
+    }
   }
 
   return (
@@ -46,27 +88,34 @@ export default ({ open, addressOptions, onSend, buildingId }) => {
         <DialogContent>
           <AutoCompleteToAddress
             addressOptions={addressOptions}
+            selected={to}
             handleAddressUpdate={updateToAddress}
+            error={errors.to}
+            multiple
+            filterSelectedOptions
           />
           <TextField
             label="Subject"
             value={subject}
             onChange={updateSubject}
+            error={errors.subject}
             fullWidth
             required
           />
           <TextField
             label="Message"
-            rows={2}
+            rows={1}
             rowsMax={8}
             value={message}
             onChange={updateMessage}
+            error={errors.message}
+            multiline
             fullWidth
             required
           />
         </DialogContent>
         <DialogActions>
-          <Button label="Cancel" color="secondary" onClick={handleClose}>
+          <Button label="Cancel" color="default" onClick={handleClose}>
             Cancel
           </Button>
           <Button label="Send" onClick={handleSend}>

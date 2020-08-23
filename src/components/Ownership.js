@@ -11,6 +11,9 @@ import {
   CardActions,
   CardHeader,
   CardContent,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
 } from "@material-ui/core"
 import {
   KeyboardDatePicker,
@@ -24,10 +27,11 @@ import {
 } from "."
 import { HouseRounded, PeopleRounded } from "@material-ui/icons"
 import { spacings, radii, colors } from "../constants"
-import { TextFieldUI, CardTilte, TabLink } from "../ui"
+import { TextFieldUI, CardTilte, TabLink, PageContainer } from "../ui"
 import { useRouteMatch } from "react-router-dom/cjs/react-router-dom.min"
+import withErrorHandling from "../utils/withErrorHandling"
 
-export default () => {
+export default withErrorHandling(({ handleError }) => {
   const [ownership, setOwnership] = useState({
     id: 1,
     activateDate: new Date(),
@@ -63,10 +67,8 @@ export default () => {
       global.internalApi.getBuildingUnits(newBuildingId).then((data) => {
         const newUnits = _.map(data, ({ id, commaxId: number }) => ({
           id,
-          number,
+          number: number.replace("\r", ""),
         }))
-
-        console.warn(newUnits)
 
         setUnits(newUnits)
 
@@ -74,8 +76,6 @@ export default () => {
           _.sortBy(newUnits, ["number"]),
           ({ number }) => number
         )
-
-        console.log("options: ", options)
 
         setAddressOptions(options)
       })
@@ -123,17 +123,8 @@ export default () => {
       setOwnershipPersonTypes(types)
     })
 
-  const getunitId = (number) => {
-    const index = units.findIndex((val) => val.number === number)
-
-    return units[index >= 0 ? index : 0].id
-  }
-
-  // const getunitNumber = (id) => {
-  //   const index = units.findIndex((val) => val.id === id)
-
-  //   return index >= 0 ? units[index].number : 0
-  // }
+  const getunitId = (unitNumber) =>
+    units.find(({ number }) => number === unitNumber).id
 
   const getOwnershipByNumber = (number) => {
     const newUnitId = getunitId(number)
@@ -147,11 +138,10 @@ export default () => {
   const getOwnershipById = (unitId) => {
     let newOwnership = {}
 
-    handleClose()
-
     global.internalApi
       .getOwnershipByUnit(unitId)
       .then((data) => {
+        console.warn(data)
         const people = _.map(data.ownershipPersons, (o) => {
           let fullAddress = o.address
 
@@ -252,28 +242,26 @@ export default () => {
         setEmptyProperty(newEmptyProperty)
       })
       .then(() =>
-        global.internalApi
-          .getBuildingOwnershipUnits(buildingId)
-          .then((data) => {
-            const newOwnershipProperties = _.map(
-              data,
-              ({ id: value, suite, type: { description } }) => ({
-                value,
-                display: `${suite} - ${description}`,
-              })
-            )
+        global.internalApi.getBuildingOwnership(buildingId).then((data) => {
+          const newOwnershipProperties = _.map(
+            data,
+            ({ id: value, suite, type: { description } }) => ({
+              value,
+              display: `Suite ${suite}: ${description.toLowerCase()}`,
+            })
+          )
 
-            setOwnershipProperties(newOwnershipProperties)
-          })
+          setOwnershipProperties(newOwnershipProperties)
+        })
       )
   }
 
   const handleSearchChange = (unit) => {
-    console.log(`loading unit ${unit}`)
+    if (Boolean(unit)) {
+      getOwnershipByNumber(unit)
 
-    getOwnershipByNumber(unit)
-
-    setShowSuite(true)
+      setShowSuite(true)
+    } else setShowSuite(false)
   }
 
   const handlePersonSave = (entity) => {
@@ -306,21 +294,26 @@ export default () => {
         })
   }
 
-  const handleOwnershipUnitDelete = (entities) =>
-    _.each(entities, (entity) => {
-      global.internalApi
-        .deleteOwnershipUnit(entity.id, entity.ownershipId)
-        .then(() => {
+  const handleOwnershipUnitDelete = (selection) =>
+    Boolean(selection.length)
+      ? selection.forEach((propId) =>
+          global.internalApi
+            .deleteOwnershipUnit(
+              propId,
+              ownership.properties.find(({ id }) => id === unitId).ownershipId
+            )
+            .then(() => {
+              getOwnershipById(unitId)
+            })
+        )
+      : handleError("Nothing selected!")
+
+  const handleOwnershipSave = () =>
+    Boolean(ownership.id)
+      ? global.internalApi.updateOwnership(ownership).then(() => {
           getOwnershipById(unitId)
         })
-    })
-
-  const handleOwnershipSave = () => {
-    if (ownership.id > 0)
-      global.internalApi.updateOwnership(ownership).then(() => {
-        getOwnershipById(unitId)
-      })
-  }
+      : handleError("Can't parse ownership id!")
 
   const handleTransfer = () => {
     handleClose()
@@ -352,23 +345,12 @@ export default () => {
       notes: newNotes,
     }))
 
-  const transferActions = [
-    <Button key="cancel" label="Cancel" primary={true} onClick={handleClose} />,
-    <Button
-      key="submit"
-      label="Submit"
-      primary={true}
-      disabled={false}
-      onClick={handleTransfer}
-    />,
-  ]
-
   const tabContent = {
     prop: (
       <Fragment>
         <Grid item xs={12}>
           <EntityCrudSummaryCard
-            searchHintText="Suite number"
+            searchHintText="Property type"
             searchType="ownership"
             entityName="Property"
             NewEntityLable="Parking\Locker"
@@ -403,11 +385,7 @@ export default () => {
               <Grid container spacing={6}>
                 <Grid item container xs={5}>
                   <MuiPickersUtilsProvider utils={MomentUtils}>
-                    <Grid
-                      item
-                      xs={12}
-                      style={{ marginBottom: spacings.xxLarge }}
-                    >
+                    <Grid item xs={12} style={{ marginBottom: spacings.large }}>
                       <KeyboardDatePicker
                         autoOk
                         variant="inline"
@@ -421,11 +399,7 @@ export default () => {
                         TextFieldComponent={TextFieldUI}
                       />
                     </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      style={{ marginBottom: spacings.xxLarge }}
-                    >
+                    <Grid item xs={12} style={{ marginBottom: spacings.large }}>
                       <KeyboardDatePicker
                         autoOk
                         variant="inline"
@@ -538,7 +512,7 @@ export default () => {
           ]}
           entities={ownership.people}
           emptyEntity={emptyPeople}
-          // onEntitySave={handlePersonSave}
+          onEntitySave={handlePersonSave}
           onEntityAdd={handlePersonSave}
           onEntitiesDelete={handlePersonDelete}
         />
@@ -547,22 +521,7 @@ export default () => {
   }
 
   return (
-    <Grid
-      container
-      style={{
-        width: "auto",
-        minHeight: "100%",
-        minWidth: 1070,
-        flexGrow: 1,
-        margin: 0,
-        padding: spacings.large,
-        textAlign: "left",
-      }}
-      alignItems="flex-start"
-      alignContent="flex-start"
-      justify="flex-start"
-      spacing={5}
-    >
+    <PageContainer>
       <Grid
         item
         container
@@ -570,7 +529,7 @@ export default () => {
         justify={showSuite ? "space-between" : "flex-end"}
         alignItems={showSuite ? "center" : "flex-start"}
         style={{
-          margin: spacings.small,
+          margin: spacings.xSmall,
           ...(showSuite
             ? { backgroundColor: colors.white, borderRadius: radii.border }
             : {}),
@@ -623,7 +582,7 @@ export default () => {
 
         {!showSuite && (
           <Grid item xs={12}>
-            <span style={{ fontSize: "1.3rem" }}>
+            <span style={{ fontSize: 24 }}>
               Please select <strong>a suite</strong>
             </span>
           </Grid>
@@ -660,14 +619,30 @@ export default () => {
 
       {showSuite && tabContent[currentTab]}
 
-      <Dialog
-        title="Transfer Ownership"
-        actions={transferActions}
-        modal={true}
-        open={open}
-      >
-        This will transfer the current ownership. Continue?
+      <Dialog modal open={open} onClose={handleClose}>
+        <DialogTitle>Transfer Ownership</DialogTitle>
+        <DialogContent>
+          This will transfer the current ownership. Continue?
+        </DialogContent>
+        <DialogActions>
+          <Button
+            style={{ padding: `${spacings.xxSmall} ${spacings.small}` }}
+            label="Cancel"
+            color="default"
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            style={{ padding: `${spacings.xxSmall} ${spacings.small}` }}
+            label="Submit"
+            disabled={false}
+            onClick={handleTransfer}
+          >
+            Submit
+          </Button>
+        </DialogActions>
       </Dialog>
-    </Grid>
+    </PageContainer>
   )
-}
+})

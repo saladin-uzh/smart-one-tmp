@@ -17,19 +17,14 @@ export default ({ messages: initialMessages, onDelete }) => {
     setFilteredMessages(initialMessages)
   }, [initialMessages])
 
-  const handleSearchChange = (searchText) => {
-    if (_.isEmpty(searchText)) setFilteredMessages(initialMessages)
-    else {
-      const foundMessages = _.filter(
-        messages,
-        (msg) =>
-          msg.message.toLowerCase().includes(searchText.toLowerCase()) ||
-          _.findIndex(msg.allSentTo, (addr) =>
-            addr.toLowerCase().includes(searchText.toLowerCase())
-          ) >= 0
-      )
+  const handleSearchChange = (selectedMessageId) => {
+    console.log(selectedMessageId)
 
-      setFilteredMessages(foundMessages)
+    if (!Boolean(selectedMessageId)) setFilteredMessages(initialMessages)
+    else {
+      const foundMessages = messages.find((m) => m.id === selectedMessageId)
+
+      setFilteredMessages([foundMessages])
     }
   }
 
@@ -44,7 +39,7 @@ export default ({ messages: initialMessages, onDelete }) => {
             type="messages"
             onSearchChange={handleSearchChange}
             options={messages}
-            hintText="Unit number, riser, floor"
+            label="Unit number, riser, floor"
           />
         }
       />

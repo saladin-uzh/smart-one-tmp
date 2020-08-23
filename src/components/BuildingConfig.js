@@ -1,17 +1,43 @@
 import _ from "lodash"
 import React, { useState, useEffect } from "react"
 
-import { Grid } from "@material-ui/core"
+import { Grid, makeStyles } from "@material-ui/core"
 
 import { EntityCrudSummaryCard } from "."
 import { HomeRounded } from "@material-ui/icons"
 import { IconDirectories, PageContainer } from "../ui"
+import withErrorHandling from "../utils/withErrorHandling"
+import { spacings } from "../constants"
 
-export default () => {
+const useStyles = makeStyles({
+  fullHeight: {
+    height: "100%",
+
+    "& .MuiPaper-root.MuiCard-root": {
+      minHeight: "100%",
+      display: "flex",
+      flexDirection: "column",
+      paddingBottom: 0,
+      marginBottom: spacings.medium,
+    },
+
+    "& .MuiCardContent-root": {
+      flexGrow: 1,
+    },
+
+    "& .MuiCardActions-root": {
+      paddingBottom: spacings.large,
+    },
+  },
+})
+
+export default withErrorHandling(({ handleError }) => {
   const [units, setUnits] = useState([])
   const [occupants, setOccupants] = useState([])
   const [directoryEntries, setDirectoryEntries] = useState([])
-  const [emptyOccupant, setEmptyOccupant] = useState({
+  const classes = useStyles()
+
+  const emptyOccupant = {
     id: 0,
     number: "",
     firstName: "",
@@ -19,112 +45,27 @@ export default () => {
     email: "",
     phone: "",
     unitId: "",
-  })
-  const [emptyDirectory, setEmptyDirectory] = useState({
+  }
+
+  const emptyDirectory = {
     id: 0,
     name: "",
     buildingId: global.buildingNum,
     unitId: "",
-  })
+  }
 
   const getUnits = (buildingId) =>
     global.internalApi.getBuildingUnits(buildingId).then((data) => {
       const newUnits = _.map(data, ({ id, commaxId: number }) => ({
         id,
-        number,
+        number: number.replace("\r", ""),
       }))
 
       setUnits(newUnits)
     })
 
-  const getunitId = (number) => {
-    const index = units.findIndex((val) => val.number === number)
-
-    return units[index >= 0 ? index : 0].id
-  }
-
-  const getunitNumber = (id) => {
-    const index = units.findIndex((val) => val.id === id)
-
-    return index >= 0 ? units[index].number : ""
-  }
-
-  const getUnitById = (unitId) => {
-    const number = getunitNumber(unitId)
-    let unit = {}
-    const newDirectoryEntries = []
-
-    global.internalApi
-      .getUnit(unitId)
-      .then(
-        ({ properyOccupants, id, suite: number, legalLevel, legalUnit }) => {
-          const occs = _.map(
-            properyOccupants,
-            ({
-              id,
-              firstName,
-              lastName,
-              email,
-              phone,
-              propertyId: unitId,
-            }) => ({
-              id,
-              firstName,
-              lastName,
-              email,
-              phone,
-              unitId,
-            })
-          )
-
-          unit = {
-            id,
-            number,
-            tags: [
-              "Floor: " + legalLevel,
-              "Riser: " + legalUnit,
-              "Exposure: East",
-            ],
-            occupants: occs,
-            directoryEntries: [],
-          }
-        }
-      )
-      .then(() => {
-        global.externalApi
-          .getDirectoryEntry(global.buildingNum, number)
-          .then((data) => {
-            _.map(data, ({ nickname, building, household }) => {
-              _.map(nickname, (o) => {
-                newDirectoryEntries.push({
-                  id: o.hu_no,
-                  name: o.username,
-                  buildingId: building,
-                  unitId: household,
-                })
-              })
-            })
-
-            unit.directoryEntries = newDirectoryEntries
-
-            setUnits((units) => [...units, unit])
-            setEmptyOccupant({
-              id: 0,
-              firstName: "",
-              lastName: "",
-              email: "",
-              phone: "",
-              unitId: unit.id,
-            })
-            setEmptyDirectory({
-              id: 0,
-              name: "",
-              buildingId: global.buildingNum,
-              unitId: number,
-            })
-          })
-      })
-  }
+  const getunitId = (unitNumber) =>
+    units.find(({ number }) => number === unitNumber).id
 
   const getOccupants = (buildingId) =>
     global.internalApi.getOccupants(buildingId).then((data) => {
@@ -155,6 +96,7 @@ export default () => {
   const handleOccupantSave = (entity) => {
     //NB: the EntityCrudSummaryCard will display the changes to the entity immediately,
     //regardless of what happens here
+    console.log(entity)
     entity.unitId = getunitId(entity.number)
 
     if (entity.id > 0) global.internalApi.updateOccupant(entity)
@@ -167,34 +109,28 @@ export default () => {
     console.log("occupant updated: ", entity)
   }
 
-  const handleOccupantDelete = (entities) => {
-    _.each(entities, (entity) => {
-      global.internalApi.deleteOccupants(entity.id).then(() => {
-        getUnitById(entity.unitId)
-      })
-    })
-  }
+  const handleOccupantDelete = (selection) =>
+    Boolean(selection.length)
+      ? selection.forEach((occId) => {
+          global.internalApi.deleteOccupants(occId).then(() => {
+            getOccupants(global.buildingId)
+          })
+        })
+      : handleError("Nothing selected!")
 
   const getDirectoryEntity = () => {
     const newDirectoryEntries = []
+
     global.externalApi.getAllDirectoryEntry().then((data) => {
-      _.map(data, ({ nickname }) => {
-        _.map(
-          nickname,
-          ({
-            hu_no: id,
-            username: name,
-            building: buildingId,
-            household: number,
-          }) => {
-            newDirectoryEntries.push({
-              id,
-              name,
-              buildingId,
-              number,
-            })
-          }
-        )
+      _.map(data, ({ nickname, building: buildingId, household: number }) => {
+        _.map(nickname, ({ hu_no: id, username: name }) => {
+          newDirectoryEntries.push({
+            id,
+            name: Boolean(name) ? name : "<empty_name>",
+            buildingId,
+            number,
+          })
+        })
       })
 
       setDirectoryEntries(newDirectoryEntries)
@@ -226,18 +162,31 @@ export default () => {
     })
   }
 
-  const handleDirectoryDelete = (entities) =>
-    _.each(entities, ({ buildingId, number: unitId, id: hu_no }) => {
-      const name = JSON.stringify([{ hu_no }]).replace(/'/g, "''")
+  const handleDirectoryDelete = (selection) =>
+    Boolean(selection.length)
+      ? selection.forEach((dirId) => {
+          const {
+            buildingId,
+            number,
+            id: hu_no,
+            name: username,
+          } = directoryEntries.find(({ id }) => id === dirId)
 
-      console.log("deleting ", buildingId, unitId, name)
+          const dirName = JSON.stringify([{ hu_no, username }]).replace(
+            /'/g,
+            '"'
+          )
 
-      global.externalApi
-        .deleteDirectoryEntry(buildingId, unitId, name)
-        .then(() => {
-          getDirectoryEntity()
+          global.externalApi
+            .deleteDirectoryEntry(buildingId, number, dirName)
+            .then(
+              () => {
+                getDirectoryEntity(buildingId, number)
+              },
+              ({ message }) => handleError(message)
+            )
         })
-    })
+      : handleError("Nothing selected!")
 
   useEffect(() => {
     getUnits(global.buildingId)
@@ -245,20 +194,9 @@ export default () => {
     getDirectoryEntity()
   }, [])
 
-  useEffect(() => {
-    console.log(
-      "units: ",
-      units,
-      "occupants: ",
-      occupants,
-      "dirs: ",
-      directoryEntries
-    )
-  }, [units, occupants, directoryEntries])
-
   return (
     <PageContainer>
-      <Grid item xs={6}>
+      <Grid item xs={6} className={classes.fullHeight}>
         <EntityCrudSummaryCard
           searchHintText="Suite number, first / last name"
           searchType="occupants"
@@ -271,7 +209,14 @@ export default () => {
             { label: "last name", name: "lastName" },
           ]}
           entitySchema={[
-            { label: "Suite number", name: "number", type: "text" },
+            {
+              label: "Suite number",
+              name: "number",
+              type: "address",
+              optionValues: _.sortBy(units, ["number"]).map(
+                ({ number }) => number
+              ),
+            },
             { label: "first name", name: "firstName", type: "text" },
             { label: "last name", name: "lastName", type: "text" },
             { label: "phone", name: "phone", type: "text" },
@@ -282,29 +227,39 @@ export default () => {
           onEntitySave={handleOccupantSave}
           onEntityAdd={handleOccupantSave}
           onEntitiesDelete={handleOccupantDelete}
+          handleError={handleError}
         />
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={6} className={classes.fullHeight}>
         <EntityCrudSummaryCard
           searchHintText="Suite number, name"
           searchType="dir"
           entityName="Directory Entries"
+          NewEntityLable="Add Directory"
           icon={IconDirectories}
           entityProperties={[
             { label: "Number", name: "number" },
             { label: "Name", name: "name" },
           ]}
           entitySchema={[
-            { label: "suite number", name: "number", type: "text" },
+            {
+              label: "Suite number",
+              name: "number",
+              type: "address",
+              optionValues: _.sortBy(units, ["number"]).map(
+                ({ number }) => number
+              ),
+            },
             { label: "name", name: "name", type: "text" },
           ]}
-          entities={directoryEntries}
+          entities={_.sortBy(directoryEntries, ["number"])}
           emptyEntity={emptyDirectory}
           onEntitySave={handleDirectorySave}
           onEntityAdd={handleDirectoryAdd}
           onEntitiesDelete={handleDirectoryDelete}
+          handleError={handleError}
         />
       </Grid>
     </PageContainer>
   )
-}
+})

@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import moment from "moment"
 
 import { SearchRounded } from "@material-ui/icons"
 import { InputAdornment } from "@material-ui/core"
@@ -14,7 +13,7 @@ export default ({ type, options, label, onSearchChange }) => {
     poeople: createFilterOptions({
       stringify: (option) =>
         Object.keys(option)
-          .map((o) => option[o])
+          .map((o) => option[o].toLowerCase())
           .join(" "),
     }),
     ownership: createFilterOptions({
@@ -28,7 +27,12 @@ export default ({ type, options, label, onSearchChange }) => {
         `${option.firstName} ${option.lastName} ${option.email} ${option.phone}`,
     }),
     messages: createFilterOptions({
-      stringify: (option) => option.message.toLowerCase(),
+      stringify: (option) =>
+        [
+          option.message.toLowerCase(),
+          option.allSentTo.join(" "),
+          option.subject.toLowerCase(),
+        ].join(" "),
     }),
   }
 
@@ -37,21 +41,19 @@ export default ({ type, options, label, onSearchChange }) => {
       case "people":
         return `${option.firstName} ${option.lastName}`
       case "ownership":
-        return `${option.type} ${option.suite}`
+        return `Suite ${option.suite}: ${option.type.toLowerCase()} `
       case "dir":
         return option.name
       case "occupants":
         return `${option.firstName} ${option.lastName}`
       case "messages":
-        return `"${option.subject}" on ${moment
-          .unix(option.sendDate)
-          .format("l")}`
+        return `"${option.subject}" to ${option.sentTo}`
       default:
         return option
     }
   }
 
-  const handleSelection = (event, newSelected) => {
+  const handleSelection = (_, newSelected) => {
     setSelected(newSelected)
 
     onSearchChange(newSelected ? newSelected.id : null)
@@ -65,7 +67,7 @@ export default ({ type, options, label, onSearchChange }) => {
       options={options}
       getOptionLabel={getOptionLabel}
       filterOptions={filterOptions[type]}
-      style={{ minWidth: `calc(${spacings.xxLarge} * 5)` }}
+      style={{ minWidth: `calc(${spacings.xxLarge} * 7)` }}
       renderInput={(params) => (
         <TextFieldNoBorder
           {...params}
@@ -83,7 +85,7 @@ export default ({ type, options, label, onSearchChange }) => {
       )}
       ListboxProps={{
         style: {
-          background: colors.white,
+          background: colors.whiteBg,
         },
       }}
     />

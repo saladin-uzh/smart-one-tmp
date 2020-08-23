@@ -43,19 +43,19 @@ export default () => (
       </Link>
     </Grid>
     <Grid item container xs={12} spacing={1} style={{ paddingLeft: 0 }}>
-      <Grid item xs={12}>
+      <Grid item xs={11}>
         <SideBarLink to="/directory">
           <HomeRounded style={{ marginRight: spacings.small }} />
           Suite Information
         </SideBarLink>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={11}>
         <SideBarLink to="/notifications">
           <NotificationsRounded style={{ marginRight: spacings.small }} />
           Notifications
         </SideBarLink>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={11}>
         <SideBarLink to="/ownership">
           <PersonRounded style={{ marginRight: spacings.small }} />
           Ownership
@@ -66,19 +66,19 @@ export default () => (
       <Divider style={{ color: colors.main }} />
     </Grid>
     <Grid item container xs={12} spacing={1} style={{ paddingLeft: 0 }}>
-      <Grid item xs={12}>
-        <SideBarLink to="/community">
+      <Grid item xs={11}>
+        <SideBarLink to="/building-config">
           <BusinessRounded style={{ marginRight: spacings.small }} />
           Building Configuration
         </SideBarLink>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={11}>
         <SideBarLink to="/change-password">
           <VpnKeyRounded style={{ marginRight: spacings.small }} />
           Change Password
         </SideBarLink>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={11}>
         <Logout>
           <SideBarLink exact to="/">
             <ExitToAppRounded style={{ marginRight: spacings.small }} />

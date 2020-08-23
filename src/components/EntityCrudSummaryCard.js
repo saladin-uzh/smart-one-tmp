@@ -32,12 +32,13 @@ export default ({
   entityProperties,
   disableAdd,
   disableDelete,
-  // disableEdit,
+  disableEdit,
   // EditEntityLable,
   entitySchema,
   NewEntityLable,
   icon: Icon,
   searchType,
+  handleError,
 }) => {
   const [filteredEntities, setFilteredEntities] = useState([])
   // const [clickedEntity, setClickedEntity] = useState({})
@@ -52,13 +53,14 @@ export default ({
 
   useEffect(() => {
     setFilteredEntities(entities)
+    setSelectedEntities([])
   }, [entities])
 
   useEffect(() => {
     const numSelected = selectedEntities.length
 
     if (numSelected) {
-      if (numSelected === entities.length) {
+      if (numSelected === filteredEntities.length) {
         setIsAllSelected(true)
         setIsSomeSelected(false)
       } else {
@@ -69,7 +71,7 @@ export default ({
       setIsSomeSelected(false)
       setIsAllSelected(false)
     }
-  }, [selectedEntities, entities.length])
+  }, [selectedEntities, filteredEntities])
 
   // const handleEntitySave = (entity) => {
   //   var value = onEntitySave(entity)
@@ -98,8 +100,11 @@ export default ({
 
   const handleRowClick = (event, entityId) => {
     if (selectedEntities.includes(entityId))
-      setSelectedEntities(_.without(selectedEntities, entityId))
-    else setSelectedEntities([...selectedEntities, entityId])
+      setSelectedEntities((selectedEntities) =>
+        _.without(selectedEntities, entityId)
+      )
+    else
+      setSelectedEntities((selectedEntities) => [...selectedEntities, entityId])
   }
 
   const handleSelectAll = (event) => {
@@ -190,7 +195,7 @@ export default ({
                     <TableRow
                       key={`lWAstsZ-E${entity.id}`}
                       onClick={(e) => handleRowClick(e, entity.id)}
-                      // role="checkbox"
+                      role="checkbox"
                       selected={isItemSelected}
                       tabIndex={-1}
                     >
@@ -276,6 +281,7 @@ export default ({
             open={true}
             onEntitySave={handleEntityAdd}
             handleClose={onAddDialogClose}
+            handleError={handleError}
           />
         )}
       </Grid>

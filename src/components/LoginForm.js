@@ -49,7 +49,7 @@ export default ({
         <Grid item xs={12}>
           <TitleUI>SmartONE Grandview</TitleUI>
         </Grid>
-        <Grid container item spacing={4}>
+        <Grid container item spacing={5}>
           <Grid item xs={12}>
             <TextFieldUI
               value={usernameInput}

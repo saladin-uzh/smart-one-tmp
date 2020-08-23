@@ -3,10 +3,10 @@ import { makeStyles, TextField } from "@material-ui/core"
 import clsx from "clsx"
 import { colors, radii, spacings } from "../constants"
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(({ palette }) => ({
   noBorder: {
-    minWidth: 100,
-    background: ({ bg }) => bg,
+    minWidth: 150,
+    backgroundColor: ({ bg }) => bg,
     borderRadius: radii.border,
     paddingTop: ({ isTiny }) => (isTiny ? 0 : spacings.xxSmall),
     paddingLeft: spacings.small,
@@ -20,16 +20,27 @@ const useStyles = makeStyles({
       top: ({ isTiny }) => (isTiny ? ".125em" : spacings.xxSmall),
     },
   },
-})
+  hasError: {
+    color: palette.error.contrastText,
+    backgroundColor: `${palette.error.light} !important`,
+
+    "& .MuiAutocomplete-endAdornment button .MuiIconButton-label": {
+      color: `${palette.error.contrastText} !important`,
+    },
+  },
+}))
 
 export default ({
   InputProps,
+  error = false,
   isTiny = false,
   bg = colors.white,
   ...props
 }) => {
   const classes = useStyles({ isTiny, bg })
-  const className = clsx(InputProps.className, classes.noBorder)
+  const className = clsx(InputProps.className, classes.noBorder, {
+    [classes.hasError]: error,
+  })
 
   return (
     <TextField

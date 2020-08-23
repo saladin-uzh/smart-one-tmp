@@ -9,7 +9,11 @@ import {
   DialogContent,
 } from "@material-ui/core"
 
-import { EntityCrudSelectField, EntityCrudTextField } from "."
+import {
+  EntityCrudSelectField,
+  EntityCrudTextField,
+  AutoCompleteToAddress,
+} from "."
 import { colors, radii } from "../constants"
 
 export default ({
@@ -21,61 +25,86 @@ export default ({
   handleClose,
   onEntitySave,
   entitySchema,
+  handleError,
 }) => {
   const [entity, setEntity] = useState(initialEntity)
-  // const [openAlert, setOpenAlert] = useState(false)
-  // const [alertMessage, setAlertMessage] = useState("")
-
-  // const handleOpenAlert = (message) => {
-  //   setOpenAlert(true)
-  //   setAlertMessage(message)
-  // }
-
-  // const handleCloseAlert = () => setOpenAlert(false)
+  const [errors, setErrors] = useState(
+    Object.assign({}, ...entitySchema.map(({ name }) => ({ [name]: false })))
+  )
 
   const handleSave = () => {
-    onEntitySave(entity)
-    handleClose()
-  }
-  // const handleSave = () => {
-  // const value = onEntitySave(entity)
+    let detectedErrors = errors
 
-  // if (!String.isNullOrEmpty(value)) {
-  // handleOpenAlert(value)
-  // }
-  // }
+    entitySchema.forEach(({ name }) => {
+      if (!Boolean(entity[name])) detectedErrors[name] = true
+      else if (detectedErrors[name]) detectedErrors[name] = false
+    })
+
+    setErrors(detectedErrors)
+
+    if (!Object.values(errors).includes(true)) {
+      onEntitySave(entity)
+      handleClose()
+    } else {
+      const errorSubject = entityName.toLowerCase()
+      const errorParts = Object.entries(errors)
+        .filter((pair) => pair[1])
+        .map(
+          ([prop, __]) =>
+            `${_.capitalize(
+              entitySchema.find(({ name }) => name === prop).label
+            )} is missing!`
+        )
+        .join("\r\n")
+
+      handleError(`Unable to add ${errorSubject}\r\n\r\n${errorParts}`)
+    }
+  }
 
   const handleChange = (value, propertyName) => {
-    console.log(value, propertyName)
+    if (errors[propertyName])
+      setErrors((errors) => ({ ...errors, [propertyName]: false }))
     setEntity((entity) => ({ ...entity, [propertyName]: value }))
   }
 
-  // const alertActions = [
-  //   <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
-  // ]
-
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} style={{ minWidth: 300 }}>
       <DialogTitle>{title ? title : `${action} ${entityName}`}</DialogTitle>
       <DialogContent>
         {_.map(entitySchema, (property) => {
+          const onChange = (value) => handleChange(value, property.name)
+
           if (property.type === "text") {
             return (
               <EntityCrudTextField
-                key={`00Nbkzvrt${property.label}`}
+                key={`00Nbkzvrt${property.name}`}
                 label={_.capitalize(property.label)}
                 value={entity[property.name]}
-                handleChange={(v) => handleChange(v, property.name)}
+                error={errors[property.name]}
+                handleChange={onChange}
+                required
               />
             )
           } else if (property.type === "options") {
             return (
               <EntityCrudSelectField
-                key={`Q4HyXnird${property.label}`}
+                key={`Q4HyXnird${property.name}`}
                 label={_.capitalize(property.label)}
                 value={entity[property.name]}
                 optionValues={property.optionValues}
-                handleChange={handleChange}
+                error={errors[property.name]}
+                handleChange={onChange}
+                required
+              />
+            )
+          } else if (property.type === "address") {
+            return (
+              <AutoCompleteToAddress
+                key={`4MMvFxRJH${property.name}`}
+                addressOptions={property.optionValues}
+                selected={entity[property.name]}
+                handleAddressUpdate={onChange}
+                error={errors[property.name]}
               />
             )
           }

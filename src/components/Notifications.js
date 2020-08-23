@@ -1,62 +1,60 @@
 import _ from "lodash"
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import moment from "moment"
 
 import { Grid } from "@material-ui/core"
 
 import { MessageList, ComposeMessageDialog } from "."
-import { spacings } from "../constants"
+import { PageContainer } from "../ui"
+import withErrorHandling from "../utils/withErrorHandling"
 
-export default () => {
+export default withErrorHandling(({ handleError }) => {
   const [messages, setMessages] = useState([])
-  const [addressOptions, setAddressOptions] = useState({})
+  const [addressOptions, setAddressOptions] = useState([])
 
-  useEffect(() => {
-    getNotifications()
-    getUnits()
-  }, [])
+  const getUnits = useCallback(() => {
+    global.internalApi.getBuildingUnits(global.buildingId).then(
+      (data) => {
+        const units = _.map(data, ({ id, commaxId: number }) => ({
+          id,
+          number,
+        }))
 
-  const getUnits = () => {
-    global.internalApi.getBuildingUnits(global.buildingId).then((data) => {
-      const units = _.map(data, ({ id, commaxId: number }) => ({
-        id,
-        number,
-      }))
+        let options = _.map(_.sortBy(units, ["number"]), ({ number }) =>
+          number.trim()
+        )
 
-      const options = _.map(_.sortBy(units, ["number"]), ({ number }) =>
-        number.trim()
-      )
+        const suiteOptions = _.fromPairs(
+          _.map(_.sortBy(units, ["suite"]), ({ suite }) => [
+            `Suite ${suite}`,
+            [suite],
+          ])
+        )
 
-      // const suiteOptions = _.fromPairs(
-      //   _.map(_.sortBy(units, ["suite"]), ({ suite }) => [
-      //     `Suite ${suite}`,
-      //     [suite],
-      //   ])
-      // )
+        const tags = _.reduce(
+          _.flatMap(units, ({ tags, suite: unit }) =>
+            _.map(tags, ({ tag }) => ({ tag, unit }))
+          ),
+          (result, { tag, unit }) => {
+            if (result[tag] || (result[tag] = [])) result[tag].push(unit)
+            return result
+          },
+          {}
+        )
 
-      // const tags = _.reduce(
-      //   _.flatMap(units, ({ tags, suite: unit }) =>
-      //     _.map(tags, ({ tag }) => ({ tag, unit }))
-      //   ),
-      //   (result, { tag, unit }) => {
-      //     if (result[tag] || (result[tag] = [])) result[tag].push(unit)
-      //     return result
-      //   },
-      //   {}
-      // )
+        options = _.merge(options, suiteOptions, tags)
 
-      // options = _.merge(options, suiteOptions, tags)
+        console.log("options", options)
 
-      console.log("options", options)
+        setAddressOptions(options)
+      },
+      ({ message }) => handleError(message)
+    )
+  }, [handleError])
 
-      setAddressOptions(options)
-    })
-  }
-
-  const getNotifications = () => {
-    global.externalApi
-      .getBuildingNotifications(global.buildingNum)
-      .then((data) => {
+  const getNotifications = useCallback(() => {
+    global.externalApi.getBuildingNotifications(global.buildingNum).then(
+      (data) => {
         const notifications = _.map(
           data,
           ({
@@ -103,39 +101,53 @@ export default () => {
         console.log("notifs: ", notifications)
 
         setMessages(notifications)
-      })
-  }
+      },
+      ({ message }) => handleError(message)
+    )
+  }, [handleError])
+
+  useEffect(() => {
+    getNotifications()
+    getUnits()
+  }, [getNotifications, getUnits])
 
   const handleMessageSend = (buildingId, toAddr, msgSubject, msgMessage) => {
     console.log("sending message to ", toAddr)
 
     global.externalApi
       .sendNotification(buildingId, toAddr, msgSubject, msgMessage)
-      .then(() => {
-        getNotifications()
-      })
+      .then(
+        () => {
+          getNotifications()
+        },
+        ({ message }) => handleError(message)
+      )
   }
 
   const handleMessageDelete = ({ id }) => {
-    global.externalApi.deleteNotification(id).then(() => {
-      getNotifications()
-    })
+    global.externalApi.deleteNotification(id).then(
+      () => {
+        getNotifications()
+      },
+      ({ message }) => handleError(message)
+    )
   }
 
   return (
-    <Grid container spacing={5} style={{ padding: spacings.large, margin: 0 }}>
-      <Grid item container xs={6}>
+    <PageContainer>
+      <Grid item container xs={10}>
         <Grid item xs={12}>
           <MessageList onDelete={handleMessageDelete} messages={messages} />
         </Grid>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={2}>
         <ComposeMessageDialog
           buildingId={global.buildingNum}
           onSend={handleMessageSend}
           addressOptions={addressOptions}
+          handleError={handleError}
         />
       </Grid>
-    </Grid>
+    </PageContainer>
   )
-}
+})

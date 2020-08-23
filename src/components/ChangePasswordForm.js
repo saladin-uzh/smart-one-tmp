@@ -4,7 +4,7 @@ import { changePassword } from "react-cognito"
 import { Button, Grid, Paper } from "@material-ui/core"
 
 import { rememberMeAction } from "../store/login"
-import { LinkUI, TitleUI, TextFieldUI } from "../ui"
+import { LinkUI, TextFieldUI } from "../ui"
 import { spacings } from "../constants"
 
 export default ({ user, dispatch, rememberMe }) => {
@@ -48,10 +48,7 @@ export default ({ user, dispatch, rememberMe }) => {
       <Paper style={{ padding: spacings.large, width: "auto" }}>
         <form onSubmit={onSubmit} style={{ maxWidth: 420 }}>
           <Grid container spacing={5}>
-            <Grid item xs={12}>
-              <TitleUI>Change Password</TitleUI>
-            </Grid>
-            <Grid container item spacing={4}>
+            <Grid container item spacing={5}>
               <Grid item xs={12}>
                 <TextFieldUI
                   value={oldPassword}

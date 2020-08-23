@@ -1,16 +1,22 @@
 import _ from "lodash"
-import React, { useState, useEffect, Fragment } from "react"
+import React, { useState, useEffect, Fragment, useCallback } from "react"
 import moment from "moment"
 
-import { Grid, Chip, Dialog, Button, Fab } from "@material-ui/core"
+import { Grid, Chip, Button, Fab } from "@material-ui/core"
 import { Autocomplete, createFilterOptions } from "@material-ui/lab"
 import { AddRounded } from "@material-ui/icons"
 
 import { MessageList, AutoCompleteSearch, EntityCrudSummaryCard } from "."
 import { spacings } from "../constants"
-import { TextFieldNoBorder, IconDirectories, IconOccupants } from "../ui"
+import {
+  TextFieldNoBorder,
+  IconDirectories,
+  IconOccupants,
+  PageContainer,
+} from "../ui"
+import withErrorHandling from "../utils/withErrorHandling"
 
-export default () => {
+export default withErrorHandling(({ handleError }) => {
   const [unit, setUnit] = useState({
     id: 1,
     number: "",
@@ -25,64 +31,50 @@ export default () => {
   const [showNewTag, setShowNewTag] = useState(false)
   const [addressOptions, setAddressOptions] = useState([])
   const [tagList, setTagList] = useState([])
-  const [openAlert, setOpenAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState("")
   const [messages, setMessages] = useState([])
   const [newTagValue, setNewTagValue] = useState("")
 
+  const getUnits = useCallback(
+    (buildingId) => {
+      global.internalApi.getBuildingUnits(buildingId).then(
+        (data) => {
+          const newUnits = _.map(data, ({ id, commaxId: number }) => ({
+            id,
+            number: number.replace("\r", ""),
+          }))
+
+          setUnits(newUnits)
+
+          const options = _.map(
+            _.sortBy(newUnits, ["number"]),
+            ({ number }) => number
+          )
+
+          setAddressOptions(options)
+        },
+        ({ message }) => handleError(message)
+      )
+    },
+    [handleError]
+  )
+
   useEffect(() => {
     getUnits(global.buildingId)
-  }, [])
+  }, [getUnits])
 
-  // useEffect(() => {
-  //   console.group("Component did mount:")
-  //   console.log("Unit: ", unit)
-  //   console.log("Occupants: ", unit.occupants)
-  //   console.log("Tags: ", tagList)
-  //   console.log("Notifs: ", messages)
-  //   console.groupEnd()
-  // }, [unit, tagList, messages])
+  useEffect(() => {
+    console.group("Component did mount:")
+    console.log("Unit: ", unit)
+    // console.log("Occupants: ", unit.occupants)
+    // console.log("Tags: ", tagList)
+    // console.log("Notifs: ", messages)
+    console.groupEnd()
+  }, [unit /**, tagList, messages*/])
 
-  const handleOpenAlert = (message) => {
-    setOpenAlert(true)
-    setAlertMessage(message)
-  }
+  const getunitId = (unitNumber) =>
+    units.find(({ number }) => number === unitNumber).id
 
-  const handleCloseAlert = () => setOpenAlert(false)
-
-  const getUnits = (buildingId) => {
-    global.internalApi.getBuildingUnits(buildingId).then((data) => {
-      const newUnits = _.map(data, ({ id, commaxId: number }) => ({
-        id,
-        number,
-      }))
-
-      console.warn(newUnits)
-
-      setUnits(newUnits)
-
-      const options = _.map(
-        _.sortBy(newUnits, ["number"]),
-        ({ number }) => number
-      )
-
-      console.log("options: ", options)
-
-      setAddressOptions(options)
-    })
-  }
-
-  const getunitId = (number) => {
-    const index = units.findIndex((val) => val.number === number)
-
-    return units[index >= 0 ? index : 0].id
-  }
-
-  const getunitNumber = (id) => {
-    const index = units.findIndex((val) => val.id === id)
-
-    return index >= 0 ? units[index].number : 0
-  }
+  const getunitNumber = (unitId) => units.find(({ id }) => id === unitId).number
 
   const getUnitByNumber = (number) => getUnitById(getunitId(number))
 
@@ -93,72 +85,85 @@ export default () => {
 
     global.internalApi
       .getUnit(unitId)
-      .then(({ properyOccupants, id, suite: number, tags }) => {
-        const occs = _.map(
-          properyOccupants,
-          ({ id, firstName, lastName, email, phone, propertyId: unitId }) => ({
-            id,
-            firstName,
-            lastName,
-            email,
-            phone,
-            unitId,
-          })
-        )
+      .then(
+        ({ properyOccupants, id, suite: number, tags }) => {
+          const occs = _.map(
+            properyOccupants,
+            ({
+              id,
+              firstName,
+              lastName,
+              email,
+              phone,
+              propertyId: unitId,
+            }) => ({
+              id,
+              firstName,
+              lastName,
+              email,
+              phone,
+              unitId,
+            })
+          )
 
-        newUnit = {
-          id,
-          number,
-          tags: tags,
-          occupants: occs,
-          directoryEntries: [],
-        }
-      })
-      .then(() => {
-        global.externalApi
-          .getDirectoryEntry(global.buildingNum, number)
-          .then((data) => {
-            _.map(data, ({ nickname, building, household }) => {
-              _.map(nickname, (o) => {
-                newDirectoryEntries.push({
-                  id: o.hu_no,
-                  name: o.username,
-                  buildingId: building,
-                  unitId: household,
+          newUnit = {
+            id,
+            number,
+            tags: tags,
+            occupants: occs,
+            directoryEntries: [],
+          }
+        },
+        ({ message }) => handleError(message)
+      )
+      .then(
+        () => {
+          global.externalApi
+            .getDirectoryEntry(global.buildingNum, number)
+            .then((data) => {
+              _.map(data, ({ nickname, building, household }) => {
+                _.map(nickname, (nick) => {
+                  newDirectoryEntries.push({
+                    id: nick.hu_no,
+                    name: Boolean(nick.username)
+                      ? nick.username
+                      : "<empty_name>",
+                    buildingId: building,
+                    number: household,
+                  })
                 })
               })
+
+              newUnit.directoryEntries = newDirectoryEntries
+
+              setUnit(newUnit)
+
+              setEmptyOccupant({
+                id: 0,
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+                unitId: newUnit.id,
+              })
+
+              setEmptyDirectory({
+                id: 0,
+                name: "",
+                buildingId: global.buildingNum,
+                unitId: number,
+              })
             })
-
-            newUnit.directoryEntries = newDirectoryEntries
-
-            setUnit(newUnit)
-
-            setEmptyOccupant({
-              id: 0,
-              firstName: "",
-              lastName: "",
-              email: "",
-              phone: "",
-              unitId: newUnit.id,
-            })
-
-            setEmptyDirectory({
-              id: 0,
-              name: "",
-              buildingId: global.buildingNum,
-              unitId: number,
-            })
-          })
-      })
+        },
+        ({ message }) => handleError(message)
+      )
   }
 
   const getNotifications = (unitNum) => {
     if (!unitNum) unitNum = unit.number
 
-    global.externalApi
-      .getBuildingNotifications(global.buildingNum)
-      .then((data) => {
-        console.log(data)
+    global.externalApi.getBuildingNotifications(global.buildingNum).then(
+      (data) => {
         const notifications = _.map(
           data,
           ({
@@ -202,41 +207,36 @@ export default () => {
           }
         )
 
-        console.log(notifications)
-
         const unitNotifications = _.filter(notifications, (msg) =>
-          msg.allSentTo.includes(unitNum.replace("\r", ""))
+          msg.allSentTo.includes(unitNum)
         )
 
         setMessages(unitNotifications)
-      })
+      },
+      ({ message }) => handleError(message)
+    )
   }
 
   const getDirectoryEntity = (buildingId, unitId) => {
     let newDirectoryEntries = []
 
-    global.externalApi.getDirectoryEntry(buildingId, unitId).then((data) => {
-      _.map(data, ({ nickname }) => {
-        _.map(
-          nickname,
-          ({
-            hu_no: id,
-            username: name,
-            building: buildingId,
-            household: number,
-          }) => {
+    global.externalApi.getDirectoryEntry(buildingId, unitId).then(
+      (data) => {
+        _.map(data, ({ nickname, building: buildingId, household: number }) => {
+          _.map(nickname, ({ hu_no: id, username: name }) => {
             newDirectoryEntries.push({
               id,
               name,
               buildingId,
               number,
             })
-          }
-        )
-      })
+          })
+        })
 
-      setUnit((unit) => ({ ...unit, directoryEntries: newDirectoryEntries }))
-    })
+        setUnit((unit) => ({ ...unit, directoryEntries: newDirectoryEntries }))
+      },
+      ({ message }) => handleError(message)
+    )
   }
 
   const handleSearchChange = (selection) => {
@@ -251,20 +251,23 @@ export default () => {
   const handleOccupantAdd = (entity) => {
     if (entity.id > 0) global.internalApi.updateOccupant(entity)
     else
-      global.internalApi
-        .addOccupant(entity)
-        .then(() => getUnitById(entity.unitId))
-
-    console.log("occupant updated: ", entity)
+      global.internalApi.addOccupant(entity).then(
+        () => getUnitById(entity.unitId),
+        ({ message }) => handleError(message)
+      )
   }
 
-  const handleOccupantDelete = (entities) => {
-    _.each(entities, (entity) => {
-      global.internalApi.deleteOccupants(entity.id).then(() => {
-        getUnitByNumber(unit.number)
-      })
-    })
-  }
+  const handleOccupantDelete = (selection) =>
+    selection.length > 0
+      ? selection.forEach((id) =>
+          global.internalApi.deleteOccupants(id).then(
+            () => {
+              getUnitByNumber(unit.number)
+            },
+            ({ message }) => handleError(message)
+          )
+        )
+      : handleError("Nothing selected!")
 
   const formateName = (name) => name.trim().replace(/\s\s+/g, " ")
 
@@ -296,23 +299,24 @@ export default () => {
     return { valid: true, error: "" }
   }
 
-  // const handleDirectorySave = ({ buildingId, unitId, name, id: hu_no }) => {
-  //   const username = formateName(name)
+  const handleDirectorySave = ({ buildingId, unitId, name, id: hu_no }) => {
+    const username = formateName(name)
 
-  //   let result = isValueName(name)
+    let result = isValueName(name)
 
-  //   if (result.valid) {
-  //     const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
+    if (result.valid) {
+      const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, "''")
 
-  //     global.externalApi
-  //       .setDirectoryEntry(buildingId, unitId, dirName)
-  //       .then(() => {
-  //         getDirectoryEntity(buildingId, unitId)
-  //       })
-  //   } else getDirectoryEntity(buildingId, unitId)
+      global.externalApi.setDirectoryEntry(buildingId, unitId, dirName).then(
+        () => {
+          getDirectoryEntity(buildingId, unitId)
+        },
+        ({ message }) => handleError(message)
+      )
+    } else getDirectoryEntity(buildingId, unitId)
 
-  //   return result.error
-  // }
+    return result.error
+  }
 
   const handleDirectoryAdd = ({ buildingId, unitId, name, id: hu_no }) => {
     const username = formateName(name)
@@ -322,53 +326,56 @@ export default () => {
     if (result.valid) {
       const dirName = JSON.stringify([{ hu_no, username }]).replace(/'/g, '"')
 
-      console.log(dirName)
-      global.externalApi
-        .addDirectoryEntry(buildingId, unitId, dirName)
-        .then(() => {
+      global.externalApi.addDirectoryEntry(buildingId, unitId, dirName).then(
+        () => {
           getDirectoryEntity(buildingId, unitId)
-        })
+        },
+        ({ message }) => handleError(message)
+      )
     } else getDirectoryEntity(buildingId, unitId)
 
-    // return result.error
+    return handleError(result.error)
   }
 
-  const handleDirectoryDelete = (entities) => {
-    const name = []
-    let newBuildingId = ""
-    let newUnitId = ""
+  const handleDirectoryDelete = (selection) =>
+    Boolean(selection.length)
+      ? selection.forEach((dirId) => {
+          const {
+            buildingId,
+            number,
+            id: hu_no,
+            name: username,
+          } = unit.directoryEntries.find(({ id }) => id === dirId)
 
-    _.each(entities, ({ buildingId, unitId, id: hu_no }) => {
-      newBuildingId = buildingId
-      newUnitId = unitId
+          const dirName = JSON.stringify([{ hu_no, username }]).replace(
+            /'/g,
+            '"'
+          )
 
-      name.push({ hu_no })
-    })
-
-    const dirName = JSON.stringify(name).replace(/'/g, "''")
-
-    console.log("deleting ", newBuildingId, newUnitId, name)
-
-    global.externalApi
-      .deleteDirectoryEntry(newBuildingId, newUnitId, dirName)
-      .then(() => {
-        getDirectoryEntity(newBuildingId, newUnitId)
-      })
-  }
+          global.externalApi
+            .deleteDirectoryEntry(buildingId, number, dirName)
+            .then(
+              () => {
+                getDirectoryEntity(buildingId, number)
+              },
+              ({ message }) => handleError(message)
+            )
+        })
+      : handleError("Nothing selected!")
 
   const handleAddTag = () =>
-    global.internalApi.getExistBuildingTags(global.buildingId).then((data) => {
-      let tags = data
+    global.internalApi.getExistBuildingTags(global.buildingId).then(
+      (data) => {
+        let tags = data
 
-      console.log(data)
-      tags = data.filter((tag) => !unit.tags.some((val) => val.tag === tag))
+        tags = data.filter((tag) => !unit.tags.some((val) => val.tag === tag))
 
-      console.log(tags)
-
-      setShowNewTag((showNewTag) => !showNewTag)
-      setNewTagValue("")
-      setTagList(tags)
-    })
+        setShowNewTag((showNewTag) => !showNewTag)
+        setNewTagValue("")
+        setTagList(tags)
+      },
+      ({ message }) => handleError(message)
+    )
 
   const handleNewTagValueChange = (event, value) =>
     setNewTagValue(_.capitalize(value))
@@ -381,7 +388,7 @@ export default () => {
     let exist = unit.tags.some((val) => val.tag === newTagValue)
 
     if (exist) {
-      handleOpenAlert("The Same Tag Cannot be Added Twice.")
+      handleError("The Same Tag Cannot be Added Twice.")
       return
     }
 
@@ -390,60 +397,49 @@ export default () => {
       PropertyId: unit.id,
     }
 
-    global.internalApi.saveTag(newTag).then(({ id, tag, PropertyId }) => {
-      const addedTag = {
-        id,
-        tag,
-        PropertyId,
-      }
+    global.internalApi.saveTag(newTag).then(
+      ({ id, tag, PropertyId }) => {
+        const addedTag = {
+          id,
+          tag,
+          PropertyId,
+        }
 
-      setUnit((unit) =>
-        _.assign(unit, {
-          tags: unit.tags.concat(addedTag),
-        })
-      )
+        setUnit((unit) =>
+          _.assign(unit, {
+            tags: unit.tags.concat(addedTag),
+          })
+        )
 
-      setShowNewTag(false)
-    })
+        setShowNewTag(false)
+      },
+      ({ message }) => handleError(message)
+    )
   }
 
   const handleRemoveTag = (tag) =>
-    global.internalApi.deleteTag(tag).then(() => {
-      setUnit((unit) =>
-        _.assign(unit, {
-          tags: _.without(unit.tags, tag),
-        })
-      )
+    global.internalApi.deleteTag(tag).then(
+      () => {
+        setShowNewTag(false)
 
-      setShowNewTag(false)
-    })
+        setUnit((unit) => ({
+          ...unit,
+          tags: _.without(unit.tags, tag),
+        }))
+      },
+      ({ message }) => handleError(message)
+    )
 
   const handleMessageDelete = ({ id }) =>
-    global.externalApi.deleteNotification(id).then(() => {
-      getNotifications(unit.number)
-    })
-
-  const actions = [
-    <Button key="ok" label="OK" primary={true} onClick={handleCloseAlert} />,
-  ]
+    global.externalApi.deleteNotification(id).then(
+      () => {
+        getNotifications(unit.number)
+      },
+      ({ message }) => handleError(message)
+    )
 
   return (
-    <Grid
-      container
-      style={{
-        width: "auto",
-        minHeight: "100%",
-        minWidth: 1070,
-        flexGrow: 1,
-        margin: 0,
-        padding: spacings.large,
-        textAlign: "left",
-      }}
-      alignItems="flex-start"
-      alignContent="flex-start"
-      justify="flex-start"
-      spacing={5}
-    >
+    <PageContainer>
       <Grid item container xs={showSuite ? 7 : 12}>
         <Grid
           item
@@ -471,7 +467,11 @@ export default () => {
           <Grid
             item
             xs={4}
-            style={{ minWidth: 150, marginBottom: spacings.xxLarge }}
+            style={{
+              minWidth: 150,
+              marginBottom: spacings.medium,
+              marginTop: showSuite ? 0 : spacings.medium,
+            }}
           >
             <AutoCompleteSearch
               addressOptions={addressOptions}
@@ -482,7 +482,7 @@ export default () => {
 
           {!showSuite && (
             <Grid item xs={12}>
-              <span style={{ fontSize: "1.3rem" }}>
+              <span style={{ fontSize: 24 }}>
                 Please select <strong>a suite</strong>
               </span>
             </Grid>
@@ -524,7 +524,13 @@ export default () => {
               ))}
 
               {showNewTag && (
-                <Grid item container style={{ width: "auto" }}>
+                <Grid
+                  item
+                  container
+                  style={{
+                    width: "auto",
+                  }}
+                >
                   <Autocomplete
                     ListboxProps={{
                       style: { maxHeight: 200, overflow: "auto" },
@@ -582,7 +588,7 @@ export default () => {
 
         {showSuite && (
           <Fragment>
-            <Grid item xs={12} style={{ marginBottom: spacings.xLarge }}>
+            <Grid item xs={12} style={{ marginBottom: spacings.medium }}>
               <EntityCrudSummaryCard
                 searchHintText="First / last name"
                 searchType="occupants"
@@ -602,7 +608,7 @@ export default () => {
                 ]}
                 entities={unit.occupants}
                 emptyEntity={emptyOccupant}
-                // onEntitySave={handleOccupantAdd}
+                onEntitySave={handleOccupantAdd}
                 onEntityAdd={handleOccupantAdd}
                 onEntitiesDelete={handleOccupantDelete}
               />
@@ -618,7 +624,7 @@ export default () => {
                 entitySchema={[{ label: "name", name: "name", type: "text" }]}
                 entities={unit.directoryEntries}
                 emptyEntity={emptyDirectory}
-                // onEntitySave={handleDirectorySave}
+                onEntitySave={handleDirectorySave}
                 onEntityAdd={handleDirectoryAdd}
                 onEntitiesDelete={handleDirectoryDelete}
                 disableAdd={
@@ -626,15 +632,6 @@ export default () => {
                 }
               />
             </Grid>
-
-            <Dialog
-              actions={actions}
-              modal={true}
-              open={openAlert}
-              onRequestClose={handleCloseAlert}
-            >
-              {alertMessage}
-            </Dialog>
           </Fragment>
         )}
       </Grid>
@@ -646,6 +643,6 @@ export default () => {
           </Grid>
         </Grid>
       )}
-    </Grid>
+    </PageContainer>
   )
-}
+})

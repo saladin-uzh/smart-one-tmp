@@ -98,7 +98,7 @@ const SmartOneTheme = createMuiTheme({
         padding: spacings.large,
 
         "& .MuiCardContent-root": {
-          padding: `${spacings.xxLarge} ${spacings.small}`,
+          padding: spacings.small,
         },
 
         "& .MuiCardActions-root": {

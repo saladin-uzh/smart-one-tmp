@@ -1,7 +1,7 @@
 import AutoCompleteSearch from "./AutoCompleteSearch"
 import AutoCompleteToAddress from "./AutoCompleteToAddress"
 import ChangePasswordForm from "./ChangePasswordForm"
-import CommunityConfiguration from "./CommunityConfiguration"
+import BuildingConfig from "./BuildingConfig"
 import ComposeMessageDialog from "./ComposeMessageDialog"
 import Directory from "./Directory"
 import EntityCrudEditDialog from "./EntityCrudEditDialog"
@@ -23,7 +23,7 @@ export {
   AutoCompleteSearch,
   AutoCompleteToAddress,
   ChangePasswordForm,
-  CommunityConfiguration,
+  BuildingConfig,
   ComposeMessageDialog,
   Directory,
   EntityCrudEditDialog,

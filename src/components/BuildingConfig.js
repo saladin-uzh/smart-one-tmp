@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react"
 import { Grid } from "@material-ui/core"
 
 import { EntityCrudSummaryCard } from "."
+import { HomeRounded } from "@material-ui/icons"
+import { IconDirectories, PageContainer } from "../ui"
 
 export default () => {
   const [units, setUnits] = useState([])
@@ -36,15 +38,15 @@ export default () => {
     })
 
   const getunitId = (number) => {
-    const o = _.filter(units, (o) => o.number === number)
+    const index = units.findIndex((val) => val.number === number)
 
-    return o.length > 0 ? o[0].id : null
+    return units[index >= 0 ? index : 0].id
   }
 
-  const getunitNumber = (unitId) => {
-    const o = _.filter(units, (o) => o.id === unitId)
+  const getunitNumber = (id) => {
+    const index = units.findIndex((val) => val.id === id)
 
-    return o.length > 0 ? o[0].number : null
+    return index >= 0 ? units[index].number : ""
   }
 
   const getUnitById = (unitId) => {
@@ -243,12 +245,26 @@ export default () => {
     getDirectoryEntity()
   }, [])
 
+  useEffect(() => {
+    console.log(
+      "units: ",
+      units,
+      "occupants: ",
+      occupants,
+      "dirs: ",
+      directoryEntries
+    )
+  }, [units, occupants, directoryEntries])
+
   return (
-    <Grid container>
+    <PageContainer>
       <Grid item xs={6}>
         <EntityCrudSummaryCard
           searchHintText="Suite number, first / last name"
+          searchType="occupants"
           entityName="Suite Occupants"
+          NewEntityLable="New Occupant"
+          icon={HomeRounded}
           entityProperties={[
             { label: "number", name: "number" },
             { label: "first name", name: "firstName" },
@@ -271,7 +287,9 @@ export default () => {
       <Grid item xs={6}>
         <EntityCrudSummaryCard
           searchHintText="Suite number, name"
+          searchType="dir"
           entityName="Directory Entries"
+          icon={IconDirectories}
           entityProperties={[
             { label: "Number", name: "number" },
             { label: "Name", name: "name" },
@@ -287,6 +305,6 @@ export default () => {
           onEntitiesDelete={handleDirectoryDelete}
         />
       </Grid>
-    </Grid>
+    </PageContainer>
   )
 }

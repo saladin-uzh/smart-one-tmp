@@ -9,7 +9,7 @@ import {
 import { CognitoState, NewPasswordRequired, PasswordReset } from "react-cognito"
 
 import {
-  CommunityConfiguration,
+  BuildingConfig,
   Ownership,
   Directory,
   Notifications,
@@ -49,16 +49,18 @@ const mainPage = ({ dispatch }) => (
         />
 
         <Route
+          exact
           path="/notifications"
           component={Notifications}
           key="2oL0oXDHj"
         />
 
-        <Route path="/directory" component={Directory} key="RzolOPipG" />
+        <Route exact path="/directory" component={Directory} key="RzolOPipG" />
 
         <Route
-          path="/community"
-          component={CommunityConfiguration}
+          exact
+          path="/building-config"
+          component={BuildingConfig}
           key="NVbTlV54J"
         />
 
@@ -68,6 +70,10 @@ const mainPage = ({ dispatch }) => (
           <PasswordReset>
             <ChangePasswordForm dispatch={dispatch} />
           </PasswordReset>
+        </Route>
+
+        <Route>
+          <Redirect to="/" key="oyHoAjSpm" />
         </Route>
       </Switch>
     </div>

@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { changePassword } from "react-cognito"
-  
+
 import { Button, Grid, Paper } from "@material-ui/core"
 
 import { rememberMeAction } from "../store/login"
@@ -33,12 +33,15 @@ export default ({ user, dispatch, rememberMe }) => {
 
   const onShowLogin = () => dispatch(rememberMeAction.set(rememberMe))
 
-  const changeOldPassword = (event) => setOldPassword(event.target.value)
+  const changeOldPassword = (value) => setOldPassword(value)
 
-  const changeNewPassword = (event) => setNewPassword(event.target.value)
+  const changeNewPassword = (value) => setNewPassword(value)
 
-  const changeConfirmPassword = (event) =>
-    setConfirmPassword(event.target.value)
+  const changeConfirmPassword = (value) => setConfirmPassword(value)
+
+  useEffect(() => {
+    dispatch(rememberMeAction.setChangePass(true))
+  }, [dispatch])
 
   return (
     <Grid container justify="center" alignItems="center">
@@ -73,7 +76,7 @@ export default ({ user, dispatch, rememberMe }) => {
               <Grid item xs={12}>
                 <TextFieldUI
                   type="password"
-                  value={newPassword}
+                  value={confirmPassword}
                   onChange={changeConfirmPassword}
                   label="Confirmation Password"
                   error={Boolean(error)}

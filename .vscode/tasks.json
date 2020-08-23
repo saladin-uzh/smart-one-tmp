@@ -13,15 +13,13 @@
         }
       },
       "runOptions": {
-        "runOn": "folderOpen",
-        "reevaluateOnRerun": false
+        "runOn": "folderOpen"
       },
       "presentation": {
-        "echo": true,
-        "reveal": "silent",
+        "reveal": "always",
         "revealProblems": "onProblem",
         "focus": true,
-        "panel": "dedicated",
+        "panel": "new",
         "showReuseMessage": false,
         "clear": true
       }

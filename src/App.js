@@ -35,16 +35,10 @@ const newPasswordPage = () => (
   </NewPasswordRequired>
 )
 
-const changePasswordPage = (props) => (
-  <PasswordReset>
-    <ChangePasswordForm {...props} />
-  </PasswordReset>
-)
-
 const mainPage = ({ dispatch }) => (
   <Router>
     <div style={{ display: "flex", width: "100%", minHeight: "100%" }}>
-      <SidebarNav dispatch={dispatch} />
+      <SidebarNav />
       <Switch>
         <Redirect exact from="/" to="/directory" key="zCgA74SIB" />
         <Redirect
@@ -70,11 +64,11 @@ const mainPage = ({ dispatch }) => (
 
         <Route path="/ownership/:tab" component={Ownership} key="PEKIP7dfZ" />
 
-        <Route
-          path="/change-password"
-          component={ChangePasswordForm}
-          key="oyQyDOVSA"
-        />
+        <Route path="/change-password" key="oyQyDOVSA">
+          <PasswordReset>
+            <ChangePasswordForm dispatch={dispatch} />
+          </PasswordReset>
+        </Route>
       </Switch>
     </div>
   </Router>
@@ -82,24 +76,22 @@ const mainPage = ({ dispatch }) => (
 
 const App = (props) => {
   const getPage = () => {
-    // const { state, userLogin, rememberMe, changePass } = props
+    const { state, userLogin, rememberMe, changePass } = props
 
-    return mainPage(props)
+    // return mainPage(props)
 
-    // switch (state) {
-    //   case CognitoState.AUTHENTICATED:
-    //   case CognitoState.LOGGING_IN:
-    //   case CognitoState.LOGGED_IN:
-    //     if (userLogin || rememberMe) {
-    //       if (changePass) return changePasswordPage(props)
-    //       return mainPage(props)
-    //     }
-    //     return loginPage(props)
-    //   case CognitoState.NEW_PASSWORD_REQUIRED:
-    //     return newPasswordPage()
-    //   default:
-    //     return loginPage(props)
-    // }
+    switch (state) {
+      case CognitoState.AUTHENTICATED:
+        return mainPage(props)
+      case CognitoState.LOGGING_IN:
+      case CognitoState.LOGGED_IN:
+        if (userLogin || rememberMe || changePass) return mainPage(props)
+        return loginPage(props)
+      case CognitoState.NEW_PASSWORD_REQUIRED:
+        return newPasswordPage()
+      default:
+        return loginPage(props)
+    }
   }
 
   return <GlobalStylesProvider>{getPage()}</GlobalStylesProvider>

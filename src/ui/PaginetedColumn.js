@@ -26,7 +26,7 @@ export default withStyles({
 
   useEffect(() => {
     onChange(entities[current])
-  }, [current])
+  }, [current, entities, onChange])
 
   const handleNextClick = () =>
     setCurrent((current) => (current === entities.length - 1 ? 0 : ++current))

@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect } from "react"
+import React, { useState, Fragment } from "react"
 
 import {
   Dialog,
@@ -10,8 +10,6 @@ import {
   DialogContent,
 } from "@material-ui/core"
 import { Add as ContentAdd } from "@material-ui/icons"
-
-import useForceUpdate from "../utils/useForceUpdate"
 
 import { AutoCompleteToAddress } from "."
 

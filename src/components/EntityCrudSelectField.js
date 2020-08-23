@@ -1,7 +1,7 @@
 import _ from "lodash"
 import React from "react"
 
-import { MenuItem, TextField } from "@material-ui/core"
+import { MenuItem } from "@material-ui/core"
 import { TextFieldUI } from "../ui"
 
 export default ({ value, label, handleChange, optionValues }) => {

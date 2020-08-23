@@ -1,5 +1,5 @@
 import _ from "lodash"
-import React, { useEffect, useState, Fragment } from "react"
+import React, { useEffect, useState, Fragment, useCallback } from "react"
 import MomentUtils from "@date-io/moment"
 import moment from "moment"
 
@@ -7,7 +7,6 @@ import {
   Grid,
   Dialog,
   Button,
-  TextField,
   Card,
   CardActions,
   CardHeader,
@@ -27,7 +26,6 @@ import { HouseRounded, PeopleRounded } from "@material-ui/icons"
 import { spacings, radii, colors } from "../constants"
 import { TextFieldUI, CardTilte, TabLink } from "../ui"
 import { useRouteMatch } from "react-router-dom/cjs/react-router-dom.min"
-import { NavLink } from "react-router-dom"
 
 export default () => {
   const [ownership, setOwnership] = useState({
@@ -56,21 +54,50 @@ export default () => {
     params: { tab: currentTab },
   } = useRouteMatch()
 
+  const getUnits = useCallback(
+    (newBuildingId = global.buildingId) => {
+      if (buildingId !== newBuildingId) {
+        setBuildingId(newBuildingId)
+      }
+
+      global.internalApi.getBuildingUnits(newBuildingId).then((data) => {
+        const newUnits = _.map(data, ({ id, commaxId: number }) => ({
+          id,
+          number,
+        }))
+
+        console.warn(newUnits)
+
+        setUnits(newUnits)
+
+        const options = _.map(
+          _.sortBy(newUnits, ["number"]),
+          ({ number }) => number
+        )
+
+        console.log("options: ", options)
+
+        setAddressOptions(options)
+      })
+    },
+    [buildingId]
+  )
+
   useEffect(() => {
     getOwnershipTypes()
     getOwnershipPersonTypes()
     getUnits()
-  }, [])
+  }, [getUnits])
 
-  useEffect(() => {
-    console.group("Component did mount:")
-    console.log("Units: ", units)
-    console.log("Ownership: ", ownership)
-    console.log("Ownership types: ", ownershipTypes)
-    console.log("Ownership person types: ", ownershipPersonTypes)
-    console.log("Ownership props: ", ownershipProperties)
-    console.groupEnd()
-  }, [units, ownershipTypes, ownershipPersonTypes, ownershipProperties])
+  // useEffect(() => {
+  //   console.group("Component did mount:")
+  //   console.log("Units: ", units)
+  //   console.log("Ownership: ", ownership)
+  //   console.log("Ownership types: ", ownershipTypes)
+  //   console.log("Ownership person types: ", ownershipPersonTypes)
+  //   console.log("Ownership props: ", ownershipProperties)
+  //   console.groupEnd()
+  // }, [units, ownershipTypes, ownershipPersonTypes, ownershipProperties])
 
   const handleOpen = () => setOpen(true)
 
@@ -95,32 +122,6 @@ export default () => {
 
       setOwnershipPersonTypes(types)
     })
-
-  const getUnits = (newBuildingId = global.buildingId) => {
-    if (buildingId !== newBuildingId) {
-      setBuildingId(newBuildingId)
-    }
-
-    global.internalApi.getBuildingUnits(newBuildingId).then((data) => {
-      const newUnits = _.map(data, ({ id, commaxId: number }) => ({
-        id,
-        number,
-      }))
-
-      console.warn(newUnits)
-
-      setUnits(newUnits)
-
-      const options = _.map(
-        _.sortBy(newUnits, ["number"]),
-        ({ number }) => number
-      )
-
-      console.log("options: ", options)
-
-      setAddressOptions(options)
-    })
-  }
 
   const getunitId = (number) => {
     const index = units.findIndex((val) => val.number === number)

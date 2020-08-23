@@ -33,9 +33,9 @@ export default ({
     })
   }
 
-  const changeUsername = (event) => setUsernameInput(event.target.value)
+  const changeUsername = (value) => setUsernameInput(value)
 
-  const changePassword = (event) => setPassword(event.target.value)
+  const changePassword = (value) => setPassword(value)
 
   // const changeRememberMe = (event, checked) => setRememberMeInput(checked)
 

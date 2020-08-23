@@ -13,7 +13,7 @@ export default ({ handleAddressUpdate, addressOptions }) => {
 
   useEffect(() => {
     handleAddressUpdate(selectedChips)
-  }, [selectedChips])
+  }, [selectedChips, handleAddressUpdate])
 
   const filterOptions = createFilterOptions({
     stringify: (option) => `Suite ${option}`,

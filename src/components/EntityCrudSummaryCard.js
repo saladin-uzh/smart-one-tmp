@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core"
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from "."
-import { colors, spacings, radii } from "../constants"
+import { colors, radii } from "../constants"
 import { CardTilte, PaginatedColumn } from "../ui"
 
 export default ({
@@ -69,7 +69,7 @@ export default ({
       setIsSomeSelected(false)
       setIsAllSelected(false)
     }
-  }, [selectedEntities])
+  }, [selectedEntities, entities.length])
 
   // const handleEntitySave = (entity) => {
   //   var value = onEntitySave(entity)

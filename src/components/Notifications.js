@@ -2,7 +2,7 @@ import _ from "lodash"
 import React, { useState, useEffect } from "react"
 import moment from "moment"
 
-import { Grid, Card } from "@material-ui/core"
+import { Grid } from "@material-ui/core"
 
 import { MessageList, ComposeMessageDialog } from "."
 import { spacings } from "../constants"

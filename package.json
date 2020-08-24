@@ -20,11 +20,13 @@
     "react-redux": "^5.0.7",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
+    "react-virtualized": "^9.22.2",
     "redux": "^4.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && surge ./build/",
+    "build": "react-scripts build",
+    "build:preview": "react-scripts build && surge ./build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
@@ -41,5 +43,17 @@
     ]
   },
   "homepage": "http://smart-one.surge.sh",
-  "icon": "./public/favicon.ico"
+  "icon": "./public/favicon.ico",
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frontexpert/pm-app.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frontexpert/pm-app/issues"
+  }
 }

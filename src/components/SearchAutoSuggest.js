@@ -63,7 +63,6 @@ export default ({ type, options, label, onSearchChange }) => {
     <Autocomplete
       value={selected}
       onChange={handleSelection}
-      freeSolo
       options={options}
       getOptionLabel={getOptionLabel}
       filterOptions={filterOptions[type]}

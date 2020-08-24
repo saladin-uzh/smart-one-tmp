@@ -6,8 +6,6 @@ import { colors, spacings, radii } from "./constants"
 
 import AvenirTtf from "./fonts/AvenirLT-Book.ttf"
 
-const tableBodyBorder = `1px solid ${colors.main}`
-
 const SmartOneTheme = createMuiTheme({
   overrides: {
     MuiCssBaseline: {
@@ -99,6 +97,8 @@ const SmartOneTheme = createMuiTheme({
 
         "& .MuiCardContent-root": {
           padding: spacings.small,
+          height: "auto",
+          width: "auto",
         },
 
         "& .MuiCardActions-root": {
@@ -110,51 +110,19 @@ const SmartOneTheme = createMuiTheme({
       root: {
         color: colors.main,
       },
-    },
-    MuiTable: {
-      root: {
-        borderCollapse: "separate",
+      // content: {
+      //   flexGrow: 0,
+      // },
+      action: {
+        marginLeft: "auto",
       },
     },
-    MuiTableBody: {
+    MuiTableCell: {
       root: {
-        "& .MuiTableRow-root": {
-          "&:first-child .MuiTableCell-root": {
-            borderTop: tableBodyBorder,
-          },
-          "&:last-child .MuiTableCell-root": {
-            borderBottom: tableBodyBorder,
-          },
-        },
-        "& .MuiTableCell-root": {
-          borderBottom: 0,
-          "&:first-child": {
-            borderLeft: tableBodyBorder,
-            borderLeftStyle: "double",
-            borderLeftWidth: 1,
-          },
-          "&:last-child": {
-            borderRight: tableBodyBorder,
-          },
-        },
-        "& .MuiTableRow-head": {
-          "& .MuiTableCell-root": {
-            border: 0,
-          },
-        },
+        padding: `${spacings.small}`,
       },
-    },
-    MuiTableRow: {
-      root: {
-        "&:not(.MuiTableRow-head)": {
-          cursor: "pointer",
-          "&:hover": {
-            backgroundColor: colors.mainFaded,
-          },
-          "&$selected": {
-            backgroundColor: colors.mainFaded,
-          },
-        },
+      paddingCheckbox: {
+        padding: `7px ${spacings.xxSmall} 8px ${spacings.small} !important`,
       },
     },
     MuiCheckbox: {
@@ -209,6 +177,7 @@ const SmartOneTheme = createMuiTheme({
     },
     primary: {
       main: colors.main,
+      light: colors.mainFaded,
     },
     secondary: {
       main: colors.main,

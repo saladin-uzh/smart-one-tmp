@@ -6,20 +6,14 @@ import {
   CardActions,
   CardContent,
   Button,
-  Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
   Grid,
   CardHeader,
-  TableContainer,
   Checkbox,
 } from "@material-ui/core"
 
 import { EntityCrudEditDialog, SearchAutoSuggest } from "."
 import { colors, radii } from "../constants"
-import { CardTilte, PaginatedColumn } from "../ui"
+import { CardTilte, PaginatedColumn, VirtualizedTable } from "../ui"
 
 export default ({
   entities,
@@ -47,9 +41,7 @@ export default ({
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [isAllSelected, setIsAllSelected] = useState(false)
   const [isSomeSelected, setIsSomeSelected] = useState(false)
-  const [currentTablePage, setCurrentTablePage] = useState(
-    entityProperties[0].name
-  )
+  const [currentTablePage, setCurrentTablePage] = useState("")
 
   useEffect(() => {
     setFilteredEntities(entities)
@@ -98,7 +90,7 @@ export default ({
     else setFilteredEntities(entities)
   }
 
-  const handleRowClick = (event, entityId) => {
+  const handleRowClick = (entityId) => {
     if (selectedEntities.includes(entityId))
       setSelectedEntities((selectedEntities) =>
         _.without(selectedEntities, entityId)
@@ -144,6 +136,72 @@ export default ({
         />
 
         <CardContent>
+          <VirtualizedTable
+            onRowClick={handleRowClick}
+            columns={[
+              {
+                label: (
+                  <Checkbox
+                    indeterminate={isSomeSelected}
+                    checked={isAllSelected}
+                    onChange={handleSelectAll}
+                    color="primary"
+                  />
+                ),
+                dataKey: "selectAll",
+              },
+              ...(entityProperties.length <= 5
+                ? _.map(entityProperties, ({ label, name }) => ({
+                    label: _.capitalize(label),
+                    dataKey: name,
+                  }))
+                : [
+                    ...entityProperties.slice(0, 4).map(({ label, name }) => ({
+                      label: _.capitalize(label),
+                      dataKey: name,
+                    })),
+                    {
+                      label: (
+                        <PaginatedColumn
+                          entities={entityProperties
+                            .slice(4)
+                            .map(({ label }) => label)}
+                          onChange={handleTablePageChange}
+                        />
+                      ),
+                      dataKey: currentTablePage,
+                    },
+                  ]),
+            ]}
+            rows={_.map(filteredEntities, (entity) => {
+              const isItemSelected = isSelected(entity.id)
+
+              const cells =
+                entityProperties.length <= 5
+                  ? _.fromPairs(
+                      _.map(entityProperties, ({ name }) => [
+                        name,
+                        entity[name],
+                      ])
+                    )
+                  : {
+                      ..._.fromPairs(
+                        entityProperties
+                          .slice(0, 4)
+                          .map(({ name }) => [name, entity[name]])
+                      ),
+                      [currentTablePage]: entity[currentTablePage],
+                    }
+
+              return {
+                id: entity.id,
+                isItemSelected,
+                selectAll: <Checkbox checked={isItemSelected} />,
+                ...cells,
+              }
+            })}
+          />
+          {/* 
           <TableContainer>
             <Table>
               <TableHead>
@@ -231,7 +289,7 @@ export default ({
                 })}
               </TableBody>
             </Table>
-          </TableContainer>
+          </TableContainer> */}
         </CardContent>
 
         <CardActions>

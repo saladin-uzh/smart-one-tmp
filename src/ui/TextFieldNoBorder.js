@@ -6,6 +6,8 @@ import { colors, radii, spacings } from "../constants"
 const useStyles = makeStyles(({ palette }) => ({
   noBorder: {
     minWidth: 150,
+    maxWidth: 200,
+    marginLeft: "auto",
     backgroundColor: ({ bg }) => bg,
     borderRadius: radii.border,
     paddingTop: ({ isTiny }) => (isTiny ? 0 : spacings.xxSmall),

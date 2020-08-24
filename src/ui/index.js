@@ -10,6 +10,7 @@ import TabLink from "./TabLink"
 import PaginatedColumn from "./PaginetedColumn"
 import PageContainer from "./PageContainer"
 import AddressChip from "./AddressChip"
+import VirtualizedTable from "./VirtualizedTable"
 
 export {
   TextFieldUI,
@@ -24,4 +25,5 @@ export {
   PaginatedColumn,
   PageContainer,
   AddressChip,
+  VirtualizedTable,
 }

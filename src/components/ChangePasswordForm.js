@@ -45,11 +45,27 @@ export default ({ user, dispatch, rememberMe }) => {
 
   return (
     <Grid container justify="center" alignItems="center">
-      <Paper style={{ padding: spacings.large, width: "auto" }}>
-        <form onSubmit={onSubmit} style={{ maxWidth: 420 }}>
-          <Grid container spacing={5}>
-            <Grid container item spacing={5}>
-              <Grid item xs={12}>
+      <Paper style={{ padding: spacings.xxLarge, width: "auto" }}>
+        <form
+          onSubmit={onSubmit}
+          style={{
+            maxWidth: 500,
+            padding: spacings.xxLarge,
+          }}
+        >
+          <Grid
+            container
+            spacing={5}
+            xs={12}
+            style={{ margin: 0, paddingTop: spacings.xLarge }}
+          >
+            <Grid
+              container
+              item
+              spacing={6}
+              style={{ marginBottom: spacings.medium }}
+            >
+              <Grid item xs={12} style={{ marginBottom: spacings.medium }}>
                 <TextFieldUI
                   value={oldPassword}
                   onChange={changeOldPassword}
@@ -59,7 +75,7 @@ export default ({ user, dispatch, rememberMe }) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{ marginBottom: spacings.medium }}>
                 <TextFieldUI
                   type="password"
                   value={newPassword}
@@ -70,7 +86,7 @@ export default ({ user, dispatch, rememberMe }) => {
                   required
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{ marginBottom: spacings.xSmall }}>
                 <TextFieldUI
                   type="password"
                   value={confirmPassword}
